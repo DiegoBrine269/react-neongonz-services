@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+
+body {
+  font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer components {
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="password"],
+    input[type="search"],
+    input[type="date"],
+
+    input[type="tel"],
+    input[type="url"], textarea, select {
+        @apply block w-full rounded-md border-0 p-2 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-500 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm bg-white
+            dark:bg-neutral-700 dark:text-slate-200 dark:ring-slate-600 dark:placeholder:text-slate-500 dark:focus:ring-blue-500;
+    }
+    
+    label {
+        @apply block text-sm leading-6 text-slate-900 first-letter:capitalize mt-2;
+    }
+
+    header {
+        @apply bg-slate-800 shadow-md;
+    }
+    nav {
+        @apply p-5 max-w-screen-lg mx-auto flex items-center justify-between;
+    }
+    main {
+        @apply max-w-screen-lg mx-auto;
+    }
+ 
+    .title-1 {
+        @apply text-3xl font-bold text-red-600 mb-4;
+    }
+
+    .title-2 {
+        @apply text-2xl font-bold text-red-600 mb-4;
+    }
+
+    .title-3 {
+        @apply text-xl font-bold text-red-600 mb-4;
+    }
+
+    .text {
+        @apply text-base font-normal text-slate-900 dark:text-slate-200;
+    }
+
+    .text-muted {
+        @apply text-sm font-normal text-slate-500 dark:text-slate-400;
+    }
+
+    .label {
+        @apply text-sm font-medium text-slate-900 dark:text-slate-200;
+    }
+
+    .btn {
+        @apply cursor-pointer my-4 block w-full md:w-auto items-center justify-center rounded-md border border-transparent bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600;
+    }
+
+    .btn-danger {
+        @apply cursor-pointer my-4 block w-full md:w-auto items-center justify-center rounded-md border border-transparent bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600;
+    }
+
+    .btn-secondary {
+        @apply cursor-pointer my-4 block w-full md:w-auto items-center justify-center rounded-md border border-transparent bg-slate-200 px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-slate-300 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600;
+    }
+    
+    .dark .tabulator {
+        @apply text-slate-200;
+    }
+
+    .dark .tabulator-col-content, .dark .tabulator-col, .dark .tabulator-cell, .dark .tabulator-headers, .dark .tabulator-header-contents,  .dark .tabulator-footer, .dark .tabulator-tableholder, .dark .tabulator-placeholder{
+        @apply !bg-neutral-800 text-slate-200;
+    }   
+
+    /* .tabulator-cell {
+        
+    } */
+    
+    .error {
+        @apply text-red-600 text-sm font-normal;
+    }
+}
+
+video {
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+}
+
+/* * {
+  pointer-events: auto !important;
+} */
