@@ -250,7 +250,7 @@ export default function Proyecto() {
             </div>
             <h3 className="title-3 mt-5 mb-2">Lista de vehículos</h3>
             <div className="flex gap-2 mt-0">
-                {proyecto?.is_open === 1 ? (
+                {proyecto?.is_open ? (
                     <button
                         className="btn mt-0"
                         onClick={() => {
@@ -266,7 +266,7 @@ export default function Proyecto() {
                     </p>
                 )}
 
-                {user?.role === "admin" && proyecto?.is_open === 1 && (
+                {user?.role === "admin" && proyecto?.is_open  && (
                     <button
                         className="btn-danger mt-0"
                         onClick={handleCerrarProyecto}
