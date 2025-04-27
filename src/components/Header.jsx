@@ -1,5 +1,5 @@
 
-import Logo from "../assets/logo.png";
+import Logo from "../assets/Logo.png";
 import LogoBlanco from "../assets/Logo-blanco.png";
 
 
