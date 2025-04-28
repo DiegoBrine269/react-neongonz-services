@@ -8,9 +8,12 @@ import { toast } from "react-toastify";
 
 export default function Centros() {
     const [centros, setCentros] = useState([]);
+    const [centro, setCentro] = useState({});
     const {token, setLoading} = useContext(AppContext);
 
-    const [isModalOpen, setModalOpen] = useState(false);
+    const [isModalCreateOpen, setModalCreateOpen] = useState(false);
+    const [isModalViewOpen, setModalViewOpen] = useState(false);
+
 
     const [formData, setFormData] = useState({
         name: "",
@@ -33,7 +36,7 @@ export default function Centros() {
             );
 
             fetchCentros();
-            setModalOpen(false);
+            setModalCreateOpen(false);
             toast.success("Centro de venta cargado correctamente");
             setFormData({
                 name: "",
@@ -89,7 +92,7 @@ export default function Centros() {
             <button
                 className="btn"
                 onClick={() => {
-                    setModalOpen(true);
+                    setModalCreateOpen(true);
                 }}
             >
                 Nuevo
@@ -102,11 +105,20 @@ export default function Centros() {
                     options={{
                         layout: "fitData",
                     }}
-
+                    events={{
+                        rowClick: (e, row) => {
+                            setModalViewOpen(true);
+                            const data = row.getData();
+                            setCentro(data);
+                        },
+                    }}
                 />
             </div>
 
-            <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
+            <Modal
+                isOpen={isModalCreateOpen}
+                onClose={() => setModalCreateOpen(false)}
+            >
                 <h2 className="title-3">Nuevo centro de ventas</h2>
 
                 <form action="">
@@ -142,9 +154,7 @@ export default function Centros() {
                         }
                     />
                     {errors.responsible && (
-                        <p className="text-red-500">
-                            {errors.responsible[0]}
-                        </p>
+                        <p className="text-red-500">{errors.responsible[0]}</p>
                     )}
 
                     <label className="label" htmlFor="location">
@@ -163,9 +173,7 @@ export default function Centros() {
                         }
                     />
                     {errors.location && (
-                        <p className="text-red-500">
-                            {errors.location[0]}
-                        </p>
+                        <p className="text-red-500">{errors.location[0]}</p>
                     )}
 
                     <input
@@ -175,6 +183,35 @@ export default function Centros() {
                         onClick={handleSubmit}
                     />
                 </form>
+            </Modal>
+
+            <Modal
+                isOpen={isModalViewOpen}
+                onClose={() => setModalViewOpen(false)}
+            >
+                <h2 className="title-3">Centro de ventas</h2>
+                <div className="flex flex-col gap-3 pl-2">
+                    <div className="text">
+                        <span className="font-bold border-b-1 block border-neutral-400">
+                            Nombre
+                        </span>{" "}
+                        <p>{centro?.name}</p>
+                    </div>
+
+                    <div className="text">
+                        <span className="font-bold border-b-1 block border-neutral-400">
+                            Responsable
+                        </span>{" "}
+                        <p>{centro?.responsible}</p>
+                    </div>
+
+                    <div className="text">
+                        <span className="font-bold border-b-1 block border-neutral-400">
+                            Ubicación
+                        </span>{" "}
+                        <p>{centro?.location}</p>
+                    </div>
+                </div>
             </Modal>
         </>
     );

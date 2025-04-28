@@ -281,7 +281,7 @@ export default function Proyecto() {
                     data={vehicles}
                     options={{
                         placeholder: "Sin resultados",
-                        layout: "fitDataStretch",
+                        layout: "fitData",
                         // resizableColumns: false,
                     }}
                     // layout={"fitData"}
@@ -460,23 +460,27 @@ export default function Proyecto() {
                 </div>
             </Modal>
 
-            <h3 className="title-3 mt-5 mb-2">Económicos en serie</h3>
-
-            <div className="relative">
-                <textarea
-                    ref={textAreaRef}
-                    className="mt-2"
-                    value={vehicles.map((v) => v.eco).join(", ")}
-                    // ref={(textarea) => (this.textArea = textarea)}
-                    readOnly
-                />
-                <button
-                    className="absolute top-1 right-2 bg-white border border-gray-300 rounded-md p-1"
-                    onClick={copyTextToClipboard}
-                >
-                    <ClipboardCopy className="text-gray-500" />
-                </button>
-            </div>
+                
+            {   user.is_admin &&
+                (<div>
+                    <h3 className="title-3 mt-5 mb-2">Económicos en serie</h3>
+                    <div className="relative">
+                        <textarea
+                            ref={textAreaRef}
+                            className="mt-2"
+                            value={vehicles.map((v) => v.eco).join(", ")}
+                            // ref={(textarea) => (this.textArea = textarea)}
+                            readOnly
+                        />
+                        <button
+                            className="absolute top-1 right-2 bg-white border border-gray-300 rounded-md p-1"
+                            onClick={copyTextToClipboard}
+                        >
+                            <ClipboardCopy className="text-gray-500" />
+                        </button>
+                    </div>
+                </div>)
+            }
         </div>
     );
 }
