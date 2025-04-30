@@ -159,7 +159,7 @@ export default function Proyectos() {
                     options={{
                         pagination: "local",
                         paginationSize: 20,
-
+                        resizableColumnFit: false,
                         layout: "fitDataStretch",
 
                         langs: {
@@ -226,7 +226,7 @@ export default function Proyectos() {
                             })
                         }
                     >
-                        <option  selected disabled>
+                        <option selected disabled>
                             Seleccione un servicio
                         </option>
                         {catalogoServicios.map((centro) => (

@@ -15,7 +15,7 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 export default function Proyecto() {
     const { id } = useParams();
     const [proyecto, setProyecto] = useState({});
-    const [vehicles, setVehicles] = useState([]);
+    const [vehiculos, setVehiculos] = useState([]);
     const [types, setTypes] = useState([]);
     const [isModalAgregarOpen, setModalAgregarOpen] = useState(false);
     const [isModalConsultarOpen, setModalConsultarOpen] = useState(false);
@@ -27,6 +27,7 @@ export default function Proyecto() {
     });
 
     const { token, setLoading, user } = useContext(AppContext);
+    console.log(user);
 
     const [escuchando, setEscuchando] = useState(false);
     const {
@@ -53,7 +54,7 @@ export default function Proyecto() {
                 },
             });
             setProyecto(res.data);
-            setVehicles(res.data.vehicles);
+            setVehiculos(res.data.vehicles);
         } catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Error al cargar el proyecto");
@@ -113,8 +114,21 @@ export default function Proyecto() {
     const handleEliminarVehiculo = async (e) => {
         e.preventDefault();
 
-        setLoading(true);
+        const result = await Swal.fire({
+            title: "¿Estás seguro de querer eliminar el vehículo del proyecto?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí, eliminar vehículo.",
+            cancelButtonText: "Cancelar",
+        });
 
+        if (!result.isConfirmed) {
+            return;
+        }
+
+        setLoading(true);
         try {
             const { data } = await clienteAxios.post(
                 `/api/projects/${id}/remove-vehicle`,
@@ -138,6 +152,7 @@ export default function Proyecto() {
         } finally {
             setLoading(false);
         }
+        
     };
 
     const handleCerrarProyecto = async (e) => {
@@ -145,8 +160,8 @@ export default function Proyecto() {
 
         const closeProject = async () => {
             const result = await Swal.fire({
-                title: "¿Está seguro de cerrar el proyecto?",
-                text: "No podrá agregar más vehículos al proyecto.",
+                title: "¿Estás seguro de querer cerrar el proyecto?",
+                text: "No podrás agregar más vehículos al proyecto.",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
@@ -230,12 +245,8 @@ export default function Proyecto() {
 
     return (
         <div className="relative">
-            <h2 className="title-2 mb-0">Proyecto</h2>
+            <h2 className="title-2 mb-0">Proyecto No. {proyecto?.id}</h2>
             <div className="pl-3">
-                <p className="text">
-                    <span className="font-bold">Número de proyecto:</span>{" "}
-                    {proyecto?.id}{" "}
-                </p>
                 <p className="text">
                     <span className="font-bold">Servicio:</span>{" "}
                     {proyecto?.service?.name}
@@ -278,7 +289,7 @@ export default function Proyecto() {
             <div className="overflow-x-scroll ">
                 <ReactTabulator
                     columns={columns}
-                    data={vehicles}
+                    data={vehiculos}
                     options={{
                         placeholder: "Sin resultados",
                         layout: "fitData",
@@ -442,7 +453,7 @@ export default function Proyecto() {
                     </div>
                 </div>
 
-                <div className="md:flex gap-2">
+                <div className="md:flex gap-1">
                     <button
                         className="btn-danger"
                         onClick={handleEliminarVehiculo}
@@ -461,14 +472,14 @@ export default function Proyecto() {
             </Modal>
 
                 
-            {   user.is_admin &&
+            {user?.role === 'admin'  && vehiculos.length > 0 &&
                 (<div>
-                    <h3 className="title-3 mt-5 mb-2">Económicos en serie</h3>
+                    <h3 className="title-3 mt-5 mb-2">Económicos en serie (para copiar y pegar)</h3>
                     <div className="relative">
                         <textarea
                             ref={textAreaRef}
                             className="mt-2"
-                            value={vehicles.map((v) => v.eco).join(", ")}
+                            value={vehiculos.map((v) => v.eco).join(", ")}
                             // ref={(textarea) => (this.textArea = textarea)}
                             readOnly
                         />
