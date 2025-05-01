@@ -72,9 +72,7 @@ export default function Proyecto() {
         } catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Error al cargar los tipos de vehículos");
-        } finally {
-            setLoading(false);
-        }
+        } 
     };
 
     const handleSubmit = async (e) => {

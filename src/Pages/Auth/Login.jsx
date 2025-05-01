@@ -2,9 +2,10 @@ import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../../context/AppContext";
 import clienteAxios from "../../config/axios";
+import { Link } from "react-router-dom";
 
 export default function Login() {
-    const { token, setToken, setLoading } = useContext(AppContext);
+    const { setToken, setLoading } = useContext(AppContext);
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -51,8 +52,9 @@ export default function Login() {
                         setFormData({ ...formData, email: e.target.value })
                     }
                 />
-                {errors.email && (<p className="text-red-500">{errors.email[0]}</p>)}
-
+                {errors.email && (
+                    <p className="text-red-500">{errors.email[0]}</p>
+                )}
 
                 <label className="label" htmlFor="password">
                     Contraseña
@@ -66,10 +68,18 @@ export default function Login() {
                         setFormData({ ...formData, password: e.target.value })
                     }
                 />
-                {errors.password && (<p className="text-red-500">{errors.password[0]}</p>)}
+                {errors.password && (
+                    <p className="text-red-500">{errors.password[0]}</p>
+                )}
 
+                <input
+                    className="btn"
+                    type="submit"
+                    value="Iniciar sesión"
+                    onClick={handleLogin}
+                />
 
-                <input className="btn" type="submit" value="Iniciar sesión" onClick={handleLogin}/>
+                <Link className="text-end block text-blue-500 underline" to="/olvide-mi-contrasena">Olvidé mi contraseña 😬</Link>
             </form>
         </>
     );

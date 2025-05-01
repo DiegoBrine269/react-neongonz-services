@@ -20,7 +20,7 @@ export default function Proyectos() {
     const [formData, setFormData] = useState({
         centre_id: "",
         service_id: "",
-        date: new Date().toISOString().split("T")[0],
+        date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0],
     });
 
     const [errors, setErrors] = useState({});

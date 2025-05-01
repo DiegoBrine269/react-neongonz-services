@@ -13,6 +13,8 @@ import Proyectos from "./Pages/Proyectos/Proyectos";
 import Proyecto from "./Pages/Proyectos/Proyecto";
 import "tabulator-tables/dist/css/tabulator_materialize.min.css";
 import Vehiculos from "./Pages/Vehiculos/Vehiculos";
+import MiCuenta from "./Pages/MiCuenta"
+import ForgotPassword from "./Pages/Auth/ForgotPassword";
 
 
 export default function App() {
@@ -31,6 +33,10 @@ export default function App() {
                         path="/login"
                         element={user ? <Home /> : <Login />}
                     />
+                    <Route
+                        path="/olvide-mi-contrasena"
+                        element={user ? <Home /> : <ForgotPassword />}
+                    />
                     {user?.is_active && (
                         <>
                             {user.role === 'admin' && (
@@ -44,7 +50,8 @@ export default function App() {
                             <Route path="/vehiculos" element={<Vehiculos />} />
                             <Route path="/proyectos" element={<Proyectos />} />
                             <Route path="/proyectos/:id" element={<Proyecto />} />
-
+                            <Route path="/mi-cuenta" element={<MiCuenta />} />
+                            
                         </>
                     )}
                     <Route
