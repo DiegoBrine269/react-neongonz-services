@@ -220,10 +220,14 @@ export default function Proyecto() {
     };
 
     useEffect(() => {
-        setLoading(true);
-        fetchProyecto();
-        fetchTypes();
-        setLoading(false);
+        const fetchData = async () => {
+            setLoading(true);
+            await fetchProyecto();
+            await fetchTypes();
+            setLoading(false);
+        };
+
+        fetchData();
     }, []);
 
     const columns = [

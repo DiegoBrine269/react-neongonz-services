@@ -23,15 +23,16 @@ export default function Login() {
             const { data } = await clienteAxios.post("/api/login", formData);
             localStorage.setItem("NEON_GONZ_TOKEN", data.token);
             setToken(data.token);
-            setLoading(false);
 
             navigate("/");
         } catch (error) {
-            setLoading(false);
             console.error("Error during request:", error);
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors);
             }
+        }
+        finally{
+            setLoading(false);
         }
     }
 

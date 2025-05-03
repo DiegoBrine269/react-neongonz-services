@@ -112,11 +112,17 @@ export default function Proyectos() {
     };
 
     useEffect(() => {
-        setLoading(true);
-        fetchProyectos();
-        fetchCentros();
-        fetchCatalogoServicios();        
-        setLoading(false);
+        const fetchData = async () => {
+            setLoading(true);
+            await Promise.all([
+                fetchProyectos(),
+                fetchCentros(),
+                fetchCatalogoServicios(),
+            ]);
+            setLoading(false);
+        };
+
+        fetchData();
     }, []);
 
     const columns = [

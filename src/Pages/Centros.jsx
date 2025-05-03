@@ -75,9 +75,13 @@ export default function Centros() {
 
     // Consultar todas las agencias  al cargar el componente
     useEffect(() => {
-        setLoading(true);
-        fetchCentros();
-        setLoading(false);
+        const fetchData = async () => {
+            setLoading(true);
+            await fetchCentros();
+            setLoading(false);
+        };
+
+        fetchData();
     }, []);
 
     const columns = [

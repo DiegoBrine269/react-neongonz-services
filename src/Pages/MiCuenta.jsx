@@ -209,7 +209,7 @@ export default function MiCuenta() {
                     <input
                         className="input"
                         type="password"
-                        placeholder="Contraseña actual"
+                        placeholder="Contraseña nueva"
                         id="new_password"
                         onChange={(e) =>
                             setFormData({
@@ -232,7 +232,7 @@ export default function MiCuenta() {
                     <input
                         className="input"
                         type="password"
-                        placeholder="Contraseña actual"
+                        placeholder="Confirma tu nueva contraseña"
                         id="new_password_confirmation"
                         onChange={(e) =>
                             setFormData({

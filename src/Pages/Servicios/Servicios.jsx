@@ -11,7 +11,7 @@ export default function Servicios() {
     const [servicios, setServicios] = useState([]);
     const navigate = useNavigate();
 
-    const { token } = useContext(AppContext);
+    const { token, setLoading } = useContext(AppContext);
 
     const [isModalOpen, setModalOpen] = useState(false);
 
@@ -71,7 +71,13 @@ export default function Servicios() {
 
     // Consultar todas las agencias  al cargar el componente
     useEffect(() => {
-        fetchServicios();
+        const fetchData = async () => {
+            setLoading(true);
+            await fetchServicios();
+            setLoading(false);
+        };
+
+        fetchData();
     }, []);
 
     const columns = [

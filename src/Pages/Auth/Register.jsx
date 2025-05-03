@@ -6,7 +6,7 @@ import { AppContext } from '../../context/AppContext';
 
 export default function Register() {
 
-    const { token, setToken } = useContext(AppContext);
+    const { token, setToken, setLoading } = useContext(AppContext);
 
     const navigate = useNavigate();
 
@@ -22,7 +22,7 @@ export default function Register() {
 
     async function handleRegister(e) {
         e.preventDefault();
-
+        setLoading(true);
         try {
             const {data} = await clienteAxios.post("/api/register", formData);
             
@@ -36,6 +36,9 @@ export default function Register() {
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors);
             }
+        }
+        finally{
+            setLoading(false);
         }
     }
 
