@@ -35,6 +35,7 @@ export default function AppProvider({ children }) {
 
     async function getUser() {
         try {
+            setLoading(true);
             const res = await clienteAxios.get("/api/user", {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -44,6 +45,9 @@ export default function AppProvider({ children }) {
             setUser(res.data);
         } catch (error) {
             console.error("Error fetching user data:", error);
+        }
+        finally{
+            setLoading(false);
         }
     }
 

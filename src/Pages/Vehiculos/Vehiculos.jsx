@@ -6,7 +6,7 @@ import Modal from "@/components/Modal";
 
 export default function Vehiculos() {
     const [vehiculos, setVehiculos] = useState([]);
-    const { token } = useContext(AppContext);
+    const { token, setLoading } = useContext(AppContext);
     const [isModalOpen, setModalOpen] = useState(false);
     const [vehiculo, setVehiculo] = useState({
         eco: "",
@@ -29,8 +29,15 @@ export default function Vehiculos() {
     }
 
     useEffect(() => {
-        fetchVehiculos();
+        const fetchData = async () => {
+            setLoading(true);
+            await fetchVehiculos();
+            setLoading(false);
+        };
+
+        fetchData();
     }, []);
+
 
     return (
         <>
