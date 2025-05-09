@@ -15,7 +15,7 @@ export default function Proyectos() {
     const [catalogoServicios, setCatalogoServicios] = useState([]);
     const [mostrarCerrados, setMostrarCerrados] = useState(false);
 
-    const { token, setLoading } = useContext(AppContext);
+    const { token, setLoading, user } = useContext(AppContext);
 
     const [isModalOpen, setModalOpen] = useState(false);
 
@@ -168,6 +168,7 @@ export default function Proyectos() {
                 Nuevo
             </button>
 
+            {user?.role === "admin" &&
             <label
                 htmlFor="mostrarCerrados"
                 className="flex gap-1 justify-end items-center"
@@ -176,7 +177,7 @@ export default function Proyectos() {
                    setMostrarCerrados(!mostrarCerrados)
                 }} />
                 <span className="text">Mostrar proyectos cerrados</span>
-            </label>
+            </label>}
 
             <div>
                 <ReactTabulator

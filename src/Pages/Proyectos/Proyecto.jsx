@@ -311,12 +311,12 @@ export default function Proyecto() {
                     </button>
                 ) : null}
 
-                <button
+                {user?.role === "admin" && <button
                     className="btn btn-danger mt-0"
                     onClick={handleEliminarProyecto}
                 >
                     <Trash2 /> Eliminar
-                </button>
+                </button>}
             </div>
 
             <h3 className="title-3 mt-2 mb-2">Lista de vehículos</h3>
