@@ -6,7 +6,7 @@ import { AppContext } from "../context/AppContext";
 import { useContext } from "react";
 // import Modal from "react-modal";
 import { ToastContainer } from "react-toastify";
-import { PacmanLoader } from "react-spinners";
+import { PacmanLoader, ClimbingBoxLoader } from "react-spinners";
 
 
 export default function Layout() {
@@ -18,7 +18,7 @@ export default function Layout() {
         <>
             {loading && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
-                    <PacmanLoader color="#ffffff" />
+                    <ClimbingBoxLoader color="#ffffff" />
                 </div>
             )}
 

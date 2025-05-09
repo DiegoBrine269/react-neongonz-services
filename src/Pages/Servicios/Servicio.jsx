@@ -3,6 +3,7 @@ import {AppContext} from '../../context/AppContext';
 import { useContext, useEffect, useState } from 'react';
 import clienteAxios from '../../config/axios';
 import { toast } from 'react-toastify';
+import { Save } from 'lucide-react';
 
 export default function Servicio() {
 
@@ -175,15 +176,17 @@ export default function Servicio() {
                 ))}
             </form>
 
-            <input
-                className="btn"
+            <button
+                className="btn mt-4"
                 type="submit"
-                value="Guardar"
                 onClick={(e) => {
                     e.preventDefault();
                     handleSubmit();
                 }}
-            />
+            >
+                <Save/>
+                Guardar
+            </button>
         </>
     );
 }

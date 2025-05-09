@@ -6,6 +6,7 @@ import { AppContext } from "../../context/AppContext";
 import Modal from "../../components/Modal";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { CirclePlus } from "lucide-react";
 
 export default function Servicios() {
     const [servicios, setServicios] = useState([]);
@@ -89,11 +90,12 @@ export default function Servicios() {
         <>
             <h2 className="title-2">Catálogo de servicios</h2>
             <button
-                className="btn"
+                className="btn mb-4"
                 onClick={() => {
                     setModalOpen(true);
                 }}
             >
+                <CirclePlus/>
                 Nuevo
             </button>
             <div>

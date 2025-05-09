@@ -3,6 +3,7 @@ import { AppContext } from "../../context/AppContext";
 import { useContext, useEffect, useState } from "react";
 import { ReactTabulator } from "react-tabulator";
 import Modal from "@/components/Modal";
+import { tabulatorConfig } from "../../config/variables";
 
 export default function Vehiculos() {
     const [vehiculos, setVehiculos] = useState([]);
@@ -67,7 +68,7 @@ export default function Vehiculos() {
                     options={{
                         pagination: true,
                         paginationSize: 10,
-                        movableColumns: true,
+                        ...tabulatorConfig
                     }}
                     events={{
                         rowClick: (e, row) => {

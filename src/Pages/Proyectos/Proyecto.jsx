@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { use, useContext, useState, useEffect, useRef } from "react";
 import { AppContext } from "../../context/AppContext";
 import clienteAxios from "../../config/axios";
@@ -6,13 +6,15 @@ import { toast } from "react-toastify";
 import { ReactTabulator } from "react-tabulator";
 import Modal from "../../components/Modal";
 import Swal from "sweetalert2";
-// import MobileScanner from "@/components/MobileScanner"; // Ajusta la ruta
-import { ClipboardCopy, Mic } from "lucide-react";
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import { tabulatorConfig, swalConfig } from "../../config/variables";
+import { ClipboardCopy, Trash2, ClipboardCheck, Car, CircleCheck } from "lucide-react";
 
 
 
 export default function Proyecto() {
+
+    const navigate = useNavigate();
+
     const { id } = useParams();
     const [proyecto, setProyecto] = useState({});
     const [vehiculos, setVehiculos] = useState([]);
@@ -27,15 +29,9 @@ export default function Proyecto() {
     });
 
     const { token, setLoading, user } = useContext(AppContext);
-    console.log(user);
+    // console.log(user);
 
-    const [escuchando, setEscuchando] = useState(false);
-    const {
-        transcript,
-        listening,
-        resetTranscript,
-        browserSupportsSpeechRecognition,
-    } = useSpeechRecognition();
+
 
 
     const [formData, setFormData] = useState({
@@ -98,7 +94,6 @@ export default function Proyecto() {
                 date: "",
             });
             setErrors({});
-            resetTranscript()
         } catch (error) {
             console.error("Error during request:", error);
             if (error.response && error.response.data.errors) {
@@ -113,13 +108,12 @@ export default function Proyecto() {
         e.preventDefault();
 
         const result = await Swal.fire({
-            title: "¿Estás seguro de querer eliminar el vehículo del proyecto?",
             icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
+            title: "¿Estás seguro de querer eliminar el vehículo del proyecto?",
             confirmButtonText: "Sí, eliminar vehículo.",
+            showCancelButton: true,
             cancelButtonText: "Cancelar",
+            ...swalConfig(),
         });
 
         if (!result.isConfirmed) {
@@ -159,13 +153,12 @@ export default function Proyecto() {
         const closeProject = async () => {
             const result = await Swal.fire({
                 title: "¿Estás seguro de querer cerrar el proyecto?",
-                text: "No podrás agregar más vehículos al proyecto.",
+                text: "No podrás agregar más vehículos.",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
                 confirmButtonText: "Sí, cerrar proyecto",
                 cancelButtonText: "Cancelar",
+                ...swalConfig()
             });
 
             if (result.isConfirmed) {
@@ -200,6 +193,50 @@ export default function Proyecto() {
         closeProject();
     };
 
+    const handleEliminarProyecto = async (e) => {
+        e.preventDefault();
+
+        const closeProject = async () => {
+            const result = await Swal.fire({
+                title: "¿Estás seguro de querer eliminar el proyecto?",
+                text: "Esta acción es irreversible.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar proyecto",
+                cancelButtonText: "Cancelar",
+                ...swalConfig()
+            });
+
+            if (result.isConfirmed) {
+                setLoading(true);
+
+                try {
+                    const { data } = await clienteAxios.delete(
+                        `/api/projects/${id}`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
+                    setModalConsultarOpen(false);
+                    navigate('/proyectos');
+                    toast.success("Proyecto eliminado exitosamente.");
+                    
+                } catch (error) {
+                    console.error("Error during request:", error);
+                    if (error.response && error.response.data.errors) {
+                        setErrors(error.response.data.errors);
+                    }
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+
+        closeProject();
+    };
+
     const textAreaRef = useRef(null);
 
     const copyTextToClipboard = () => {
@@ -210,14 +247,7 @@ export default function Proyecto() {
         }
     };
 
-    const handleEscuchar = () => {
-        if (escuchando) {
-            SpeechRecognition.stopListening();
-        } else {
-            SpeechRecognition.startListening();
-        }
-        setEscuchando((prev) => !prev);
-    };
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -236,13 +266,21 @@ export default function Proyecto() {
             field: "eco",
             headerFilter: "input",
             headerFilterParams: { type: "number" },
+            resizable: false,
         },
         {
             title: "Tipo",
             field: "type",
             headerFilter: "input",
+            resizable: false,
         },
-        { title: "Comentario", field: "commentary", headerFilter: "input" },
+        {
+            title: "Comentario",
+            field: "commentary",
+            headerFilter: "input",
+            resizable: false,
+            width: 250
+        },
     ];
 
     return (
@@ -261,7 +299,27 @@ export default function Proyecto() {
                     <span className="font-bold">Fecha:</span> {proyecto?.date}
                 </p>
             </div>
-            <h3 className="title-3 mt-5 mb-2">Lista de vehículos</h3>
+
+            <div className="flex gap-2 mt-2">
+                {user?.role === "admin" && proyecto?.is_open ? (
+                    <button
+                        className="btn btn-secondary mt-0"
+                        onClick={handleCerrarProyecto}
+                    >
+                        <ClipboardCheck />
+                        Cerrar
+                    </button>
+                ) : null}
+
+                <button
+                    className="btn btn-danger mt-0"
+                    onClick={handleEliminarProyecto}
+                >
+                    <Trash2 /> Eliminar
+                </button>
+            </div>
+
+            <h3 className="title-3 mt-2 mb-2">Lista de vehículos</h3>
             <div className="flex gap-2 mt-0">
                 {proyecto?.is_open ? (
                     <button
@@ -270,7 +328,8 @@ export default function Proyecto() {
                             setModalAgregarOpen(true);
                         }}
                     >
-                        Agregar vehículo
+                        <Car />
+                        Agregar
                     </button>
                 ) : (
                     <p className="text-muted mb-2">
@@ -278,26 +337,13 @@ export default function Proyecto() {
                         vehículos.
                     </p>
                 )}
-
-                {user?.role === "admin" && proyecto?.is_open  && (
-                    <button
-                        className="btn-danger mt-0"
-                        onClick={handleCerrarProyecto}
-                    >
-                        Cerrar proyecto
-                    </button>
-                )}
             </div>
             <div className="overflow-x-scroll ">
                 <ReactTabulator
                     columns={columns}
                     data={vehiculos}
-                    options={{
-                        placeholder: "Sin resultados",
-                        layout: "fitData",
-                        // resizableColumns: false,
-                    }}
-                    // layout={"fitData"}
+                    options={tabulatorConfig}
+                    layout={"fitData"}
                     events={{
                         rowClick: (e, row) => {
                             setVehiculo(row.getData());
@@ -323,16 +369,14 @@ export default function Proyecto() {
                                 type="number"
                                 id="eco"
                                 placeholder="Económico"
-                                value={formData.eco || transcript.replace(/\D/g, "")}
+                                value={formData.eco}
                                 min={1}
                                 onChange={(e) => {
-                                        setFormData({
-                                            ...formData,
-                                            eco: e.target.value,
-                                        })
-                                        resetTranscript()
-                                    }
-                                }
+                                    setFormData({
+                                        ...formData,
+                                        eco: e.target.value,
+                                    });
+                                }}
                                 autoComplete="off"
                                 autoFocus
                             />
@@ -340,14 +384,6 @@ export default function Proyecto() {
                                 <p className="error">{errors.eco[0]}</p>
                             )}
                         </div>
-                        <button
-                            type="button"
-                            className={`${escuchando ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"
-                            } p-1 rounded-sm text-white`}
-                            onClick={handleEscuchar}
-                        >
-                            <Mic />
-                        </button>
                     </div>
 
                     <label className="label" htmlFor="type">
@@ -387,7 +423,7 @@ export default function Proyecto() {
                         <p className="error">{errors.commentary[0]}</p>
                     )}
 
-                    <div className="flex gap-2 mt-5">
+                    <div className="flex gap-2 mt-2">
                         <input
                             className="btn"
                             type="submit"
@@ -457,9 +493,10 @@ export default function Proyecto() {
 
                 <div className="md:flex gap-1">
                     <button
-                        className="btn-danger"
+                        className="btn btn-danger"
                         onClick={handleEliminarVehiculo}
                     >
+                        <Trash2/>
                         Eliminar del proyecto
                     </button>
                     <button
@@ -468,15 +505,17 @@ export default function Proyecto() {
                             setModalConsultarOpen(false);
                         }}
                     >
+                        <CircleCheck/>
                         Aceptar
                     </button>
                 </div>
             </Modal>
 
-                
-            {user?.role === 'admin'  && vehiculos.length > 0 &&
-                (<div>
-                    <h3 className="title-3 mt-5 mb-2">Económicos en serie (para copiar y pegar)</h3>
+            {user?.role === "admin" && vehiculos.length > 0 && (
+                <div>
+                    <h3 className="title-3 mt-5 mb-2">
+                        Económicos en serie (para copiar y pegar)
+                    </h3>
                     <div className="relative">
                         <textarea
                             ref={textAreaRef}
@@ -492,8 +531,8 @@ export default function Proyecto() {
                             <ClipboardCopy className="text-gray-500" />
                         </button>
                     </div>
-                </div>)
-            }
+                </div>
+            )}
         </div>
     );
 }

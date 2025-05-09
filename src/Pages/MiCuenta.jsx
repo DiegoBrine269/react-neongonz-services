@@ -3,6 +3,7 @@ import { useContext, useState } from "react";
 import Modal from "../components/Modal";
 import clienteAxios from "../config/axios";
 import { toast } from "react-toastify";
+import { Pencil, KeyRound } from "lucide-react";
 
 export default function MiCuenta() {
 
@@ -94,22 +95,24 @@ export default function MiCuenta() {
                 </p>
             </div>
 
-            <div className="flex gap-2 mt-4">
+            <div className="mt-4">
                 <button
                     className="btn mt-0"
                     onClick={() => {
                         setModalDatos(true);
                     }}
                 >
+                    <Pencil/>
                     Modificar datos
                 </button>
 
                 <button
-                    className="btn-danger mt-0"
+                    className="btn btn-danger mt-0"
                     onClick={() => {
                         setModalPass(true);
                     }}
                 >
+                    <KeyRound/>
                     Cambiar contraseña
                 </button>
             </div>

@@ -5,6 +5,7 @@ import clienteAxios from "../config/axios";
 import { AppContext } from "../context/AppContext";
 import Modal from "../components/Modal";
 import { toast } from "react-toastify";
+import { CirclePlus } from "lucide-react";
 
 export default function Centros() {
     const [centros, setCentros] = useState([]);
@@ -94,11 +95,12 @@ export default function Centros() {
         <>
             <h2 className="title-2">Centros de venta</h2>
             <button
-                className="btn"
+                className="btn mb-4"
                 onClick={() => {
                     setModalCreateOpen(true);
                 }}
             >
+                <CirclePlus/>
                 Nuevo
             </button>
             <div>

@@ -5,13 +5,15 @@ import clienteAxios from "../../config/axios";
 import { AppContext } from "../../context/AppContext";
 import Modal from "../../components/Modal";
 import { toast } from "react-toastify";
-
 import { useNavigate } from "react-router-dom";
+import { tabulatorConfig } from "../../config/variables";
+import { CirclePlus,Save } from "lucide-react";
 
 export default function Proyectos() {
     const [projects, setProjects] = useState([]);
     const [centros, setCentros] = useState([]);
     const [catalogoServicios, setCatalogoServicios] = useState([]);
+    const [mostrarCerrados, setMostrarCerrados] = useState(false);
 
     const { token, setLoading } = useContext(AppContext);
 
@@ -60,7 +62,7 @@ export default function Proyectos() {
 
     async function fetchProyectos(page = 1) {
         try {
-            const res = await clienteAxios.get(`/api/projects?page=${page}`, {
+            const res = await clienteAxios.get(`/api/projects?${mostrarCerrados ? 'show_closed=1' : 'show_closed=0'}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -125,23 +127,30 @@ export default function Proyectos() {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        fetchProyectos();
+    }, [mostrarCerrados]);
+
     const columns = [
         {
             title: "Nombre",
             field: "service.name",
             headerFilter: "input",
             width: 250,
+            resizable:false
         },
         {
             title: "Centro de ventas",
             field: "centre.name",
             headerFilter: "input",
             width: 250,
+            resizable:false
         },
         {
             title: "Fecha",
             field: "date",
             headerFilter: "input",
+            resizable:false
             // formatter: "datetime",
         },
     ];
@@ -150,13 +159,25 @@ export default function Proyectos() {
         <>
             <h2 className="title-2">Listado de proyectos</h2>
             <button
-                className="btn"
+                className="btn mb-4"
                 onClick={() => {
                     setModalOpen(true);
                 }}
             >
+                <CirclePlus />
                 Nuevo
             </button>
+
+            <label
+                htmlFor="mostrarCerrados"
+                className="flex gap-1 justify-end items-center"
+            >
+                <input className="h-4 w-4" type="checkbox" id="mostrarCerrados" checked={mostrarCerrados} onChange={() => {
+                   setMostrarCerrados(!mostrarCerrados)
+                }} />
+                <span className="text">Mostrar proyectos cerrados</span>
+            </label>
+
             <div>
                 <ReactTabulator
                     data={projects}
@@ -165,23 +186,8 @@ export default function Proyectos() {
                     options={{
                         pagination: "local",
                         paginationSize: 20,
-                        resizableColumnFit: false,
                         layout: "fitDataStretch",
-
-                        langs: {
-                            default: {
-                                pagination: {
-                                    first: "Primero",
-                                    first_title: "Primera página",
-                                    last: "Último",
-                                    last_title: "Última página",
-                                    prev: "Anterior",
-                                    prev_title: "Página anterior",
-                                    next: "Siguiente",
-                                    next_title: "Página siguiente",
-                                },
-                            },
-                        },
+                        ...tabulatorConfig,
                     }}
                     events={{
                         rowClick: handleRowClick,
@@ -206,7 +212,7 @@ export default function Proyectos() {
                             })
                         }
                     >
-                        <option value="" selected disabled>
+                        <option value="" defaultValue disabled>
                             Seleccione un centro de ventas
                         </option>
                         {centros.map((centro) => (
@@ -266,12 +272,14 @@ export default function Proyectos() {
                         <p className="text-red-500">{errors.date[0]}</p>
                     )}
 
-                    <input
-                        className="btn"
+                    <button
+                        className="btn mt-4"
                         type="submit"
-                        value="Guardar"
                         onClick={handleSubmit}
-                    />
+                    >
+                        <Save />
+                        Guardar
+                    </button>
                 </form>
             </Modal>
         </>
