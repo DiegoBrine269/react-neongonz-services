@@ -12,7 +12,7 @@ export default function Servicios() {
     const [servicios, setServicios] = useState([]);
     const navigate = useNavigate();
 
-    const { token, setLoading } = useContext(AppContext);
+    const { token, setLoading, totalFilas, setTotalFilas } = useContext(AppContext);
 
     const [isModalOpen, setModalOpen] = useState(false);
 
@@ -95,9 +95,14 @@ export default function Servicios() {
                     setModalOpen(true);
                 }}
             >
-                <CirclePlus/>
+                <CirclePlus />
                 Nuevo
             </button>
+
+            <p className="text">
+                Total: <span className="font-bold">{totalFilas}</span>
+            </p>
+
             <div>
                 <ReactTabulator
                     data={servicios}
@@ -109,6 +114,8 @@ export default function Servicios() {
                     }}
                     events={{
                         rowClick: handleRowClick,
+                        dataLoaded: (data) => setTotalFilas(data.length),
+                        dataFiltered: (filters, rows) => setTotalFilas(rows.length),
                     }}
                 />
             </div>

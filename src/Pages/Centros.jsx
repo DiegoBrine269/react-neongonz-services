@@ -10,7 +10,7 @@ import { CirclePlus } from "lucide-react";
 export default function Centros() {
     const [centros, setCentros] = useState([]);
     const [centro, setCentro] = useState({});
-    const {token, setLoading} = useContext(AppContext);
+    const { token, setLoading, totalFilas, setTotalFilas } = useContext(AppContext);
 
     const [isModalCreateOpen, setModalCreateOpen] = useState(false);
     const [isModalViewOpen, setModalViewOpen] = useState(false);
@@ -100,9 +100,14 @@ export default function Centros() {
                     setModalCreateOpen(true);
                 }}
             >
-                <CirclePlus/>
+                <CirclePlus />
                 Nuevo
             </button>
+
+            <p className="text">
+                Total: <span className="font-bold">{totalFilas}</span>
+            </p>
+
             <div>
                 <ReactTabulator
                     data={centros}
@@ -117,6 +122,8 @@ export default function Centros() {
                             const data = row.getData();
                             setCentro(data);
                         },
+                        dataLoaded: (data) => setTotalFilas(data.length),
+                        dataFiltered: (filters, rows) => setTotalFilas(rows.length),
                     }}
                 />
             </div>

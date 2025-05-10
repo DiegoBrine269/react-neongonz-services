@@ -81,6 +81,9 @@ export default function AppProvider({ children }) {
     // Loading
     const [loading, setLoading] = useState(false);
 
+    //Total de filas
+    const [totalFilas, setTotalFilas] = useState(0);
+
     return (
         <AppContext.Provider
             value={{
@@ -95,6 +98,8 @@ export default function AppProvider({ children }) {
                 setIsMenuOpen,
                 loading,
                 setLoading,
+                totalFilas,
+                setTotalFilas
             }}
         >
             {children}

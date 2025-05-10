@@ -18,7 +18,7 @@ export default function Layout() {
         <>
             {loading && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
-                    <ClimbingBoxLoader color="#ffffff" />
+                    <PacmanLoader color="#ffffff" />
                 </div>
             )}
 

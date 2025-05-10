@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 // import "../../node_modules/react-tabulator/css/materialize/tabulator_materialize.min.css";
 import { ReactTabulator } from "react-tabulator";
 import clienteAxios from "../../config/axios";
@@ -10,12 +10,13 @@ import { tabulatorConfig } from "../../config/variables";
 import { CirclePlus,Save } from "lucide-react";
 
 export default function Proyectos() {
-    const [projects, setProjects] = useState([]);
+    
+    const [proyectos, setProyectos] = useState([]);
     const [centros, setCentros] = useState([]);
     const [catalogoServicios, setCatalogoServicios] = useState([]);
     const [mostrarCerrados, setMostrarCerrados] = useState(false);
 
-    const { token, setLoading, user } = useContext(AppContext);
+    const { token, setLoading, user, totalFilas, setTotalFilas } = useContext(AppContext);
 
     const [isModalOpen, setModalOpen] = useState(false);
 
@@ -68,9 +69,9 @@ export default function Proyectos() {
                 },
             });
 
-            setProjects(res.data);
+            setProyectos(res.data);
         } catch (error) {
-            setProjects([]);
+            setProyectos([]);
             console.error("Error fetching data:", error);
             toast.error("Error al cargar los servicios");
         }
@@ -131,27 +132,39 @@ export default function Proyectos() {
         fetchProyectos();
     }, [mostrarCerrados]);
 
+    
+
     const columns = [
         {
             title: "Nombre",
             field: "service.name",
             headerFilter: "input",
             width: 250,
-            resizable:false
+            resizable: false,
         },
         {
             title: "Centro de ventas",
             field: "centre.name",
             headerFilter: "input",
             width: 250,
-            resizable:false
+            resizable: false,
         },
         {
             title: "Fecha",
             field: "date",
             headerFilter: "input",
-            resizable:false
+            resizable: false,
             // formatter: "datetime",
+        },
+        {
+            title: "Estatus",
+            field: "is_open",
+            headerFilter: "input",
+            formatter : (cell) => {
+                return cell.getValue() === 1 ? 'Abierto' : 'Cerrado';
+            },
+            resizable: false,
+            width: 250,
         },
     ];
 
@@ -168,20 +181,28 @@ export default function Proyectos() {
                 Nuevo
             </button>
 
-            {user?.role === "admin" &&
-            <label
-                htmlFor="mostrarCerrados"
-                className="flex gap-1 justify-end items-center"
-            >
-                <input className="h-4 w-4" type="checkbox" id="mostrarCerrados" checked={mostrarCerrados} onChange={() => {
-                   setMostrarCerrados(!mostrarCerrados)
-                }} />
-                <span className="text">Mostrar proyectos cerrados</span>
-            </label>}
+            {user?.role === "admin" && (
+                <label
+                    htmlFor="mostrarCerrados"
+                    className="flex gap-1 justify-end items-center"
+                >
+                    <input
+                        className="h-4 w-4"
+                        type="checkbox"
+                        id="mostrarCerrados"
+                        checked={mostrarCerrados}
+                        onChange={() => {
+                            setMostrarCerrados(!mostrarCerrados);
+                        }}
+                    />
+                    <span className="text">Mostrar proyectos cerrados</span>
+                </label>
+            )}
 
+            <p className="text">Total: <span className="font-bold">{totalFilas}</span></p>
             <div>
                 <ReactTabulator
-                    data={projects}
+                    data={proyectos}
                     columns={columns}
                     // layout={"fitColumns"}
                     options={{
@@ -192,6 +213,8 @@ export default function Proyectos() {
                     }}
                     events={{
                         rowClick: handleRowClick,
+                        dataLoaded: (data) => setTotalFilas(data.length),
+                        dataFiltered: (filters, rows) => setTotalFilas(rows.length),
                     }}
                 />
             </div>

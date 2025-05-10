@@ -28,7 +28,7 @@ export default function Proyecto() {
         commentary: "",
     });
 
-    const { token, setLoading, user } = useContext(AppContext);
+    const { token, setLoading, user, totalFilas, setTotalFilas } = useContext(AppContext);
     // console.log(user);
 
 
@@ -279,8 +279,9 @@ export default function Proyecto() {
             field: "commentary",
             headerFilter: "input",
             resizable: false,
-            width: 250
+            width: 250,
         },
+
     ];
 
     return (
@@ -311,12 +312,14 @@ export default function Proyecto() {
                     </button>
                 ) : null}
 
-                {user?.role === "admin" && <button
-                    className="btn btn-danger mt-0"
-                    onClick={handleEliminarProyecto}
-                >
-                    <Trash2 /> Eliminar
-                </button>}
+                {user?.role === "admin" && (
+                    <button
+                        className="btn btn-danger mt-0"
+                        onClick={handleEliminarProyecto}
+                    >
+                        <Trash2 /> Eliminar
+                    </button>
+                )}
             </div>
 
             <h3 className="title-3 mt-2 mb-2">Lista de vehículos</h3>
@@ -338,6 +341,8 @@ export default function Proyecto() {
                     </p>
                 )}
             </div>
+            <p className="text">Total: <span className="font-bold">{totalFilas}</span></p>
+
             <div className="overflow-x-scroll ">
                 <ReactTabulator
                     columns={columns}
@@ -350,6 +355,8 @@ export default function Proyecto() {
 
                             setModalConsultarOpen(true);
                         },
+                        dataLoaded: (data) => setTotalFilas(data.length),
+                        dataFiltered: (filters, rows) => setTotalFilas(rows.length),
                     }}
                 />
             </div>
@@ -496,7 +503,7 @@ export default function Proyecto() {
                         className="btn btn-danger"
                         onClick={handleEliminarVehiculo}
                     >
-                        <Trash2/>
+                        <Trash2 />
                         Eliminar del proyecto
                     </button>
                     <button
@@ -505,7 +512,7 @@ export default function Proyecto() {
                             setModalConsultarOpen(false);
                         }}
                     >
-                        <CircleCheck/>
+                        <CircleCheck />
                         Aceptar
                     </button>
                 </div>
