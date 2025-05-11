@@ -161,7 +161,7 @@ export default function Proyectos() {
             field: "is_open",
             headerFilter: "input",
             formatter : (cell) => {
-                return cell.getValue() === 1 ? 'Abierto' : 'Cerrado';
+                return cell.getValue()  ? 'Abierto' : 'Cerrado';
             },
             resizable: false,
             width: 250,

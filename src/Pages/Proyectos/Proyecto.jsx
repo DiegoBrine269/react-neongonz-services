@@ -7,15 +7,15 @@ import { ReactTabulator } from "react-tabulator";
 import Modal from "../../components/Modal";
 import Swal from "sweetalert2";
 import { tabulatorConfig, swalConfig } from "../../config/variables";
-import { ClipboardCopy, Trash2, ClipboardCheck, Car, CircleCheck } from "lucide-react";
+import { ClipboardCopy, Trash2, ClipboardCheck, Car, CircleCheck, ChevronDown, ChevronRight } from "lucide-react";
 
 
 
 export default function Proyecto() {
-
     const navigate = useNavigate();
 
     const { id } = useParams();
+    const [proyectosAbiertos, setProyectosAbiertos] = useState([]);
     const [proyecto, setProyecto] = useState({});
     const [vehiculos, setVehiculos] = useState([]);
     const [types, setTypes] = useState([]);
@@ -25,14 +25,13 @@ export default function Proyecto() {
     const [vehiculo, setVehiculo] = useState({
         eco: "",
         type: "",
-        commentary: "",
+        commentary: ""
     });
+    const [isCollapsed, setIsCollapsed] = useState(true);
 
-    const { token, setLoading, user, totalFilas, setTotalFilas } = useContext(AppContext);
+    const { token, setLoading, user, totalFilas, setTotalFilas } =
+        useContext(AppContext);
     // console.log(user);
-
-
-
 
     const [formData, setFormData] = useState({
         eco: "",
@@ -40,6 +39,7 @@ export default function Proyecto() {
         project_id: id,
         user_id: user.id,
         commentary: "",
+        extra_projects: [],
     });
 
     const fetchProyecto = async () => {
@@ -68,7 +68,7 @@ export default function Proyecto() {
         } catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Error al cargar los tipos de vehículos");
-        } 
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -101,6 +101,23 @@ export default function Proyecto() {
             }
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchProyectosAbiertos = async (e) => {
+        try {
+            const res = await clienteAxios.get(
+                `/api/centres/${proyecto.centre.id}/open-projects`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            setProyectosAbiertos(res.data);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            toast.error("Error al cargar el proyecto");
         }
     };
 
@@ -144,7 +161,6 @@ export default function Proyecto() {
         } finally {
             setLoading(false);
         }
-        
     };
 
     const handleCerrarProyecto = async (e) => {
@@ -158,7 +174,7 @@ export default function Proyecto() {
                 showCancelButton: true,
                 confirmButtonText: "Sí, cerrar proyecto",
                 cancelButtonText: "Cancelar",
-                ...swalConfig()
+                ...swalConfig(),
             });
 
             if (result.isConfirmed) {
@@ -204,7 +220,7 @@ export default function Proyecto() {
                 showCancelButton: true,
                 confirmButtonText: "Sí, eliminar proyecto",
                 cancelButtonText: "Cancelar",
-                ...swalConfig()
+                ...swalConfig(),
             });
 
             if (result.isConfirmed) {
@@ -220,9 +236,8 @@ export default function Proyecto() {
                         }
                     );
                     setModalConsultarOpen(false);
-                    navigate('/proyectos');
+                    navigate("/proyectos");
                     toast.success("Proyecto eliminado exitosamente.");
-                    
                 } catch (error) {
                     console.error("Error during request:", error);
                     if (error.response && error.response.data.errors) {
@@ -237,6 +252,29 @@ export default function Proyecto() {
         closeProject();
     };
 
+    const toggleProyectoExtra = (item) => {
+        setFormData((prevFormData) => {
+            const extraProjects = Array.isArray(prevFormData.extra_projects)
+                ? [...prevFormData.extra_projects]
+                : []; // Asegúrate de que sea un array
+            if (extraProjects.includes(item)) {
+                // Si el elemento ya está en el array, lo eliminamos
+                return {
+                    ...prevFormData,
+                    extra_projects: extraProjects.filter(
+                        (project) => project !== item
+                    ),
+                };
+            } else {
+                // Si el elemento no está en el array, lo agregamos
+                return {
+                    ...prevFormData,
+                    extra_projects: [...extraProjects, item],
+                };
+            }
+        });
+    };
+
     const textAreaRef = useRef(null);
 
     const copyTextToClipboard = () => {
@@ -246,8 +284,6 @@ export default function Proyecto() {
             toast.success("Texto copiado al portapapeles");
         }
     };
-
-
 
     useEffect(() => {
         const fetchData = async () => {
@@ -259,6 +295,12 @@ export default function Proyecto() {
 
         fetchData();
     }, []);
+
+    useEffect(() => {
+        if (proyecto.centre && proyecto.centre.id) {
+            fetchProyectosAbiertos();
+        }
+    }, [proyecto.centre]); // Se ejecuta cuando proyecto.centre cambia
 
     const columns = [
         {
@@ -281,7 +323,6 @@ export default function Proyecto() {
             resizable: false,
             width: 250,
         },
-
     ];
 
     return (
@@ -341,7 +382,9 @@ export default function Proyecto() {
                     </p>
                 )}
             </div>
-            <p className="text">Total: <span className="font-bold">{totalFilas}</span></p>
+            <p className="text">
+                Total: <span className="font-bold">{totalFilas}</span>
+            </p>
 
             <div className="overflow-x-scroll ">
                 <ReactTabulator
@@ -352,11 +395,11 @@ export default function Proyecto() {
                     events={{
                         rowClick: (e, row) => {
                             setVehiculo(row.getData());
-
                             setModalConsultarOpen(true);
                         },
                         dataLoaded: (data) => setTotalFilas(data.length),
-                        dataFiltered: (filters, rows) => setTotalFilas(rows.length),
+                        dataFiltered: (filters, rows) =>
+                            setTotalFilas(rows.length),
                     }}
                 />
             </div>
@@ -428,6 +471,38 @@ export default function Proyecto() {
                     ></textarea>
                     {errors.commentary && (
                         <p className="error">{errors.commentary[0]}</p>
+                    )}
+
+                    {proyectosAbiertos.length > 1 && (
+                        <div>
+                            <label
+                                className="label flex"
+                                htmlFor="other-projects"
+                                onClick={() => setIsCollapsed(!isCollapsed)}
+                            >
+                                {isCollapsed ? <ChevronRight /> : <ChevronDown />}
+                                Agregar a otros proyectos de forma simultánea (opcional)
+                            </label>
+                            <div className={`pl-2 overflow-hidden transition-all duration-300 ease-in-out ${isCollapsed ? "max-h-0" : "max-h-96"}`}>
+                                {proyectosAbiertos.map((p) => p.id != id ? (
+                                    <label
+                                        className="inline-flex items-center text-xs"
+                                        key={p.id}
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-btn peer"
+                                            onChange={() => toggleProyectoExtra(p.id)}
+                                            checked={formData?.extra_projects?.includes(p.id)}
+                                        />
+                                        <span className="checkbox-label peer-checked:bg-blue-500 peer-checked:text-white peer-checked:ring-blue-500">
+                                            {p.service}
+                                        </span>
+                                    </label>
+                                ) : null
+                                )}
+                            </div>  
+                        </div>                    
                     )}
 
                     <div className="flex gap-2 mt-2">
