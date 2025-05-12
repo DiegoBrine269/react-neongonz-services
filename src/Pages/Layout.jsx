@@ -23,7 +23,7 @@ export default function Layout() {
             )}
 
             <div
-                className="grid grid-rows-[auto_1fr_auto] min-h-screen"
+                className="grid grid-rows-[auto_1fr_auto] min-h-[100dvh]"
                 onClick={() => {
                     if (isMenuOpen) {
                         setIsMenuOpen(false);

@@ -481,12 +481,12 @@ export default function Proyecto() {
                         <p className="error">{errors.commentary[0]}</p>
                     )}
 
-                    {proyectosAbiertos.length > 1 && (
+                    {proyectosAbiertos?.length > 1 && (
                         <div>
                             <label
                                 className="label flex"
                                 htmlFor="other-projects"
-                                onClick={() => setIsCollapsed(!isCollapsed)}
+                                onClick={() => setIsCollapsed((prev) => !prev)}
                             >
                                 {isCollapsed ? (
                                     <ChevronRight />
