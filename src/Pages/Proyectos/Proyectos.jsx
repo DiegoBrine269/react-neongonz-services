@@ -12,11 +12,11 @@ import { CirclePlus,Save } from "lucide-react";
 export default function Proyectos() {
     
     const [proyectos, setProyectos] = useState([]);
-    const [centros, setCentros] = useState([]);
     const [catalogoServicios, setCatalogoServicios] = useState([]);
     const [mostrarCerrados, setMostrarCerrados] = useState(false);
 
-    const { token, setLoading, user, totalFilas, setTotalFilas } = useContext(AppContext);
+
+    const { token, setLoading, user, totalFilas, setTotalFilas, fetchCentros, centros} = useContext(AppContext);
 
     const [isModalOpen, setModalOpen] = useState(false);
 
@@ -77,21 +77,7 @@ export default function Proyectos() {
         }
     }
 
-    async function fetchCentros() {
-        try {
-            const res = await clienteAxios.get("/api/centres", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
 
-            setCentros(res.data);
-        } catch (error) {
-            setCentros([]);
-            console.error("Error fetching data:", error);
-            toast.error("Error al cargar los centros");
-        }
-    }
 
     async function fetchCatalogoServicios() {
         try {
@@ -166,6 +152,7 @@ export default function Proyectos() {
             resizable: false,
             width: 250,
         },
+        
     ];
 
     return (
@@ -199,7 +186,9 @@ export default function Proyectos() {
                 </label>
             )}
 
-            <p className="text">Total: <span className="font-bold">{totalFilas}</span></p>
+            <p className="text">
+                Total: <span className="font-bold">{totalFilas}</span>
+            </p>
             <div>
                 <ReactTabulator
                     data={proyectos}
@@ -214,7 +203,8 @@ export default function Proyectos() {
                     events={{
                         rowClick: handleRowClick,
                         dataLoaded: (data) => setTotalFilas(data.length),
-                        dataFiltered: (filters, rows) => setTotalFilas(rows.length),
+                        dataFiltered: (filters, rows) =>
+                            setTotalFilas(rows.length),
                     }}
                 />
             </div>
@@ -235,8 +225,9 @@ export default function Proyectos() {
                                 centre_id: e.target.value,
                             })
                         }
+                        defaultValue=""
                     >
-                        <option value="" defaultValue disabled>
+                        <option value="" disabled>
                             Seleccione un centro de ventas
                         </option>
                         {centros.map((centro) => (
@@ -261,8 +252,9 @@ export default function Proyectos() {
                                 service_id: e.target.value,
                             })
                         }
+                        defaultValue=""
                     >
-                        <option selected disabled>
+                        <option value="" disabled>
                             Seleccione un servicio
                         </option>
                         {catalogoServicios.map((centro) => (

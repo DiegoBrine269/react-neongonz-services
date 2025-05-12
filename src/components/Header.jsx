@@ -4,7 +4,7 @@ import LogoBlanco from "../assets/Logo-blanco.png";
 
 
 import { NavLink } from "react-router-dom";
-import { Menu, X, Car, Factory, Wrench, User, LogOut, Sun, Moon, LogIn, UserRoundPlus, BriefcaseBusiness  } from "lucide-react";
+import { Menu, X, Car, Factory, Wrench, User, LogOut, Sun, Moon, LogIn, UserRoundPlus, BriefcaseBusiness, Receipt  } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import { useContext } from "react";
 
@@ -43,6 +43,7 @@ export default function Header() {
                 {user && user.role === 'admin' && <Item to="/centros-de-venta" text="Centros de venta" children={<Factory />} />}
                 {user && user.role === 'admin' && <Item to="/servicios" text="Servicios" children={<Wrench />} />}
                 {user && <Item to="/proyectos" text="Proyectos" children={<BriefcaseBusiness />} />}
+                {user && user.role === 'admin' && <Item to="/cotizaciones" text="Cotizaciones" children={<Receipt />} />}
                 {user && <Item to="/mi-cuenta" text="Mi cuenta" children={<User />} />}
                 {user && <button className="`flex items-center gap-2 p-2 rounded-md transition-colors duration-300 dark:text-neutral-200 hover:bg-gray-200 hover:text-neutral-900 dark:hover:bg-neutral-700 dark:hover:text-neutral-200" onClick={handleLogout}>
                          Cerrar sesión

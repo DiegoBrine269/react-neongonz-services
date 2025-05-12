@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import clienteAxios from "../config/axios";
-
+import { toast } from "react-toastify";
 
 export const AppContext = createContext();
 
@@ -9,6 +9,9 @@ export default function AppProvider({ children }) {
  
     //Dark or Light mode
     const [darkMode, setDarkMode] = useState(false);
+
+    //
+    const [centros, setCentros] = useState([]);
 
     const toggleDarkMode = () => {
         const newDarkMode = !darkMode;
@@ -75,6 +78,22 @@ export default function AppProvider({ children }) {
         }
     }
 
+    async function fetchCentros() {
+        try {
+            const res = await clienteAxios.get("/api/centres", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            setCentros(res.data);
+        } catch (error) {
+            setCentros([]);
+            console.error("Error fetching data:", error);
+            toast.error("Error al cargar los centros");
+        }
+    }
+
     //Menú de navegación
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -99,7 +118,10 @@ export default function AppProvider({ children }) {
                 loading,
                 setLoading,
                 totalFilas,
-                setTotalFilas
+                setTotalFilas,
+                fetchCentros,
+                centros,
+                setCentros
             }}
         >
             {children}

@@ -323,6 +323,13 @@ export default function Proyecto() {
             resizable: false,
             width: 250,
         },
+        {
+            title: "Fecha y hora de registro",
+            field: "created_at",
+            headerFilter: "input",
+            resizable: false,
+            width: 250,
+        },
     ];
 
     return (
@@ -445,8 +452,9 @@ export default function Proyecto() {
                         onChange={(e) =>
                             setFormData({ ...formData, type: e.target.value })
                         }
+                        defaultValue=""
                     >
-                        <option value="">Seleccione un tipo</option>
+                        <option value="" disabled>Seleccione un tipo</option>
                         {types.map((type) => (
                             <option key={type.id} value={type.id}>
                                 {type.type}
@@ -480,29 +488,43 @@ export default function Proyecto() {
                                 htmlFor="other-projects"
                                 onClick={() => setIsCollapsed(!isCollapsed)}
                             >
-                                {isCollapsed ? <ChevronRight /> : <ChevronDown />}
-                                Agregar a otros proyectos de forma simultánea (opcional)
-                            </label>
-                            <div className={`pl-2 overflow-hidden transition-all duration-300 ease-in-out ${isCollapsed ? "max-h-0" : "max-h-96"}`}>
-                                {proyectosAbiertos.map((p) => p.id != id ? (
-                                    <label
-                                        className="inline-flex items-center text-xs"
-                                        key={p.id}
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            className="checkbox-btn peer"
-                                            onChange={() => toggleProyectoExtra(p.id)}
-                                            checked={formData?.extra_projects?.includes(p.id)}
-                                        />
-                                        <span className="checkbox-label peer-checked:bg-blue-500 peer-checked:text-white peer-checked:ring-blue-500">
-                                            {p.service}
-                                        </span>
-                                    </label>
-                                ) : null
+                                {isCollapsed ? (
+                                    <ChevronRight />
+                                ) : (
+                                    <ChevronDown />
                                 )}
-                            </div>  
-                        </div>                    
+                                Agregar a otros proyectos de forma simultánea
+                                (opcional)
+                            </label>
+                            <div
+                                className={`pl-2 overflow-hidden transition-all duration-300 ease-in-out ${
+                                    isCollapsed ? "max-h-0" : "max-h-96"
+                                }`}
+                            >
+                                {proyectosAbiertos.map((p) =>
+                                    p.id != id ? (
+                                        <label
+                                            className="inline-flex items-center text-xs"
+                                            key={p.id}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                className="checkbox-btn peer"
+                                                onChange={() =>
+                                                    toggleProyectoExtra(p.id)
+                                                }
+                                                checked={formData?.extra_projects?.includes(
+                                                    p.id
+                                                )}
+                                            />
+                                            <span className="checkbox-label peer-checked:bg-blue-500 peer-checked:text-white peer-checked:ring-blue-500">
+                                                {p.service}
+                                            </span>
+                                        </label>
+                                    ) : null
+                                )}
+                            </div>
+                        </div>
                     )}
 
                     <div className="flex gap-2 mt-2">

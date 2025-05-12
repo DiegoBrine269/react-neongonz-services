@@ -15,6 +15,9 @@ import "tabulator-tables/dist/css/tabulator_materialize.min.css";
 import Vehiculos from "./Pages/Vehiculos/Vehiculos";
 import MiCuenta from "./Pages/MiCuenta"
 import ForgotPassword from "./Pages/Auth/ForgotPassword";
+import Cotizaciones from "./Pages/Cotizaciones/Cotizaciones";
+import Nueva from "./Pages/Cotizaciones/Nueva";
+
 
 
 export default function App() {
@@ -43,7 +46,8 @@ export default function App() {
                                 <>
                                     <Route path="/centros-de-venta" element={<Centros />} />
                                     <Route path="/servicios" element={<Servicios />} />
-
+                                    <Route path="/cotizaciones" element={<Cotizaciones />} />
+                                    <Route path="/cotizaciones/nueva" element={<Nueva />} />
                                     <Route path="/servicios/:id" element={<Servicio />} />
                                 </>
                             )}
