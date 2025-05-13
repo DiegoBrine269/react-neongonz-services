@@ -1,12 +1,12 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { use, useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { AppContext } from "../../context/AppContext";
 import clienteAxios from "../../config/axios";
 import { toast } from "react-toastify";
-import { ReactTabulator } from "react-tabulator";
 import Modal from "../../components/Modal";
 import Swal from "sweetalert2";
-import { tabulatorConfig, swalConfig } from "../../config/variables";
+import Tabla from "../../components/Tabla";
+import { swalConfig } from "../../config/variables";
 import { ClipboardCopy, Trash2, ClipboardCheck, Car, CircleCheck, ChevronDown, ChevronRight } from "lucide-react";
 
 
@@ -389,27 +389,26 @@ export default function Proyecto() {
                     </p>
                 )}
             </div>
-            <p className="text">
-                Total: <span className="font-bold">{totalFilas}</span>
-            </p>
 
-            <div className="overflow-x-scroll ">
-                <ReactTabulator
-                    columns={columns}
-                    data={vehiculos}
-                    options={tabulatorConfig}
-                    layout={"fitData"}
-                    events={{
-                        rowClick: (e, row) => {
-                            setVehiculo(row.getData());
-                            setModalConsultarOpen(true);
-                        },
-                        dataLoaded: (data) => setTotalFilas(data.length),
-                        dataFiltered: (filters, rows) =>
-                            setTotalFilas(rows.length),
-                    }}
-                />
-            </div>
+
+            <Tabla
+                options={{
+                    pagination: "local",
+                    paginationSize: 20,
+                    layout: "fitDataStretch",
+                }}
+                events={{
+                    rowClick: (e, row) => {
+                        setVehiculo(row.getData());
+                        setModalConsultarOpen(true);
+                    },
+                }}
+                columns={columns}
+                data={vehiculos}
+            />
+
+
+
             <Modal
                 isOpen={isModalAgregarOpen}
                 onClose={() => setModalAgregarOpen(false)}

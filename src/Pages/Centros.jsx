@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-// import "../../node_modules/react-tabulator/css/materialize/tabulator_materialize.min.css";
-import { ReactTabulator } from "react-tabulator";
+import Tabla from "../components/Tabla";
 import clienteAxios from "../config/axios";
 import { AppContext } from "../context/AppContext";
 import Modal from "../components/Modal";
@@ -104,29 +103,18 @@ export default function Centros() {
                 Nuevo
             </button>
 
-            <p className="text">
-                Total: <span className="font-bold">{totalFilas}</span>
-            </p>
 
-            <div>
-                <ReactTabulator
-                    data={centros}
-                    columns={columns}
-                    // layout={"fitColumns"}
-                    options={{
-                        layout: "fitData",
-                    }}
-                    events={{
-                        rowClick: (e, row) => {
-                            setModalViewOpen(true);
-                            const data = row.getData();
-                            setCentro(data);
-                        },
-                        dataLoaded: (data) => setTotalFilas(data.length),
-                        dataFiltered: (filters, rows) => setTotalFilas(rows.length),
-                    }}
-                />
-            </div>
+            <Tabla
+                events={{
+                    rowClick: (e, row) => {
+                        setModalViewOpen(true);
+                        const data = row.getData();
+                        setCentro(data);
+                    },
+                }}
+                columns={columns}
+                data={centros}
+            />
 
             <Modal
                 isOpen={isModalCreateOpen}

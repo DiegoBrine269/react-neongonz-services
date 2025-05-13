@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState, useRef } from "react";
 // import "../../node_modules/react-tabulator/css/materialize/tabulator_materialize.min.css";
-import { ReactTabulator } from "react-tabulator";
+
 import clienteAxios from "../../config/axios";
 import { AppContext } from "../../context/AppContext";
 import Modal from "../../components/Modal";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { tabulatorConfig } from "../../config/variables";
 import { CirclePlus,Save } from "lucide-react";
+import Tabla from "../../components/Tabla";
 
 export default function Proyectos() {
     
@@ -16,7 +16,7 @@ export default function Proyectos() {
     const [mostrarCerrados, setMostrarCerrados] = useState(false);
 
 
-    const { token, setLoading, user, totalFilas, setTotalFilas, fetchCentros, centros} = useContext(AppContext);
+    const { token, setLoading, user, fetchCentros, centros} = useContext(AppContext);
 
     const [isModalOpen, setModalOpen] = useState(false);
 
@@ -102,12 +102,12 @@ export default function Proyectos() {
 
     useEffect(() => {
         const fetchData = async () => {
-            setLoading(true);
-            await Promise.all([
-                fetchProyectos(),
-                fetchCentros(),
-                fetchCatalogoServicios(),
-            ]);
+            // setLoading(true);
+            // await Promise.all([
+                fetchProyectos();
+                fetchCentros();
+                fetchCatalogoServicios();
+            // ]);
             setLoading(false);
         };
 
@@ -186,28 +186,18 @@ export default function Proyectos() {
                 </label>
             )}
 
-            <p className="text">
-                Total: <span className="font-bold">{totalFilas}</span>
-            </p>
-            <div>
-                <ReactTabulator
-                    data={proyectos}
-                    columns={columns}
-                    // layout={"fitColumns"}
-                    options={{
-                        pagination: "local",
-                        paginationSize: 20,
-                        layout: "fitDataStretch",
-                        ...tabulatorConfig,
-                    }}
-                    events={{
-                        rowClick: handleRowClick,
-                        dataLoaded: (data) => setTotalFilas(data.length),
-                        dataFiltered: (filters, rows) =>
-                            setTotalFilas(rows.length),
-                    }}
-                />
-            </div>
+            <Tabla
+                options={{
+                    pagination: "local",
+                    paginationSize: 20,
+                    layout: "fitDataStretch",
+                }}
+                events={{
+                    rowClick: handleRowClick
+                }}
+                columns={columns}
+                data={proyectos}
+            />
 
             <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
                 <h2 className="title-3">Nuevo proyecto</h2>

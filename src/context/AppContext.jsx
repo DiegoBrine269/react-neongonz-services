@@ -101,7 +101,7 @@ export default function AppProvider({ children }) {
     const [loading, setLoading] = useState(false);
 
     //Total de filas
-    const [totalFilas, setTotalFilas] = useState(0);
+
 
     return (
         <AppContext.Provider
@@ -117,8 +117,6 @@ export default function AppProvider({ children }) {
                 setIsMenuOpen,
                 loading,
                 setLoading,
-                totalFilas,
-                setTotalFilas,
                 fetchCentros,
                 centros,
                 setCentros
