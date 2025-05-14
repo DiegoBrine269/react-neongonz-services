@@ -13,6 +13,9 @@ export default function AppProvider({ children }) {
     //
     const [centros, setCentros] = useState([]);
 
+    //
+    const [proyectos, setProyectos] = useState([]);
+
     const toggleDarkMode = () => {
         const newDarkMode = !darkMode;
         setDarkMode(newDarkMode);
@@ -119,7 +122,9 @@ export default function AppProvider({ children }) {
                 setLoading,
                 fetchCentros,
                 centros,
-                setCentros
+                setCentros,
+                proyectos,
+                setProyectos
             }}
         >
             {children}

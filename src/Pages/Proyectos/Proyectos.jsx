@@ -11,12 +11,12 @@ import Tabla from "../../components/Tabla";
 
 export default function Proyectos() {
     
-    const [proyectos, setProyectos] = useState([]);
+
     const [catalogoServicios, setCatalogoServicios] = useState([]);
     const [mostrarCerrados, setMostrarCerrados] = useState(false);
 
 
-    const { token, setLoading, user, fetchCentros, centros} = useContext(AppContext);
+    const { token, setLoading, user, fetchCentros, centros, proyectos, setProyectos} = useContext(AppContext);
 
     const [isModalOpen, setModalOpen] = useState(false);
 
