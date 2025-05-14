@@ -494,17 +494,22 @@ export default function Proyecto() {
                                         setIsCollapsed((prev) => !prev)
                                     }
                                 >
-                                    {isCollapsed ? (
-                                        <ChevronRight />
-                                    ) : (
-                                        <ChevronDown />
-                                    )}
+                                    <ChevronRight
+                                        className={
+                                            isCollapsed ? "block" : "hidden"
+                                        }
+                                    />
+                                    <ChevronDown
+                                        className={
+                                            !isCollapsed ? "block" : "hidden"
+                                        }
+                                    />
                                     Agregar a otros proyectos de forma
                                     simultánea (opcional)
                                 </label>
                                 <div
                                     className={`pl-2 overflow-hidden transition-all duration-300 ease-in-out ${
-                                        isCollapsed ? "max-h-0" : "max-h-96"
+                                        isCollapsed ? "max-h-0" : null
                                     }`}
                                 >
                                     {proyectosAbiertos.map((p) =>
