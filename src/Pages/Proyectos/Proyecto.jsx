@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 import Tabla from "../../components/Tabla";
 import { swalConfig } from "../../config/variables";
 import { ClipboardCopy, Trash2, ClipboardCheck, Car, CircleCheck, ChevronDown, ChevronRight } from "lucide-react";
-
+import ErrorBoundary from '../../components/ErrorBoundary';
 
 
 export default function Proyecto() {
@@ -390,7 +390,6 @@ export default function Proyecto() {
                 )}
             </div>
 
-
             <Tabla
                 options={{
                     pagination: "local",
@@ -407,150 +406,162 @@ export default function Proyecto() {
                 data={vehiculos}
             />
 
-
-
-            <Modal
-                isOpen={isModalAgregarOpen}
-                onClose={() => setModalAgregarOpen(false)}
-            >
-                <h2 className="title-3">Agregar vehículo al proyecto</h2>
-                <form action="">
-                    <label className="label" htmlFor="eco">
-                        Económico
-                    </label>
-                    <div className="grid grid-cols-[1fr_auto] gap-2">
-                        <div>
-                            <input
-                                className="input"
-                                type="number"
-                                id="eco"
-                                placeholder="Económico"
-                                value={formData.eco}
-                                min={1}
-                                onChange={(e) => {
-                                    setFormData({
-                                        ...formData,
-                                        eco: e.target.value,
-                                    });
-                                }}
-                                autoComplete="off"
-                                autoFocus
-                            />
-                            {errors.eco && (
-                                <p className="error">{errors.eco[0]}</p>
-                            )}
-                        </div>
-                    </div>
-
-                    <label className="label" htmlFor="type">
-                        Tipo de vehículo
-                    </label>
-                    <select
-                        className="input"
-                        id="type"
-                        onChange={(e) =>
-                            setFormData({ ...formData, type: e.target.value })
-                        }
-                        defaultValue=""
-                    >
-                        <option value="" disabled>Seleccione un tipo</option>
-                        {types.map((type) => (
-                            <option key={type.id} value={type.id}>
-                                {type.type}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.type && <p className="error">{errors.type[0]}</p>}
-
-                    <label className="label" htmlFor="commentary">
-                        Comentario (opcional)
-                    </label>
-                    <textarea
-                        name=""
-                        id="commentary"
-                        placeholder="Comentario"
-                        onChange={(e) =>
-                            setFormData({
-                                ...formData,
-                                commentary: e.target.value,
-                            })
-                        }
-                    ></textarea>
-                    {errors.commentary && (
-                        <p className="error">{errors.commentary[0]}</p>
-                    )}
-
-                    {proyectosAbiertos?.length > 1 && (
-                        <div>
-                            <label
-                                className="label flex"
-                                // htmlFor="other-projects"
-                                onClick={() => setIsCollapsed((prev) => !prev)}
-                            >
-                                {isCollapsed ? (
-                                    <ChevronRight />
-                                ) : (
-                                    <ChevronDown />
-                                )}
-                                Agregar a otros proyectos de forma simultánea
-                                (opcional)
-                            </label>
-                            <div
-                                className={`pl-2 overflow-hidden transition-all duration-300 ease-in-out ${
-                                    isCollapsed ? "max-h-0" : "max-h-96"
-                                }`}
-                            >
-                                {proyectosAbiertos.map((p) =>
-                                    p.id != id ? (
-                                        <label
-                                            className="inline-flex items-center text-xs"
-                                            key={p.id}
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                className="checkbox-btn peer"
-                                                onChange={() =>
-                                                    toggleProyectoExtra(p.id)
-                                                }
-                                                checked={formData?.extra_projects?.includes(
-                                                    p.id
-                                                )}
-                                            />
-                                            <span className="checkbox-label peer-checked:bg-blue-500 peer-checked:text-white peer-checked:ring-blue-500">
-                                                {p.service}
-                                            </span>
-                                        </label>
-                                    ) : null
+            <ErrorBoundary>
+                <Modal
+                    isOpen={isModalAgregarOpen}
+                    onClose={() => setModalAgregarOpen(false)}
+                >
+                    <h2 className="title-3">Agregar vehículo al proyecto</h2>
+                    <form action="">
+                        <label className="label" htmlFor="eco">
+                            Económico
+                        </label>
+                        <div className="grid grid-cols-[1fr_auto] gap-2">
+                            <div>
+                                <input
+                                    className="input"
+                                    type="number"
+                                    id="eco"
+                                    placeholder="Económico"
+                                    value={formData.eco}
+                                    min={1}
+                                    onChange={(e) => {
+                                        setFormData({
+                                            ...formData,
+                                            eco: e.target.value,
+                                        });
+                                    }}
+                                    autoComplete="off"
+                                    autoFocus
+                                />
+                                {errors.eco && (
+                                    <p className="error">{errors.eco[0]}</p>
                                 )}
                             </div>
                         </div>
-                    )}
 
-                    <div className="flex gap-2 mt-2">
-                        <input
-                            className="btn"
-                            type="submit"
-                            value="Registrar"
-                            onClick={handleSubmit}
-                        />
+                        <label className="label" htmlFor="type">
+                            Tipo de vehículo
+                        </label>
+                        <select
+                            className="input"
+                            id="type"
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    type: e.target.value,
+                                })
+                            }
+                            defaultValue=""
+                        >
+                            <option value="" disabled>
+                                Seleccione un tipo
+                            </option>
+                            {types.map((type) => (
+                                <option key={type.id} value={type.id}>
+                                    {type.type}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.type && (
+                            <p className="error">{errors.type[0]}</p>
+                        )}
 
-                        {/* <MobileScanner
-                            onDetect={(codigo) =>{
-                                //eliminar caracteres no deseados
-                                let codigoR = codigo.replace(/[^0-9]/g, "");
-                                console.log(codigoR);
-                                const match = codigoR.match(/\b\d{5}\b/);
+                        <label className="label" htmlFor="commentary">
+                            Comentario (opcional)
+                        </label>
+                        <textarea
+                            name=""
+                            id="commentary"
+                            placeholder="Comentario"
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    commentary: e.target.value,
+                                })
+                            }
+                        ></textarea>
+                        {errors.commentary && (
+                            <p className="error">{errors.commentary[0]}</p>
+                        )}
 
-                                if (match) {
-                                    setFormData({ ...formData, eco: parseInt(codigoR) });
+                        {proyectosAbiertos?.length > 1 && (
+                            <div>
+                                <label
+                                    className="label flex"
+                                    // htmlFor="other-projects"
+                                    onClick={() =>
+                                        setIsCollapsed((prev) => !prev)
+                                    }
+                                >
+                                    {isCollapsed ? (
+                                        <ChevronRight />
+                                    ) : (
+                                        <ChevronDown />
+                                    )}
+                                    Agregar a otros proyectos de forma
+                                    simultánea (opcional)
+                                </label>
+                                <div
+                                    className={`pl-2 overflow-hidden transition-all duration-300 ease-in-out ${
+                                        isCollapsed ? "max-h-0" : "max-h-96"
+                                    }`}
+                                >
+                                    {proyectosAbiertos.map((p) =>
+                                        p.id != id ? (
+                                            <label
+                                                className="inline-flex items-center text-xs"
+                                                key={p.id}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    className="checkbox-btn peer"
+                                                    onChange={() =>
+                                                        toggleProyectoExtra(
+                                                            p.id
+                                                        )
+                                                    }
+                                                    checked={formData?.extra_projects?.includes(
+                                                        p.id
+                                                    )}
+                                                />
+                                                <span className="checkbox-label peer-checked:bg-blue-500 peer-checked:text-white peer-checked:ring-blue-500">
+                                                    {p.service}
+                                                </span>
+                                            </label>
+                                        ) : null
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="flex gap-2 mt-2">
+                            <input
+                                className="btn"
+                                type="submit"
+                                value="Registrar"
+                                onClick={handleSubmit}
+                            />
+
+                            {/* <MobileScanner
+                                onDetect={(codigo) =>{
+                                    //eliminar caracteres no deseados
+                                    let codigoR = codigo.replace(/[^0-9]/g, "");
+                                    console.log(codigoR);
+                                    const match = codigoR.match(/\b\d{5}\b/);
+
+                                    if (match) {
+                                        setFormData({ ...formData, eco: parseInt(codigoR) });
+                                    }
+
                                 }
+                                }
+                            /> */}
+                        </div>
+                    </form>
+                </Modal>
+            </ErrorBoundary>
 
-                            }
-                            }
-                        /> */}
-                    </div>
-                </form>
-            </Modal>
             <Modal
                 isOpen={isModalConsultarOpen}
                 onClose={() => setModalConsultarOpen(false)}
