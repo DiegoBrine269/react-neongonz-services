@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@import "animate.css";
 
 body {
   font-family: "Nunito", sans-serif;
@@ -103,7 +103,7 @@ body {
     } */
     
     .error {
-        @apply text-red-600 text-sm font-normal;
+        @apply text-red-600 text-sm font-normal ;
     }
 }
 

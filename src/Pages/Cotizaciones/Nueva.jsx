@@ -5,20 +5,38 @@ import { toast } from "react-toastify";
 import clienteAxios from "../../config/axios";
 import { Printer } from "lucide-react";
 
+
 export default function Nueva() {
 
     const { token, setLoading, user, totalFilas, setTotalFilas, centros, fetchCentros} = useContext(AppContext);
 
     const [centro, setCentro] = useState("");
+    const [errors, setErrors] = useState({});
 
     const [vehiculosPendientes, setVehiculosPendientes] = useState([]);
     const [centrosPendientes, setCentrosPendientes] = useState([]);
     const [proyectosPendientes, setProyectosPendientes] = useState([]);
 
-    const [formData, setFormData] = useState({
+    const [seleccionados, setSeleccionados] = useState([]);
 
+    const [formData, setFormData] = useState({
         vehicles: [],
     });
+
+    const handleCheckboxChange = (item) => {
+        setSeleccionados(
+            (prev) =>
+                prev.includes(item)
+                    ? prev.filter((i) => i !== item) // lo quita
+                    : [...prev, item] // lo agrega
+        );
+    };
+
+    useEffect(()=>{
+        setFormData({
+            vehicles:seleccionados
+        });
+    }, [seleccionados]);
 
 
     async function fetchVehiculos() {
@@ -45,9 +63,7 @@ export default function Nueva() {
                         .values() // Obtén los valores únicos
                 )
             );
-            console.log(
-                Array.from(new Set(res.data.map((item) => item.project)))
-            );
+
 
             setVehiculosPendientes(res.data);
         } catch (error) {
@@ -56,6 +72,34 @@ export default function Nueva() {
             toast.error("Error al cargar los vehículos");
         }
     }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const { data } = await clienteAxios.post(
+                `/api/invoices`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            setErrors({});
+
+        } catch (error) {
+            console.error("Error during request:", error);
+            if (error.response && error.response.data.errors) {
+                toast.error(error.response.data.errors);
+            }
+            setErrors(error.response.data.errors);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -114,7 +158,7 @@ export default function Nueva() {
                                     </p>
 
                                     <div className="flex gap-1 flex-wrap">
-                                        {vehiculosPendientes.map(
+                                        {vehiculosPendientes?.map(
                                             (v) =>
                                                 v.project_id == p.id && (
                                                     <label
@@ -124,12 +168,15 @@ export default function Nueva() {
                                                         <input
                                                             type="checkbox"
                                                             className="checkbox-btn peer"
-                                                            // onChange={() =>
-                                                            //     // toggleProyectoExtra(p.id)
-                                                            // }
-                                                            // checked={formData?.extra_projects?.includes(
-                                                            //     p.id
-                                                            // )}
+                                                            value={v.id}
+                                                            checked={seleccionados.includes(
+                                                                v.id
+                                                            )}
+                                                            onChange={() =>
+                                                                handleCheckboxChange(
+                                                                    v.id
+                                                                )
+                                                            }
                                                         />
                                                         <span className="checkbox-label peer-checked:bg-blue-500 peer-checked:text-white peer-checked:ring-blue-500">
                                                             {v.eco}
@@ -141,18 +188,18 @@ export default function Nueva() {
                                 </div>
                             ) : null
                         )}
-                    <button
-                        className="btn mt-4"
-                        // onClick={() => {
-                        //     setModalOpen(true);
-                        // }}
-                    >
-                        <Printer />
-                        Generar
-                    </button>
+                        <button className="btn mt-4" onClick={handleSubmit}>
+                            <Printer />
+                            Generar
+                        </button>
+
+                        {errors.vehicles && (
+                            <p className="error animate__animated animate__shakeX">
+                                {errors?.vehicles[0]}
+                            </p>
+                        )}
                     </div>
                 )}
-
             </form>
         </>
     );

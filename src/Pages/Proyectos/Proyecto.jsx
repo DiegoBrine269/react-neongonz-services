@@ -484,7 +484,7 @@ export default function Proyecto() {
                         <div>
                             <label
                                 className="label flex"
-                                htmlFor="other-projects"
+                                // htmlFor="other-projects"
                                 onClick={() => setIsCollapsed((prev) => !prev)}
                             >
                                 {isCollapsed ? (
