@@ -1,6 +1,6 @@
 const tabulatorConfig = {
     placeholder: "Sin resultados",
-    layout: "fitData",
+    layout: "fitDataFill",
     resizableColumns: false,
     langs: {
         default: {

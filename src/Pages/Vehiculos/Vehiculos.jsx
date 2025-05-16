@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import { ReactTabulator } from "react-tabulator";
 import Modal from "@/components/Modal";
 import { tabulatorConfig } from "../../config/variables";
+import Tabla from "../../components/Tabla";
 
 export default function Vehiculos() {
     const [vehiculos, setVehiculos] = useState([]);
@@ -29,15 +30,15 @@ export default function Vehiculos() {
         }
     }
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            await fetchVehiculos();
-            setLoading(false);
-        };
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         setLoading(true);
+    //         await fetchVehiculos();
+    //         setLoading(false);
+    //     };
 
-        fetchData();
-    }, []);
+    //     fetchData();
+    // }, []);
 
 
     return (
@@ -45,8 +46,7 @@ export default function Vehiculos() {
             <h2 className="title-2">Listado de vehículos</h2>
 
             <div>
-                <ReactTabulator
-                    data={vehiculos} // Set the table data
+                <Tabla
                     columns={[
                         {
                             title: "Económico",
@@ -66,9 +66,17 @@ export default function Vehiculos() {
                     ]}
                     layout="fitColumns"
                     options={{
-                        pagination: true,
-                        paginationSize: 10,
-                        ...tabulatorConfig
+                        pagination: true, //enable pagination
+                        paginationMode: "remote", //enable remote pagination
+                        ajaxURL: `${import.meta.env.VITE_API_URL}/api/vehicles`,
+                        ajaxConfig: {
+                            method: "GET",
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        },
+                        filterMode:"remote",
+
                     }}
                     events={{
                         rowClick: (e, row) => {
@@ -77,13 +85,11 @@ export default function Vehiculos() {
                             setModalOpen(true);
                         },
                     }}
+                    
                 />
             </div>
 
-            <Modal
-                isOpen={isModalOpen}
-                onClose={() => setModalOpen(false)}
-            >
+            <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
                 <h2 className="title-3">Vehículo</h2>
                 <div className="flex flex-col gap-3 pl-2">
                     <div className="text">
@@ -104,9 +110,7 @@ export default function Vehiculos() {
                         </span>{" "}
                         <p>{vehiculo?.centre_name}</p>
                     </div>
-                    
                 </div>
-
 
                 <button
                     className="btn"
@@ -116,7 +120,6 @@ export default function Vehiculos() {
                 >
                     Aceptar
                 </button>
-
             </Modal>
         </>
     );

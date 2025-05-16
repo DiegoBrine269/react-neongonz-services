@@ -14,7 +14,7 @@ export default function Proyectos() {
 
     const [catalogoServicios, setCatalogoServicios] = useState([]);
     const [mostrarCerrados, setMostrarCerrados] = useState(false);
-
+    const hoy = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
 
     const { token, setLoading, user, fetchCentros, centros, proyectos, setProyectos} = useContext(AppContext);
 
@@ -23,7 +23,7 @@ export default function Proyectos() {
     const [formData, setFormData] = useState({
         centre_id: "",
         service_id: "",
-        date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0],
+        date: hoy,
     });
 
     const [errors, setErrors] = useState({});
@@ -47,7 +47,7 @@ export default function Proyectos() {
             setFormData({
                 centre_id: "",
                 service_id: "",
-                date: "",
+                date: hoy,
             });
             setErrors({});
         } catch (error) {

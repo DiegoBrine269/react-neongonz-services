@@ -2,8 +2,9 @@ import { useState } from "react";
 import { tabulatorConfig } from "../config/variables.js"
 import { ReactTabulator } from "react-tabulator";
 
-export default function Tabla({data, columns, options, events}) {
+export default function Tabla({data  , columns, options, events}) {
     const [totalFilas, setTotalFilas] = useState(0);
+
     return (
         <>
             <p className="text">
@@ -13,17 +14,26 @@ export default function Tabla({data, columns, options, events}) {
                 <ReactTabulator
                     data={data}
                     columns={columns}
-                    layout={"fitDataStretch"}
+                    // layout={"fitColumns"}
                     options={{
                         ...options,
                         ...tabulatorConfig,
-                        layout: "fitDataStretch",
+                        ajaxResponse: (url, params, response) => {
+                            console.log(response.total);
+                            setTotalFilas(response.total);
+                            return response;
+                        },
                     }}
                     events={{
                         ...events,
-                        dataLoaded: (data) => setTotalFilas(data.length),
-                        dataFiltered: (filters, rows) =>
-                            setTotalFilas(rows.length),
+                        dataLoaded: (data) => {
+                            if (options?.paginationMode !== "remote")
+                                setTotalFilas(data.length);
+                        },
+                        dataFiltered: (filters, rows) => {
+                            if (options?.paginationMode !== "remote")
+                                setTotalFilas(rows.length);
+                        },
                     }}
                 />
             </div>

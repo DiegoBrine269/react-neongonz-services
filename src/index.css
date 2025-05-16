@@ -94,7 +94,7 @@ body {
         @apply text-slate-200;
     }
 
-    .dark .tabulator-col-content, .dark .tabulator-col, .dark .tabulator-cell, .dark .tabulator-headers, .dark .tabulator-header-contents,  .dark .tabulator-footer, .dark .tabulator-tableholder, .dark .tabulator-placeholder{
+    .dark .tabulator-col-content, .dark .tabulator-row, .dark .tabulator-col, .dark .tabulator-cell, .dark .tabulator-headers, .dark .tabulator-header-contents,  .dark .tabulator-footer, .dark .tabulator-tableholder, .dark .tabulator-placeholder{
         @apply !bg-neutral-800 text-slate-200;
     }   
 

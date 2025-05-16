@@ -27,7 +27,7 @@ export default function Proyecto() {
         type: "",
         commentary: ""
     });
-    const [isCollapsed, setIsCollapsed] = useState(true);
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     const { token, setLoading, user, totalFilas, setTotalFilas } =
         useContext(AppContext);
@@ -394,7 +394,7 @@ export default function Proyecto() {
                 options={{
                     pagination: "local",
                     paginationSize: 20,
-                    layout: "fitDataStretch",
+                    layout: "fitDataFill",
                 }}
                 events={{
                     rowClick: (e, row) => {
@@ -508,14 +508,14 @@ export default function Proyecto() {
                                     simultánea (opcional)
                                 </label>
                                 <div
-                                    className={`pl-2 overflow-hidden transition-all duration-300 ease-in-out ${
+                                    className={`pl-2 pt-2 flex flex-wrap gap-1 overflow-hidden ${
                                         isCollapsed ? "max-h-0" : null
                                     }`}
                                 >
                                     {proyectosAbiertos.map((p) =>
                                         p.id != id ? (
                                             <label
-                                                className="inline-flex items-center text-xs"
+                                                className="inline-flex items-center text-xs mt-0"
                                                 key={p.id}
                                             >
                                                 <input
