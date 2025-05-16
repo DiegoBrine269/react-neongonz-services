@@ -1,4 +1,5 @@
 const tabulatorConfig = {
+    // locale: true,
     placeholder: "Sin resultados",
     layout: "fitDataFill",
     resizableColumns: false,
@@ -13,6 +14,10 @@ const tabulatorConfig = {
                 prev_title: "Página anterior",
                 next: "Siguiente",
                 next_title: "Página siguiente",
+            },
+            ajax: {
+                loading: "Cargando datos...", // Cambia "Loading..."
+                error: "Error al cargar", // También puedes cambiar "Error loading data"
             },
         },
     },

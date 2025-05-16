@@ -6,12 +6,12 @@ import { AppContext } from "../context/AppContext";
 import { useContext } from "react";
 // import Modal from "react-modal";
 import { ToastContainer } from "react-toastify";
-import { PacmanLoader, ClimbingBoxLoader } from "react-spinners";
-
+import { PacmanLoader, PulseLoader } from "react-spinners";
+import useNetworkStatus from "../hooks/useNetworkStatus";
 
 export default function Layout() {
     const {isMenuOpen, setIsMenuOpen, loading} = useContext(AppContext);
-
+    const { isOnline } = useNetworkStatus();
 
 
     return (
@@ -19,6 +19,13 @@ export default function Layout() {
             {loading && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
                     <PacmanLoader color="#ffffff" />
+                </div>
+            )}
+
+            {!isOnline && (
+                <div className="fixed inset-0 z-50 flex gap-2 flex-col items-center justify-center bg-black/75">
+                    <p className="text-white font-bold">No hay conexión a internet, reintentando.</p>
+                    <PulseLoader color="#ffffff" />
                 </div>
             )}
 

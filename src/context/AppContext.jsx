@@ -65,6 +65,8 @@ export default function AppProvider({ children }) {
     async function handleLogout(e) {
         e.preventDefault();
 
+        setLoading(true);
+
         try {
             await clienteAxios.post("/api/logout", null, {
                 headers: {

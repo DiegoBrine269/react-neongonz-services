@@ -16,8 +16,7 @@ export default function Header() {
     const handleToggle = () => {
         setIsMenuOpen(!isMenuOpen);
     };
-    
-    function Item({ to, text, children }) {
+    function Item({ to, text, children, onClick }) {
         return (
             <NavLink
                 to={to}
@@ -28,7 +27,10 @@ export default function Header() {
                             : ""
                     }`
                 }
-                onClick={() => setIsMenuOpen(false)}
+                onClick={(e) => {
+                    setIsMenuOpen(false);
+                    if (onClick) onClick(e);
+                }}
             >
                 {children}
                 <span>{text}</span>
@@ -38,22 +40,20 @@ export default function Header() {
 
     function Items () {
         return (
-            <>
-                {user && <Item to="/vehiculos" text="Vehículos" children={<Car />} />}
-                {user && user.role === 'admin' && <Item to="/centros-de-venta" text="Centros de venta" children={<Factory />} />}
-                {user && user.role === 'admin' && <Item to="/servicios" text="Servicios" children={<Wrench />} />}
-                {user && <Item to="/proyectos" text="Proyectos" children={<BriefcaseBusiness />} />}
-                {user && user.role === 'admin' && <Item to="/cotizaciones" text="Cotizaciones" children={<Receipt />} />}
-                {user && <Item to="/mi-cuenta" text="Mi cuenta" children={<User />} />}
-                {user && <button className="`flex items-center gap-2 p-2 rounded-md transition-colors duration-300 dark:text-neutral-200 hover:bg-gray-200 hover:text-neutral-900 dark:hover:bg-neutral-700 dark:hover:text-neutral-200" onClick={handleLogout}>
-                         Cerrar sesión
-                        </button>     }
-                {!user && <Item to="/login" text="Iniciar Sesión" children={<LogIn />}/>}
-                {!user && <Item to="/registro" text="Crear una cuenta" children={<UserRoundPlus />}/>}
-
-
-            </>
-        );
+                    <>
+                        {user && <Item to="/vehiculos" text="Vehículos" children={<Car />} />}
+                        {user && user.role === 'admin' && <Item to="/centros-de-venta" text="Centros de venta" children={<Factory />} />}
+                        {user && user.role === 'admin' && <Item to="/servicios" text="Servicios" children={<Wrench />} />}
+                        {user && <Item to="/proyectos" text="Proyectos" children={<BriefcaseBusiness />} />}
+                        {user && user.role === 'admin' && <Item to="/cotizaciones" text="Cotizaciones" children={<Receipt />} />}
+                        {user && <Item to="/mi-cuenta" text="Mi cuenta" children={<User />} />}
+                        {user && (
+                            <Item to="/logout" text="Cerrar sesión" children={<LogOut />} onClick={handleLogout} />
+                        )}
+                        {!user && <Item to="/login" text="Iniciar Sesión" children={<LogIn />}/>}
+                        {!user && <Item to="/registro" text="Crear una cuenta" children={<UserRoundPlus />}/>}
+                    </>
+                );
     }
 
 
@@ -69,13 +69,13 @@ export default function Header() {
                     </NavLink>
                 </nav>
 
-                <div className="hidden md:flex md:justify-evenly" >
+                <div className="hidden lg:flex lg:justify-evenly" >
                     <Items />
                 </div>
 
                 {isMenuOpen && (
 
-                    <div className="md:hidden bg-white dark:bg-neutral-800 dark:text-neutral-200 shadow-md rounded-lg p-4 absolute top-16 left-0 right-0 mx-auto w-11/12 z-10">
+                    <div className="lg:hidden bg-white dark:bg-neutral-800 dark:text-neutral-200 shadow-md rounded-lg p-4 absolute top-16 left-0 right-0 mx-auto w-11/12 z-10">
                         <Items />
                     </div>
                 )}
