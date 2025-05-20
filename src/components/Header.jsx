@@ -60,12 +60,12 @@ export default function Header() {
     return (
         <header className="relative bg-gray-100 dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700 py-2">
             <div className="container mx-auto">
-                <nav className="flex py-5 items-center gap-4 justify-start md:justify-center">
-                    <button onClick={handleToggle} className="md:hidden text-black dark:text-neutral-200">
+                <nav className="flex py-5 items-center gap-4 justify-start lg:justify-center">
+                    <button onClick={handleToggle} className="lg:hidden text-black dark:text-neutral-200">
                         {isMenuOpen ? <X /> : <Menu onClick={handleToggle} />}
                     </button>
                     <NavLink to="/">
-                        <img src={darkMode ? LogoBlanco : Logo} alt="Logo" className="w-12 md:w-16" />
+                        <img src={darkMode ? LogoBlanco : Logo} alt="Logo" className="w-12 lg:w-16" />
                     </NavLink>
                 </nav>
 

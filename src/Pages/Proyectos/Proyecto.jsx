@@ -7,14 +7,16 @@ import Modal from "../../components/Modal";
 import Swal from "sweetalert2";
 import Tabla from "../../components/Tabla";
 import { swalConfig } from "../../config/variables";
-import { ClipboardCopy, Trash2, ClipboardCheck, Car, CircleCheck, ChevronDown, ChevronRight } from "lucide-react";
+import { ClipboardCopy, Trash2, ClipboardCheck, Car, CircleCheck, ChevronDown, ChevronRight, Pencil,Save } from "lucide-react";
 import ErrorBoundary from '../../components/ErrorBoundary';
+import { format } from "@formkit/tempo";
 
 
 export default function Proyecto() {
     const navigate = useNavigate();
 
     const { id } = useParams();
+    const [editando, setEditando] = useState(false);
     const [proyectosAbiertos, setProyectosAbiertos] = useState([]);
     const [proyecto, setProyecto] = useState({});
     const [vehiculos, setVehiculos] = useState([]);
@@ -29,7 +31,7 @@ export default function Proyecto() {
     });
     const [isCollapsed, setIsCollapsed] = useState(false);
 
-    const { token, setLoading, user, totalFilas, setTotalFilas } =
+    const { token, setLoading, user, totalFilas, setTotalFilas, fetchCentros, centros, fetchServicios, servicios } =
         useContext(AppContext);
     // console.log(user);
 
@@ -42,6 +44,12 @@ export default function Proyecto() {
         extra_projects: [],
     });
 
+    const [formDataEdit, setFormDataEdit] = useState({
+        centre_id: "",
+        service_id: "",
+        date: "",
+    });
+
     const fetchProyecto = async () => {
         try {
             const res = await clienteAxios.get(`/api/projects/${id}`, {
@@ -50,6 +58,11 @@ export default function Proyecto() {
                 },
             });
             setProyecto(res.data);
+            setFormDataEdit({
+                centre_id: res.data.centre.id,
+                service_id: res.data.service.id,
+                date: res.data.date,
+            });
             setVehiculos(res.data.vehicles);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -93,6 +106,50 @@ export default function Proyecto() {
                 service_id: "",
                 date: "",
             });
+            setErrors({});
+        } catch (error) {
+            console.error("Error during request:", error);
+            if (error.response && error.response.data.errors) {
+                setErrors(error.response.data.errors);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSubmitEdit = async (e) => {
+        e.preventDefault();
+
+        const result = await Swal.fire({
+            icon: "warning",
+            title: "¿Estás seguro de querer editar el proyecto?",
+            text: "En caso de cambiar de centro de ventas, los vehículos también serán reasignados.",
+            confirmButtonText: "Aceptar",
+            showCancelButton: true,
+            cancelButtonText: "Cancelar",
+            ...swalConfig(),
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
+
+        setLoading(true);
+
+        try {
+            const { data } = await clienteAxios.put(`/api/projects/${id}`,
+                formDataEdit,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            fetchProyecto();
+            setEditando(false);
+            toast.success("Proyecto actualizado correctamente");
             setErrors({});
         } catch (error) {
             console.error("Error during request:", error);
@@ -289,6 +346,8 @@ export default function Proyecto() {
         const fetchData = async () => {
             setLoading(true);
             await fetchProyecto();
+            await fetchCentros();
+            await fetchServicios();
             await fetchTypes();
             setLoading(false);
         };
@@ -306,8 +365,8 @@ export default function Proyecto() {
         {
             title: "Económico",
             field: "eco",
-            headerFilter: "input",
-            headerFilterParams: { type: "number" },
+            headerFilter: "number",
+            // headerFilterParams: { type: "number" },
             resizable: false,
         },
         {
@@ -326,7 +385,19 @@ export default function Proyecto() {
         {
             title: "Fecha y hora de registro",
             field: "created_at",
-            headerFilter: "input",
+            // headerFilter: "input",
+            formatter: (cell) => {
+                const date = cell.getValue();
+                console.log(date);
+                return format(date, {"date": "short", "time": "short"}, "es");
+            },
+            // headerFilterFunc: (headerValue, rowValue) => {
+            //     if (!headerValue) return true; // sin filtro, mostrar todo
+            //     const formatted = formatDateTime(rowValue); // rowValue es el valor original (created_at)
+            //     return formatted
+            //         .toLowerCase()
+            //         .includes(headerValue.toLowerCase());
+            // },
             resizable: false,
             width: 250,
         },
@@ -334,7 +405,18 @@ export default function Proyecto() {
 
     return (
         <div className="relative">
-            <h2 className="title-2 mb-0">Proyecto No. {proyecto?.id}</h2>
+            <div className="flex items-center gap-2">
+                <h2 className="title-2 mb-0">Proyecto No. {proyecto?.id}</h2>
+                <button
+                    onClick={() => {
+                        setEditando((prev) => !prev);
+                        // console.log(editando);
+                    }}
+                    className="cursor-pointer"
+                >
+                    <Pencil className="text w-5" />
+                </button>
+            </div>
             <div className="pl-3">
                 <p className="text">
                     <span className="font-bold">Servicio:</span>{" "}
@@ -405,6 +487,95 @@ export default function Proyecto() {
                 columns={columns}
                 data={vehiculos}
             />
+
+            <Modal isOpen={editando} onClose={() => setEditando(false)}>
+                <h3 className="title-3">Editar proyecto</h3>
+                <form action="">
+                    <label className="label" htmlFor="centre_id">
+                        Centro de ventas
+                    </label>
+                    <select
+                        id="centre_id"
+                        className="input"
+                        onChange={(e) =>
+                            setFormDataEdit({
+                                ...formDataEdit,
+                                centre_id: e.target.value,
+                            })
+                        }
+                        value={formDataEdit?.centre_id || ""}
+                    >
+                        <option value="" disabled>
+                            Seleccione un centro de ventas
+                        </option>
+                        {centros.map((centro) => (
+                            <option key={centro.id} value={centro.id}>
+                                {centro.name}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.centre_id && (
+                        <p className="text-red-500">{errors.centre_id[0]}</p>
+                    )}
+
+                    <label className="label" htmlFor="service_id">
+                        Servicio
+                    </label>
+                    <select
+                        id="service_id"
+                        className="input"
+                        onChange={(e) =>
+                            setFormDataEdit({
+                                ...formDataEdit,
+                                service_id: e.target.value,
+                            })
+                        }
+                        value={formDataEdit?.service_id || ""}
+                    >
+                        <option value="" disabled>
+                            Seleccione un servicio
+                        </option>
+                        {servicios.map((centro) => (
+                            <option key={centro.id} value={centro.id}>
+                                {centro.name}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.service_id && (
+                        <p className="text-red-500">{errors.service_id[0]}</p>
+                    )}
+
+                    <label className="label" htmlFor="fecha">
+                        fecha
+                    </label>
+                    <input
+                        className="input"
+                        type="date"
+                        id="fecha"
+                        placeholder="fecha"
+                        value={formDataEdit?.date}
+                        // defaultValue={formData.date || new Date().toISOString().split("T")[0]}
+                        onChange={(e) =>
+                            setFormDataEdit({
+                                ...formDataEdit,
+                                date: e.target.value,
+                            })
+                        }
+                    />
+                    {errors.date && (
+                        <p className="text-red-500">{errors.date[0]}</p>
+                    )}
+
+                    <button
+                        className="btn mt-4"
+                        type="submit"
+                        onClick={handleSubmitEdit}
+                    >
+                        <Save />
+                        Guardar
+                    </button>
+                </form>
+            </Modal>
 
             <ErrorBoundary>
                 <Modal
@@ -598,7 +769,7 @@ export default function Proyecto() {
                         <span className="font-bold border-b-1 block border-neutral-400">
                             Fecha y hora de registro
                         </span>{" "}
-                        <p>{vehiculo?.created_at}</p>
+                        <p>{format(vehiculo?.created_at, { date: "full", time: "medium" }, "es")}</p>
                     </div>
                     <div className="text">
                         <span className="font-bold border-b-1 block border-neutral-400">

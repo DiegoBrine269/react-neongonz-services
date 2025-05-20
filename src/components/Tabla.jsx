@@ -5,6 +5,8 @@ import { ReactTabulator } from "react-tabulator";
 export default function Tabla({data  , columns, options, events}) {
     const [totalFilas, setTotalFilas] = useState(0);
 
+
+
     return (
         <>
             <p className="text">
@@ -14,6 +16,7 @@ export default function Tabla({data  , columns, options, events}) {
                 <ReactTabulator
                     data={data}
                     columns={columns}
+                    
                     // layout={"fitColumns"}
                     options={{
                         ...options,

@@ -6,17 +6,19 @@ import { AppContext } from "../../context/AppContext";
 import Modal from "../../components/Modal";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { CirclePlus,Save } from "lucide-react";
+import { CirclePlus, Save } from "lucide-react";
 import Tabla from "../../components/Tabla";
+import { format } from "@formkit/tempo";
+
 
 export default function Proyectos() {
     
 
-    const [catalogoServicios, setCatalogoServicios] = useState([]);
+    // const [servicios, setServicios] = useState([]);
     const [mostrarCerrados, setMostrarCerrados] = useState(false);
     const hoy = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
 
-    const { token, setLoading, user, fetchCentros, centros, proyectos, setProyectos} = useContext(AppContext);
+    const { token, setLoading, user, fetchServicios, centros, proyectos, setProyectos, servicios} = useContext(AppContext);
 
     const [isModalOpen, setModalOpen] = useState(false);
 
@@ -79,21 +81,7 @@ export default function Proyectos() {
 
 
 
-    async function fetchCatalogoServicios() {
-        try {
-            const res = await clienteAxios.get("/api/services", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
 
-            setCatalogoServicios(res.data);
-        } catch (error) {
-            setCatalogoServicios([]);
-            console.error("Error fetching data:", error);
-            toast.error("Error al cargar los servicios");
-        }
-    }
 
     const handleRowClick = (e, row) => {
         const id = row.getData().id;
@@ -105,8 +93,8 @@ export default function Proyectos() {
             // setLoading(true);
             // await Promise.all([
                 fetchProyectos();
-                fetchCentros();
-                fetchCatalogoServicios();
+                // fetchCentros();
+                fetchServicios();
             // ]);
             setLoading(false);
         };
@@ -121,6 +109,13 @@ export default function Proyectos() {
     
 
     const columns = [
+        {
+            title: "Número",
+            field: "id",
+            headerFilter: "input",
+            width: 100,
+            resizable: false,
+        },
         {
             title: "Nombre",
             field: "service.name",
@@ -140,19 +135,22 @@ export default function Proyectos() {
             field: "date",
             headerFilter: "input",
             resizable: false,
+            formatter: (cell) => {
+                const date = new Date(cell.getValue());
+                return format(date, "DD/MM/YYYY");
+            }
             // formatter: "datetime",
         },
         {
             title: "Estatus",
             field: "is_open",
             headerFilter: "input",
-            formatter : (cell) => {
-                return cell.getValue()  ? 'Abierto' : 'Cerrado';
+            formatter: (cell) => {
+                return cell.getValue() ? "Abierto" : "Cerrado";
             },
             resizable: false,
             width: 250,
         },
-        
     ];
 
     return (
@@ -247,7 +245,7 @@ export default function Proyectos() {
                         <option value="" disabled>
                             Seleccione un servicio
                         </option>
-                        {catalogoServicios.map((centro) => (
+                        {servicios.map((centro) => (
                             <option key={centro.id} value={centro.id}>
                                 {centro.name}
                             </option>

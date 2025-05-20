@@ -55,12 +55,12 @@ export default function Vehiculos() {
                         },
                         {
                             title: "Tipo",
-                            field: "type_name",
+                            field: "type",
                             headerFilter: true,
                         },
                         {
                             title: "Centro",
-                            field: "centre_name",
+                            field: "centre",
                             headerFilter: true,
                         },
                     ]}

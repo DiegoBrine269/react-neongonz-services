@@ -16,6 +16,9 @@ export default function AppProvider({ children }) {
     //
     const [proyectos, setProyectos] = useState([]);
 
+    const [servicios, setServicios] = useState([]);
+
+
     const toggleDarkMode = () => {
         const newDarkMode = !darkMode;
         setDarkMode(newDarkMode);
@@ -99,6 +102,22 @@ export default function AppProvider({ children }) {
         }
     }
 
+    async function fetchServicios() {
+        try {
+            const res = await clienteAxios.get("/api/services", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            setServicios(res.data);
+        } catch (error) {
+            setServicios([]);
+            console.error("Error fetching data:", error);
+            toast.error("Error al cargar los servicios");
+        }
+    }
+
     //Menú de navegación
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -126,7 +145,9 @@ export default function AppProvider({ children }) {
                 centros,
                 setCentros,
                 proyectos,
-                setProyectos
+                setProyectos,
+                fetchServicios,
+                servicios,
             }}
         >
             {children}

@@ -4,9 +4,11 @@ import { AppContext } from "../../context/AppContext";
 import { toast } from "react-toastify";
 import clienteAxios from "../../config/axios";
 import { Printer } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 
 export default function Nueva() {
+    const navigate = useNavigate();
 
     const { token, setLoading, user, totalFilas, setTotalFilas, centros, fetchCentros} = useContext(AppContext);
 
@@ -18,9 +20,12 @@ export default function Nueva() {
     const [proyectosPendientes, setProyectosPendientes] = useState([]);
 
     const [seleccionados, setSeleccionados] = useState([]);
+    const [seleccionarTodo, setSeleccionarTodo] = useState(false);
+
 
     const [formData, setFormData] = useState({
         vehicles: [],
+        comments: null
     });
 
     const handleCheckboxChange = (item) => {
@@ -34,14 +39,16 @@ export default function Nueva() {
 
     useEffect(()=>{
         setFormData({
+            ...formData,
             vehicles:seleccionados
         });
     }, [seleccionados]);
 
 
     async function fetchVehiculos() {
+        setLoading(true);
         try {
-            const res = await clienteAxios.get("/api/vehicles?invoice=pending",
+            const res = await clienteAxios.get(`/api/vehicles?invoice=pending`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -71,35 +78,64 @@ export default function Nueva() {
             console.error("Error fetching data:", error);
             toast.error("Error al cargar los vehículos");
         }
+        finally
+        {
+            setLoading(false);
+        }
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log(formData);
         setLoading(true);
 
         try {
-            const { data } = await clienteAxios.post(
+            const response = await clienteAxios.post(
                 `/api/invoices`,
                 formData,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
+                    responseType: "blob",
                 }
             );
 
-            setErrors({});
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "Cotización.pdf"); 
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
 
+            setErrors({});
+            navigate('/cotizaciones');
+            // useNavigate('/cotizaciones');
         } catch (error) {
             console.error("Error during request:", error);
-            if (error.response && error.response.data.errors) {
-                toast.error(error.response.data.errors);
+            if (error.response) {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    try {
+                        const errorData = JSON.parse(reader.result);
+                        if (errorData.errors) {
+                            setErrors(errorData.errors);
+                        }
+                    } catch (parseError) {
+                        console.error("Error parsing response:", parseError);
+                        toast.error("Error desconocido al generar el PDF");
+                    }
+                };
+                reader.readAsText(error.response.data);
+            } else {
+                toast.error("Error desconocido al generar el PDF");
             }
-            setErrors(error.response.data.errors);
         } finally {
             setLoading(false);
         }
     };
+    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -114,6 +150,28 @@ export default function Nueva() {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        if(seleccionarTodo){
+            console.log("Seleccionando todo");
+            // debugger
+            vehiculosPendientes.forEach(v => {
+                if(v.centre_id == centro && !seleccionados.includes(v)) 
+                    setSeleccionados((prev) => [...prev, v]);
+            });
+
+            return;
+        }    
+
+        setSeleccionados([]);
+        
+    }, [seleccionarTodo]);
+
+
+    useEffect(() => {
+        setSeleccionarTodo(false);
+        setSeleccionados([]);
+    }, [centro]);
+
     return (
         <>
             <h2 className="title-2">Nueva cotización</h2>
@@ -123,43 +181,66 @@ export default function Nueva() {
             </p>
 
             <form action="">
-                <label className="label" htmlFor="correo">
-                    Centro de ventas
-                </label>
 
-                <select
-                    id="centre_id"
-                    className="input"
-                    value={centro}
-                    onChange={(e) => setCentro(e.target.value)}
-                    defaultValue=""
-                >
-                    <option value="" disabled>
-                        Seleccione un centro de ventas
-                    </option>
-                    {centros
-                        .filter((centro) =>
-                            centrosPendientes.includes(centro.id)
-                        )
-                        .map((centro) => (
-                            <option key={centro.id} value={centro.id}>
-                                {centro.name}
-                            </option>
-                        ))}
-                </select>
+                {
+                    vehiculosPendientes.length > 0 && (
+                        <>
+                            <label className="label" htmlFor="correo">
+                                Centro de ventas
+                            </label>
+                            <select
+                                id="centre_id"
+                                className="input"
+                                value={centro}
+                                onChange={(e) => setCentro(e.target.value)}
+                                >
+                                <option value="" disabled>
+                                    Seleccione un centro de ventas
+                                </option>
+                                {centros
+                                    .filter((centro) =>
+                                        centrosPendientes.includes(centro.id)
+                                )
+                                .map((centro) => (
+                                    <option key={centro.id} value={centro.id}>
+                                            {centro.name}
+                                        </option>
+                                    ))}
+                            </select>
+                        </>
+                    )
+                }
+
+                {vehiculosPendientes.length > 0 && (
+                    <label
+                        htmlFor="mostrarCerrados"
+                        className="flex gap-1 justify-end items-center"
+                    >
+                        <input
+                            className="h-4 w-4"
+                            type="checkbox"
+                            id="mostrarCerrados"
+                            checked={seleccionarTodo}
+                            onChange={() => {
+                                setSeleccionarTodo(!seleccionarTodo);
+                            }}
+                        />
+                        <span className="text">Seleccionar todo</span>
+                    </label>
+                )}
 
                 {centro !== "" && (
-                    <div className="pt-4">
+                    <div className="pt-2">
                         {proyectosPendientes.map((p) =>
                             p.centre_id == centro ? (
-                                <div>
+                                <div key={p.id}>
                                     <p className="title-3 mb-1 mt-4">
                                         {p.service}
                                     </p>
 
                                     <div className="flex gap-1 flex-wrap">
-                                        {vehiculosPendientes?.map(
-                                            (v) =>
+                                        {vehiculosPendientes?.map((v) => {
+                                            return (
                                                 v.project_id == p.id && (
                                                     <label
                                                         className="inline-flex items-center text-xs m-0"
@@ -170,30 +251,49 @@ export default function Nueva() {
                                                             className="checkbox-btn peer"
                                                             value={v.id}
                                                             checked={seleccionados.includes(
-                                                                v.id
+                                                                v
                                                             )}
-                                                            onChange={() =>
+                                                            onChange={(e) => {
                                                                 handleCheckboxChange(
-                                                                    v.id
-                                                                )
-                                                            }
+                                                                    v
+                                                                );
+                                                            }}
                                                         />
                                                         <span className="checkbox-label peer-checked:bg-blue-500 peer-checked:text-white peer-checked:ring-blue-500">
                                                             {v.eco}
                                                         </span>
                                                     </label>
                                                 )
-                                        )}
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             ) : null
                         )}
-                        <button className="btn mt-4" onClick={handleSubmit}>
-                            <Printer />
-                            Generar
-                        </button>
 
-                        {errors.vehicles && (
+                        {
+                            seleccionados.length > 0 && (
+
+                                <>
+                                    <label htmlFor="comments" className="label">
+                                        Comentarios o instrucciones especiales
+                                    </label>
+                                    <textarea
+                                    value={formData.comments ?? ""}
+                                    id="comments"
+                                    placeholder="Comentarios o instrucciones especiales"
+                                    onChange={e => setFormData({...formData, comments:e.target.value})}
+                                    ></textarea>
+
+                                    <button className="btn mt-4" onClick={handleSubmit}>
+                                        <Printer />
+                                        Generar
+                                    </button>
+                                </>
+                            )
+                        }
+
+                        {errors?.vehicles && (
                             <p className="error animate__animated animate__shakeX">
                                 {errors?.vehicles[0]}
                             </p>
