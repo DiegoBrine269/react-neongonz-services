@@ -102,13 +102,13 @@ export default function Vehiculos() {
                         <span className="font-bold border-b-1 block border-neutral-400">
                             Tipo
                         </span>{" "}
-                        <p>{vehiculo?.type_name}</p>
+                        <p>{vehiculo?.type}</p>
                     </div>
                     <div className="text">
                         <span className="font-bold border-b-1 block border-neutral-400">
                             Centro de ventas
                         </span>{" "}
-                        <p>{vehiculo?.centre_name}</p>
+                        <p>{vehiculo?.centre}</p>
                     </div>
                 </div>
 

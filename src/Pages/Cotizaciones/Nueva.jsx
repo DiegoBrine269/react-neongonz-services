@@ -211,7 +211,7 @@ export default function Nueva() {
                     )
                 }
 
-                {vehiculosPendientes.length > 0 && (
+                {centro && vehiculosPendientes.length > 0 && (
                     <label
                         htmlFor="mostrarCerrados"
                         className="flex gap-1 justify-end items-center"

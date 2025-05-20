@@ -110,10 +110,10 @@ export default function Proyectos() {
 
     const columns = [
         {
-            title: "Número",
+            title: "No.",
             field: "id",
             headerFilter: "input",
-            width: 100,
+            width:70,
             resizable: false,
         },
         {

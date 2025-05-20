@@ -427,7 +427,7 @@ export default function Proyecto() {
                     {proyecto?.centre?.name}{" "}
                 </p>
                 <p className="text">
-                    <span className="font-bold">Fecha:</span> {proyecto?.date}
+                    <span className="font-bold">Fecha:</span> {format(proyecto?.date, "full", "es")}
                 </p>
             </div>
 
@@ -762,7 +762,7 @@ export default function Proyecto() {
                         </span>{" "}
                         <p>
                             {vehiculo?.commentary ??
-                                "No se registró comentario."}
+                                "-"}
                         </p>
                     </div>
                     <div className="text">
