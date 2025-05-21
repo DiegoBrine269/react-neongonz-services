@@ -10,6 +10,7 @@ import { swalConfig } from "../../config/variables";
 import { ClipboardCopy, Trash2, ClipboardCheck, Car, CircleCheck, ChevronDown, ChevronRight, Pencil,Save } from "lucide-react";
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { format } from "@formkit/tempo";
+import RadioButtonItem from "../../components/RadioButtonItem";
 
 
 export default function Proyecto() {
@@ -48,6 +49,7 @@ export default function Proyecto() {
         centre_id: "",
         service_id: "",
         date: "",
+        extra_projects: [],
     });
 
     const fetchProyecto = async () => {
@@ -309,27 +311,31 @@ export default function Proyecto() {
         closeProject();
     };
 
-    const toggleProyectoExtra = (item) => {
-        setFormData((prevFormData) => {
-            const extraProjects = Array.isArray(prevFormData.extra_projects)
-                ? [...prevFormData.extra_projects]
-                : []; // Asegúrate de que sea un array
-            if (extraProjects.includes(item)) {
-                // Si el elemento ya está en el array, lo eliminamos
+    const toggleItemInArray = (setter, key, item) => {
+        setter((prevState) => {
+            const array = Array.isArray(prevState[key]) ? [...prevState[key]] : [];
+            if (array.includes(item)) {
+                // Remove the item if it exists
                 return {
-                    ...prevFormData,
-                    extra_projects: extraProjects.filter(
-                        (project) => project !== item
-                    ),
+                    ...prevState,
+                    [key]: array.filter((i) => i !== item),
                 };
             } else {
-                // Si el elemento no está en el array, lo agregamos
+                // Add the item if it doesn't exist
                 return {
-                    ...prevFormData,
-                    extra_projects: [...extraProjects, item],
+                    ...prevState,
+                    [key]: [...array, item],
                 };
             }
         });
+    };
+
+    const toggleProyectoExtra = (item) => {
+        toggleItemInArray(setFormData, "extra_projects", item);
+    };
+
+    const toggleProyectoExtraEdit = (item) => {
+        toggleItemInArray(setFormDataEdit, "extra_projects", item);
     };
 
     const textAreaRef = useRef(null);
@@ -359,7 +365,15 @@ export default function Proyecto() {
         if (proyecto.centre && proyecto.centre.id) {
             fetchProyectosAbiertos();
         }
-    }, [proyecto.centre]); // Se ejecuta cuando proyecto.centre cambia
+    }, [proyecto.centre]);
+
+    useEffect(() => {
+        // console.log(proyecto);
+        if (proyecto.related_projects){
+            setFormDataEdit({...formDataEdit, extra_projects: JSON.parse(proyecto?.related_projects),});
+            setFormData({...formData, extra_projects: JSON.parse(proyecto?.related_projects),});
+        }
+    }, [proyecto]);
 
     const columns = [
         {
@@ -376,11 +390,23 @@ export default function Proyecto() {
             resizable: false,
         },
         {
-            title: "Comentario",
-            field: "commentary",
+            title: "Registrado por",
+            field: "user",
             headerFilter: "input",
             resizable: false,
-            width: 250,
+            formatter: (cell) => {
+                const user = cell.getValue();
+                return `${user?.name ?? ""} ${user?.last_name ?? ""}`;
+            },
+            headerFilterFunc: (headerValue, rowValue) => {
+                if (!headerValue) return true; // sin filtro, mostrar todo
+                const formatted = `${rowValue?.name ?? ""} ${
+                    rowValue?.last_name ?? ""
+                }`; // rowValue es el valor original (user)
+                return formatted
+                    .toLowerCase()
+                    .includes(headerValue.toLowerCase());
+            },
         },
         {
             title: "Fecha y hora de registro",
@@ -388,8 +414,8 @@ export default function Proyecto() {
             // headerFilter: "input",
             formatter: (cell) => {
                 const date = cell.getValue();
-                console.log(date);
-                return format(date, {"date": "short", "time": "short"}, "es");
+                // console.log(date);
+                return format(date, { date: "short", time: "short" }, "es");
             },
             // headerFilterFunc: (headerValue, rowValue) => {
             //     if (!headerValue) return true; // sin filtro, mostrar todo
@@ -401,6 +427,13 @@ export default function Proyecto() {
             resizable: false,
             width: 250,
         },
+        {
+            title: "Comentario",
+            field: "commentary",
+            headerFilter: "input",
+            resizable: false,
+            // width: 250,
+        },
     ];
 
     return (
@@ -408,10 +441,7 @@ export default function Proyecto() {
             <div className="flex items-center gap-2">
                 <h2 className="title-2 mb-0">Proyecto No. {proyecto?.id}</h2>
                 <button
-                    onClick={() => {
-                        setEditando((prev) => !prev);
-                        // console.log(editando);
-                    }}
+                    onClick={() => {setEditando((prev) => !prev);}}
                     className="cursor-pointer"
                 >
                     <Pencil className="text w-5" />
@@ -429,6 +459,7 @@ export default function Proyecto() {
                 <p className="text">
                     <span className="font-bold">Fecha:</span> {format(proyecto?.date, "full", "es")}
                 </p>
+
             </div>
 
             <div className="flex gap-2 mt-2">
@@ -566,6 +597,39 @@ export default function Proyecto() {
                         <p className="text-red-500">{errors.date[0]}</p>
                     )}
 
+                    {proyectosAbiertos?.length > 1 && (
+                        <div>
+                            <label
+                                className="label flex"
+                                onClick={() => setIsCollapsed((prev) => !prev)}
+                            >
+                                <ChevronRight
+                                    className={isCollapsed ? "block" : "hidden"}
+                                />
+                                <ChevronDown
+                                    className={!isCollapsed ? "block" : "hidden"}
+                                />
+                                Enlazar con otros proyectos
+                            </label>
+                            <div
+                                className={`pl-2 pt-2 flex flex-wrap gap-1 overflow-hidden ${
+                                    isCollapsed ? "max-h-0" : null
+                                }`}
+                            >
+                                {proyectosAbiertos.map((p) =>
+                                    p.id != id ? (
+                                        <RadioButtonItem
+                                            key={p.id}
+                                            onChange={() => toggleProyectoExtraEdit(p.id)}
+                                            checked={formDataEdit?.extra_projects?.includes(p.id)}
+                                            label={p.service}
+                                        />
+                                    ) : null
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     <button
                         className="btn mt-4"
                         type="submit"
@@ -660,23 +724,15 @@ export default function Proyecto() {
                             <div>
                                 <label
                                     className="label flex"
-                                    // htmlFor="other-projects"
-                                    onClick={() =>
-                                        setIsCollapsed((prev) => !prev)
-                                    }
+                                    onClick={() => setIsCollapsed((prev) => !prev)}
                                 >
                                     <ChevronRight
-                                        className={
-                                            isCollapsed ? "block" : "hidden"
-                                        }
+                                        className={isCollapsed ? "block" : "hidden"}
                                     />
                                     <ChevronDown
-                                        className={
-                                            !isCollapsed ? "block" : "hidden"
-                                        }
+                                        className={!isCollapsed ? "block" : "hidden"}
                                     />
-                                    Agregar a otros proyectos de forma
-                                    simultánea (opcional)
+                                    Agregar a otros proyectos de forma simultánea (opcional)
                                 </label>
                                 <div
                                     className={`pl-2 pt-2 flex flex-wrap gap-1 overflow-hidden ${
@@ -685,26 +741,12 @@ export default function Proyecto() {
                                 >
                                     {proyectosAbiertos.map((p) =>
                                         p.id != id ? (
-                                            <label
-                                                className="inline-flex items-center text-xs mt-0"
+                                            <RadioButtonItem
                                                 key={p.id}
-                                            >
-                                                <input
-                                                    type="checkbox"
-                                                    className="checkbox-btn peer"
-                                                    onChange={() =>
-                                                        toggleProyectoExtra(
-                                                            p.id
-                                                        )
-                                                    }
-                                                    checked={formData?.extra_projects?.includes(
-                                                        p.id
-                                                    )}
-                                                />
-                                                <span className="checkbox-label peer-checked:bg-blue-500 peer-checked:text-white peer-checked:ring-blue-500">
-                                                    {p.service}
-                                                </span>
-                                            </label>
+                                                onChange={() => toggleProyectoExtra(p.id)}
+                                                checked={formData?.extra_projects?.includes(p.id)}
+                                                label={p.service}
+                                            />
                                         ) : null
                                     )}
                                 </div>

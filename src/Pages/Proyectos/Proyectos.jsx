@@ -127,7 +127,7 @@ export default function Proyectos() {
             title: "Centro de ventas",
             field: "centre.name",
             headerFilter: "input",
-            width: 250,
+            // width: 250,
             resizable: false,
         },
         {
@@ -149,7 +149,7 @@ export default function Proyectos() {
                 return cell.getValue() ? "Abierto" : "Cerrado";
             },
             resizable: false,
-            width: 250,
+            // width: 250,
         },
     ];
 
