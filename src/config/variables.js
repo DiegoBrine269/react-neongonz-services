@@ -34,4 +34,9 @@ const swalConfig = () => {
     };
 };
 
-export {tabulatorConfig, swalConfig};
+const formatoMoneda = new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: "MXN",
+});
+
+export {tabulatorConfig, swalConfig, formatoMoneda};

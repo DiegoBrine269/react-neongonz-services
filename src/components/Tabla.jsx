@@ -22,7 +22,7 @@ export default function Tabla({data  , columns, options, events}) {
                         ...options,
                         ...tabulatorConfig,
                         ajaxResponse: (url, params, response) => {
-                            console.log(response.total);
+                            // console.log(response.total);
                             setTotalFilas(response.total);
                             return response;
                         },

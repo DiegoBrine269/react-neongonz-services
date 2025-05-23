@@ -8,6 +8,8 @@ import { AppContext } from "../../context/AppContext";
 import Modal from "../../components/Modal";
 import clienteAxios from "../../config/axios";
 import { Trash2, CircleCheck } from "lucide-react";
+import { formatoMoneda, swalConfig } from "../../config/variables";
+import Swal from "sweetalert2";
 
 export default function Cotizaciones() {
 
@@ -39,7 +41,13 @@ export default function Cotizaciones() {
 
             const blob = new Blob([res.data], { type: "application/pdf" });
             const url = window.URL.createObjectURL(blob);
-            window.open(url, "_blank");
+
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `${cotizacion?.path}`;
+            link.click();
+
+            window.URL.revokeObjectURL(url); // Limpieza
 
         } catch (error) {
 
@@ -52,27 +60,42 @@ export default function Cotizaciones() {
     }
 
     async function handleEliminarCotizacion() {
-        try {
+
+        const result = await Swal.fire({
+            title: "¿Estás segur@ de querer eliminar la cotización?",
+            text: "Esta acción es irreversible",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar cotización",
+            cancelButtonText: "Cancelar",
+            ...swalConfig(),
+        });
+
+        if (result.isConfirmed) {
             setLoading(true);
-            const res = await clienteAxios.delete(`/api/invoices/${cotizacion?.id}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
 
-            toast.success("Cotización eliminada correctamente");
-            setModal(false);
-            setCotizacion({});
+            try {
+                setLoading(true);
+                const res = await clienteAxios.delete(`/api/invoices/${cotizacion?.id}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
 
-            recargarTabla();
+                toast.success("Cotización eliminada correctamente");
+                setModal(false);
+                setCotizacion({});
 
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            toast.error("Error al eliminar la cotización");
-        } finally {
-            setLoading(false);
+                recargarTabla();
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                toast.error("Error al eliminar la cotización");
+            } finally {
+                setLoading(false);
+            }
         }
     }
     
@@ -118,9 +141,10 @@ export default function Cotizaciones() {
                             headerFilterFunc: "=",
                             formatter: (cell) => {
                                 return cell.getValue()
-                                    ? "$ " + cell.getValue()
+                                    ? formatoMoneda.format(parseInt(cell.getValue()))
                                     : null;
                             },
+                            hozAlign: "right",
                         },
                     ]}
                     ref={tableRef}
@@ -168,7 +192,7 @@ export default function Cotizaciones() {
                         <span className="font-bold border-b-1 block border-neutral-400">
                             Monto total
                         </span>{" "}
-                        <p>$ {cotizacion?.total}</p>
+                        <p>{formatoMoneda.format(cotizacion?.total)}</p>
                     </div>
 
                     <div className="text">

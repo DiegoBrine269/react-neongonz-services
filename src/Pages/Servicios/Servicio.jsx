@@ -137,15 +137,9 @@ export default function Servicio() {
                         <input
                             id={type.id}
                             type="number"
-                            value={
-                                formData.vehicles_types_prices.find(
-                                    (price) => price.vehicle_type_id === type.id
-                                )?.price 
-                                // ||
-                                // vehicles_types_prices.find(
-                                //     (price) => price.vehicle_type_id === type.id
-                                // )?.price 
-                            }
+                            min="0"
+                            step="50"
+                            value={formData.vehicles_types_prices.find((price) => price.vehicle_type_id === type.id)?.price }
                             placeholder="Precio"
                             onChange={(e) => {
                                 const newValue = e.target.value;

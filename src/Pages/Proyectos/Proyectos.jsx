@@ -113,7 +113,7 @@ export default function Proyectos() {
             title: "No.",
             field: "id",
             headerFilter: "input",
-            width:70,
+            width: 70,
             resizable: false,
         },
         {
@@ -131,6 +131,13 @@ export default function Proyectos() {
             resizable: false,
         },
         {
+            title: "No. vehiculos",
+            hozAlign: "right",
+            field: "total_vehicles",
+            headerFilter: "input",
+            resizable: false,
+        },
+        {
             title: "Fecha",
             field: "date",
             headerFilter: "input",
@@ -138,7 +145,7 @@ export default function Proyectos() {
             formatter: (cell) => {
                 const date = new Date(cell.getValue());
                 return format(date, "DD/MM/YYYY");
-            }
+            },
             // formatter: "datetime",
         },
         {
