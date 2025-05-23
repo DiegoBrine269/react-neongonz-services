@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import clienteAxios from "../../config/axios";
 import { Printer } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import { format } from "@formkit/tempo";
 
 export default function Nueva() {
     const navigate = useNavigate();
@@ -216,6 +216,8 @@ export default function Nueva() {
     useEffect(() => {
         setSeleccionarTodo(false);
         setSeleccionados([]);
+        setProyectosSeleccionados([]);
+        
     }, [centro]);
 
     return (
@@ -286,12 +288,11 @@ export default function Nueva() {
                                                 name={p.id}
                                                 type="checkbox"
                                                 id={`seleccionar-proyecto-${p.id}`}
-                                                checked={
-                                                    proyectosSeleccionados[p.id] || false}
+                                                checked={proyectosSeleccionados[p.id] || false}
                                                 onChange={handleCheckboxProyectoChange}
                                             />
                                             <span className="title-3 m-0">
-                                                {p.service}
+                                                {`${p.service} (${format(p.date, "full", "es")})`}
                                             </span>
                                         </label>
                                     </div>
