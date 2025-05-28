@@ -377,7 +377,7 @@ export default function Proyecto() {
 
     const columns = [
         {
-            title: "Económico",
+            title: "Eco.",
             field: "eco",
             headerFilter: "number",
             // headerFilterParams: { type: "number" },
