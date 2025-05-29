@@ -18,7 +18,7 @@ export default function Proyectos() {
     const [mostrarCerrados, setMostrarCerrados] = useState(false);
     const hoy = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
 
-    const { token, setLoading, user, fetchServicios, centros, proyectos, setProyectos, servicios} = useContext(AppContext);
+    const { token, setLoading, user, fetchServicios, fetchCentros, centros, proyectos, setProyectos, servicios} = useContext(AppContext);
 
     const [isModalOpen, setModalOpen] = useState(false);
 
@@ -93,7 +93,7 @@ export default function Proyectos() {
             // setLoading(true);
             // await Promise.all([
                 fetchProyectos();
-                // fetchCentros();
+                fetchCentros();
                 fetchServicios();
             // ]);
             setLoading(false);

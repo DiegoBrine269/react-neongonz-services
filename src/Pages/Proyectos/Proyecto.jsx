@@ -110,6 +110,7 @@ export default function Proyecto() {
             });
             setErrors({});
         } catch (error) {
+            // toast.error("Error al agregar el vehículo");
             console.error("Error during request:", error);
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors);
@@ -352,10 +353,10 @@ export default function Proyecto() {
         const fetchData = async () => {
             setLoading(true);
             await fetchProyecto();
+            setLoading(false);
             await fetchCentros();
             await fetchServicios();
             await fetchTypes();
-            setLoading(false);
         };
 
         fetchData();
@@ -651,29 +652,29 @@ export default function Proyecto() {
                         <label className="label" htmlFor="eco">
                             Económico
                         </label>
-                        <div className="grid grid-cols-[1fr_auto] gap-2">
-                            <div>
-                                <input
-                                    className="input"
-                                    type="number"
-                                    id="eco"
-                                    placeholder="Económico"
-                                    value={formData.eco}
-                                    min={1}
-                                    onChange={(e) => {
-                                        setFormData({
-                                            ...formData,
-                                            eco: e.target.value,
-                                        });
-                                    }}
-                                    autoComplete="off"
-                                    autoFocus
-                                />
-                                {errors.eco && (
-                                    <p className="error">{errors.eco[0]}</p>
-                                )}
-                            </div>
+                        
+                        <div>
+                            <input
+                                className="input"
+                                type="number"
+                                id="eco"
+                                placeholder="Económico"
+                                value={formData.eco}
+                                min={1}
+                                onChange={(e) => {
+                                    setFormData({
+                                        ...formData,
+                                        eco: e.target.value,
+                                    });
+                                }}
+                                autoComplete="off"
+                                autoFocus
+                            />
+                            {errors.eco && (
+                                <p className="error">{errors.eco[0]}</p>
+                            )}
                         </div>
+                        
 
                         <label className="label" htmlFor="type">
                             Tipo de vehículo
