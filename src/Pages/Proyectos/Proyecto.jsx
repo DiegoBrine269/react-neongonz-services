@@ -31,6 +31,7 @@ export default function Proyecto() {
         commentary: ""
     });
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [usarPlaca, setUsarPlaca] = useState(false);
 
     const { token, setLoading, user, totalFilas, setTotalFilas, fetchCentros, centros, fetchServicios, servicios } =
         useContext(AppContext);
@@ -43,6 +44,7 @@ export default function Proyecto() {
         user_id: user.id,
         commentary: "",
         extra_projects: [],
+        usar_placa: usarPlaca,
     });
 
     const [formDataEdit, setFormDataEdit] = useState({
@@ -109,6 +111,7 @@ export default function Proyecto() {
                 date: "",
             });
             setErrors({});
+            setUsarPlaca(false);
         } catch (error) {
             // toast.error("Error al agregar el vehículo");
             console.error("Error during request:", error);
@@ -380,7 +383,7 @@ export default function Proyecto() {
         {
             title: "Eco.",
             field: "eco",
-            headerFilter: "number",
+            headerFilter: "input",
             // headerFilterParams: { type: "number" },
             resizable: false,
         },
@@ -442,7 +445,9 @@ export default function Proyecto() {
             <div className="flex items-center gap-2">
                 <h2 className="title-2 mb-0">Proyecto No. {proyecto?.id}</h2>
                 <button
-                    onClick={() => {setEditando((prev) => !prev);}}
+                    onClick={() => {
+                        setEditando((prev) => !prev);
+                    }}
                     className="cursor-pointer"
                 >
                     <Pencil className="text w-5" />
@@ -458,9 +463,9 @@ export default function Proyecto() {
                     {proyecto?.centre?.name}{" "}
                 </p>
                 <p className="text">
-                    <span className="font-bold">Fecha:</span> {format(proyecto?.date, "full", "es")}
+                    <span className="font-bold">Fecha:</span>{" "}
+                    {format(proyecto?.date, "full", "es")}
                 </p>
-
             </div>
 
             <div className="flex gap-2 mt-2">
@@ -608,7 +613,9 @@ export default function Proyecto() {
                                     className={isCollapsed ? "block" : "hidden"}
                                 />
                                 <ChevronDown
-                                    className={!isCollapsed ? "block" : "hidden"}
+                                    className={
+                                        !isCollapsed ? "block" : "hidden"
+                                    }
                                 />
                                 Enlazar con otros proyectos
                             </label>
@@ -621,8 +628,12 @@ export default function Proyecto() {
                                     p.id != id ? (
                                         <RadioButtonItem
                                             key={p.id}
-                                            onChange={() => toggleProyectoExtraEdit(p.id)}
-                                            checked={formDataEdit?.extra_projects?.includes(p.id)}
+                                            onChange={() =>
+                                                toggleProyectoExtraEdit(p.id)
+                                            }
+                                            checked={formDataEdit?.extra_projects?.includes(
+                                                p.id
+                                            )}
                                             label={p.service}
                                         />
                                     ) : null
@@ -649,16 +660,36 @@ export default function Proyecto() {
                 >
                     <h2 className="title-3">Agregar vehículo al proyecto</h2>
                     <form action="">
-                        <label className="label" htmlFor="eco">
-                            Económico
+                        <label
+                            htmlFor="usar-placa"
+                            className="flex justify-end items-center gap-2"
+                        >
+                            <input
+                                type="checkbox"
+                                name=""
+                                id="usar-placa"
+                                checked={usarPlaca}
+                                onChange={() => {
+                                    setFormData({
+                                        ...formData,
+                                        usar_placa: !usarPlaca,
+                                        eco: "",
+                                    });
+                                    setUsarPlaca((prev) => !prev);
+                                }}
+                            />
+                            Usar no. de placa
                         </label>
-                        
+                        <label className="label" htmlFor="eco">
+                            {usarPlaca ? "No. de placa" : "Económico"}
+                        </label>
+
                         <div>
                             <input
                                 className="input"
-                                type="number"
+                                type={usarPlaca ? "text" : "number"}
                                 id="eco"
-                                placeholder="Económico"
+                                placeholder={usarPlaca ? "No. de placa" : "Económico"}
                                 value={formData.eco}
                                 min={1}
                                 onChange={(e) => {
@@ -667,6 +698,7 @@ export default function Proyecto() {
                                         eco: e.target.value,
                                     });
                                 }}
+                                // onBlur={}
                                 autoComplete="off"
                                 autoFocus
                             />
@@ -674,7 +706,6 @@ export default function Proyecto() {
                                 <p className="error">{errors.eco[0]}</p>
                             )}
                         </div>
-                        
 
                         <label className="label" htmlFor="type">
                             Tipo de vehículo
@@ -725,15 +756,22 @@ export default function Proyecto() {
                             <div>
                                 <label
                                     className="label flex"
-                                    onClick={() => setIsCollapsed((prev) => !prev)}
+                                    onClick={() =>
+                                        setIsCollapsed((prev) => !prev)
+                                    }
                                 >
                                     <ChevronRight
-                                        className={isCollapsed ? "block" : "hidden"}
+                                        className={
+                                            isCollapsed ? "block" : "hidden"
+                                        }
                                     />
                                     <ChevronDown
-                                        className={!isCollapsed ? "block" : "hidden"}
+                                        className={
+                                            !isCollapsed ? "block" : "hidden"
+                                        }
                                     />
-                                    Agregar a otros proyectos de forma simultánea (opcional)
+                                    Agregar a otros proyectos de forma
+                                    simultánea (opcional)
                                 </label>
                                 <div
                                     className={`pl-2 pt-2 flex flex-wrap gap-1 overflow-hidden ${
@@ -744,8 +782,12 @@ export default function Proyecto() {
                                         p.id != id ? (
                                             <RadioButtonItem
                                                 key={p.id}
-                                                onChange={() => toggleProyectoExtra(p.id)}
-                                                checked={formData?.extra_projects?.includes(p.id)}
+                                                onChange={() =>
+                                                    toggleProyectoExtra(p.id)
+                                                }
+                                                checked={formData?.extra_projects?.includes(
+                                                    p.id
+                                                )}
                                                 label={p.service}
                                             />
                                         ) : null
@@ -803,16 +845,19 @@ export default function Proyecto() {
                         <span className="font-bold border-b-1 block border-neutral-400">
                             Comentario
                         </span>{" "}
-                        <p>
-                            {vehiculo?.commentary ??
-                                "-"}
-                        </p>
+                        <p>{vehiculo?.commentary ?? "-"}</p>
                     </div>
                     <div className="text">
                         <span className="font-bold border-b-1 block border-neutral-400">
                             Fecha y hora de registro
                         </span>{" "}
-                        <p>{format(vehiculo?.created_at, { date: "full", time: "medium" }, "es")}</p>
+                        <p>
+                            {format(
+                                vehiculo?.created_at,
+                                { date: "full", time: "medium" },
+                                "es"
+                            )}
+                        </p>
                     </div>
                     <div className="text">
                         <span className="font-bold border-b-1 block border-neutral-400">

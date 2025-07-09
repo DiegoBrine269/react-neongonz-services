@@ -15,7 +15,7 @@ export default defineConfig({
         host: true,
         proxy: {
             "/api": {
-                target: "http://192.168.0.15:8000",
+                target: "http://192.168.0.11:8000",
                 changeOrigin: true,
                 headers: {
                     Accept: "application/json",

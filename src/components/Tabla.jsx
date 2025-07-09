@@ -1,17 +1,26 @@
+
 import { useState } from "react";
 import { tabulatorConfig } from "../config/variables.js"
 import { ReactTabulator } from "react-tabulator";
+import { Download } from "lucide-react";
 
-export default function Tabla({data  , columns, options, events}) {
+export default function Tabla({data, columns, options, events}) {
     const [totalFilas, setTotalFilas] = useState(0);
 
 
 
     return (
         <>
-            <p className="text">
-                Total: <span className="font-bold">{totalFilas}</span>
-            </p>
+            <div className="flex justify-between items-center">
+                <p className="text">
+                    Total: <span className="font-bold">{totalFilas}</span>
+                </p>
+
+                {/* <button className="btn bg-green-800 max-w-35">
+                    <Download/>
+                    Descargar
+                </button> */}
+            </div>
             <div>
                 <ReactTabulator
                     data={data}
