@@ -662,7 +662,7 @@ export default function Proyecto() {
                     <form action="">
                         <label
                             htmlFor="usar-placa"
-                            className="flex justify-end items-center gap-2"
+                            className="label flex justify-end items-center gap-2"
                         >
                             <input
                                 type="checkbox"
