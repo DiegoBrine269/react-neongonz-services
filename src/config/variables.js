@@ -1,5 +1,6 @@
 const tabulatorConfig = {
     // locale: true,
+    // resizableRows: true,
     placeholder: "Sin resultados",
     layout: "fitDataFill",
     resizableColumns: false,

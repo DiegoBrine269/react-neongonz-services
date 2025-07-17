@@ -4,7 +4,7 @@ import { tabulatorConfig } from "../config/variables.js"
 import { ReactTabulator } from "react-tabulator";
 import { Download } from "lucide-react";
 
-export default function Tabla({data, columns, options, events}) {
+export default function Tabla({className, data, columns, options, events}) {
     const [totalFilas, setTotalFilas] = useState(0);
 
 
@@ -21,7 +21,7 @@ export default function Tabla({data, columns, options, events}) {
                     Descargar
                 </button> */}
             </div>
-            <div>
+            <div className={className}>
                 <ReactTabulator
                     data={data}
                     columns={columns}
@@ -30,6 +30,7 @@ export default function Tabla({data, columns, options, events}) {
                     options={{
                         ...options,
                         ...tabulatorConfig,
+                        
                         ajaxResponse: (url, params, response) => {
                             // console.log(response.total);
                             setTotalFilas(response.total);

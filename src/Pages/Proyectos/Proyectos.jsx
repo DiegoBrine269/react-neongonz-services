@@ -193,13 +193,14 @@ export default function Proyectos() {
             )}
 
             <Tabla
+                className="custom-table"
                 options={{
                     pagination: "local",
                     paginationSize: 20,
                     layout: "fitDataStretch",
                 }}
                 events={{
-                    rowClick: handleRowClick
+                    rowClick: handleRowClick,
                 }}
                 columns={columns}
                 data={proyectos}

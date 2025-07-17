@@ -7,7 +7,7 @@ import Modal from "../../components/Modal";
 import Swal from "sweetalert2";
 import Tabla from "../../components/Tabla";
 import { swalConfig } from "../../config/variables";
-import { ClipboardCopy, Trash2, ClipboardCheck, Car, CircleCheck, ChevronDown, ChevronRight, Pencil,Save } from "lucide-react";
+import { ClipboardCopy, Trash2, ClipboardCheck, Car, CircleCheck, ChevronDown, ChevronRight, Pencil,Save, PackageOpen } from "lucide-react";
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { format } from "@formkit/tempo";
 import RadioButtonItem from "../../components/RadioButtonItem";
@@ -226,16 +226,16 @@ export default function Proyecto() {
         }
     };
 
-    const handleCerrarProyecto = async (e) => {
+    const handleToggleStatusProyecto = async (e) => {
         e.preventDefault();
 
         const closeProject = async () => {
             const result = await Swal.fire({
-                title: "¿Estás seguro de querer cerrar el proyecto?",
-                text: "No podrás agregar más vehículos.",
+                title: `¿Estás seguro de querer ${proyecto?.is_open ? "cerrar" : "abrir"} el proyecto?`,
+                // text: "No podrás agregar más vehículos.",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonText: "Sí, cerrar proyecto",
+                confirmButtonText: `Sí, ${proyecto?.is_open ? "cerrar" : "abrir"} proyecto`,
                 cancelButtonText: "Cancelar",
                 ...swalConfig(),
             });
@@ -245,7 +245,7 @@ export default function Proyecto() {
 
                 try {
                     const { data } = await clienteAxios.post(
-                        `/api/projects/${id}/close`,
+                        `/api/projects/${id}/toggle-status`,
                         { id: vehiculo.id },
                         {
                             headers: {
@@ -256,7 +256,10 @@ export default function Proyecto() {
                     fetchProyecto();
                     setModalConsultarOpen(false);
                     setVehiculo({});
-                    toast.success("Proyecto cerrado correctamente");
+
+                    const mensaje = proyecto?.is_open ? "Proyecto abierto exitosamente." : "Proyecto cerrado exitosamente.";
+
+                    toast.success(mensaje);
                     setErrors({});
                 } catch (error) {
                     console.error("Error during request:", error);
@@ -275,7 +278,7 @@ export default function Proyecto() {
     const handleEliminarProyecto = async (e) => {
         e.preventDefault();
 
-        const closeProject = async () => {
+        const deleteProject = async () => {
             const result = await Swal.fire({
                 title: "¿Estás seguro de querer eliminar el proyecto?",
                 text: "Esta acción es irreversible.",
@@ -312,7 +315,7 @@ export default function Proyecto() {
             }
         };
 
-        closeProject();
+        deleteProject();
     };
 
     const toggleItemInArray = (setter, key, item) => {
@@ -390,16 +393,18 @@ export default function Proyecto() {
         {
             title: "Tipo",
             field: "type",
-            headerFilter: "list",
-            headerFilterParams: { valuesLookup: true, clearable: true },
+            headerFilter: "input",
+            // headerFilter: "list",
+            // headerFilterParams: { valuesLookup: true, clearable: true },
             resizable: false,
             width: 100,
         },
         {
             title: "Registrado por",
             field: "user.name",
-            headerFilter: "list",
-            headerFilterParams: { valuesLookup: true, clearable: true },
+            headerFilter: "input",
+            // headerFilter: "list",
+            // headerFilterParams: { valuesLookup: true, clearable: true },
             resizable: false,
             width: 100,
             // formatter: (cell) => {
@@ -473,13 +478,17 @@ export default function Proyecto() {
             </div>
 
             <div className="flex gap-2 mt-2">
-                {user?.role === "admin" && proyecto?.is_open ? (
+                {user?.role === "admin" ? (
                     <button
                         className="btn btn-secondary mt-0"
-                        onClick={handleCerrarProyecto}
+                        onClick={handleToggleStatusProyecto}
                     >
-                        <ClipboardCheck />
-                        Cerrar
+                        {proyecto?.is_open ? (
+                            <ClipboardCheck />
+                        ) : (
+                            <PackageOpen />
+                        )}
+                        {proyecto?.is_open ? "Cerrar" : "Abrir"}
                     </button>
                 ) : null}
 
@@ -514,11 +523,12 @@ export default function Proyecto() {
             </div>
 
             <Tabla
-                options={{
-                    pagination: "local",
-                    paginationSize: 30,
-                    layout: "fitColumns",
-                }}
+                className="custom-table"
+                // options={{
+                //     pagination: "local",
+                //     paginationSize: 30,
+                //     layout: "fitColumns",
+                // }}
                 events={{
                     rowClick: (e, row) => {
                         setVehiculo(row.getData());
@@ -693,7 +703,9 @@ export default function Proyecto() {
                                 className="input"
                                 type={usarPlaca ? "text" : "number"}
                                 id="eco"
-                                placeholder={usarPlaca ? "No. de placa" : "Económico"}
+                                placeholder={
+                                    usarPlaca ? "No. de placa" : "Económico"
+                                }
                                 value={formData.eco}
                                 min={1}
                                 onChange={(e) => {
