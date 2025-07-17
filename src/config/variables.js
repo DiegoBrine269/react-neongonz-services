@@ -25,12 +25,23 @@ const tabulatorConfig = {
 
 
 
-const swalConfig = () => {
+const swalConfig = (danger = false) => {
     const isDark = document.querySelector("html").classList.contains("dark");
-    return {
-        theme: isDark ? "dark" : "light",
+
+    const dangerColors = {
+        confirmButtonColor: "#dc2626",
+        cancelButtonColor: "#2563eb",
+    };
+
+    const defaultColors = {
         confirmButtonColor: "#2563eb",
         cancelButtonColor: "#dc2626",
+    };
+
+    return {
+        theme: isDark ? "dark" : "light",
+        confirmButtonColor: !danger ? dangerColors.confirmButtonColor : defaultColors.confirmButtonColor,
+        cancelButtonColor: !danger ? dangerColors.cancelButtonColor : defaultColors.cancelButtonColor,
     };
 };
 

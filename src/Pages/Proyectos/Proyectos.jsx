@@ -120,14 +120,14 @@ export default function Proyectos() {
             title: "Nombre",
             field: "service.name",
             headerFilter: "input",
-            width: 250,
+            width: 150,
             resizable: false,
         },
         {
             title: "Centro de ventas",
             field: "centre.name",
             headerFilter: "input",
-            // width: 250,
+            width: 150,
             resizable: false,
         },
         {
@@ -143,7 +143,8 @@ export default function Proyectos() {
             headerFilter: "input",
             resizable: false,
             formatter: (cell) => {
-                const date = new Date(cell.getValue());
+                const date = new Date(cell.getValue() + "T12:00:00");
+
                 return format(date, "DD/MM/YYYY");
             },
             // formatter: "datetime",

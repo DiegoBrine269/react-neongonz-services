@@ -390,27 +390,31 @@ export default function Proyecto() {
         {
             title: "Tipo",
             field: "type",
-            headerFilter: "input",
+            headerFilter: "list",
+            headerFilterParams: { valuesLookup: true, clearable: true },
             resizable: false,
+            width: 100,
         },
         {
             title: "Registrado por",
-            field: "user",
-            headerFilter: "input",
+            field: "user.name",
+            headerFilter: "list",
+            headerFilterParams: { valuesLookup: true, clearable: true },
             resizable: false,
-            formatter: (cell) => {
-                const user = cell.getValue();
-                return `${user?.name ?? ""} ${user?.last_name ?? ""}`;
-            },
-            headerFilterFunc: (headerValue, rowValue) => {
-                if (!headerValue) return true; // sin filtro, mostrar todo
-                const formatted = `${rowValue?.name ?? ""} ${
-                    rowValue?.last_name ?? ""
-                }`; // rowValue es el valor original (user)
-                return formatted
-                    .toLowerCase()
-                    .includes(headerValue.toLowerCase());
-            },
+            width: 100,
+            // formatter: (cell) => {
+            //     const user = cell.getValue();
+            //     return `${user?.name ?? ""} ${user?.last_name ?? ""}`;
+            // },
+            // headerFilterFunc: (headerValue, rowValue) => {
+            //     if (!headerValue) return true; // sin filtro, mostrar todo
+            //     const formatted = `${rowValue?.name ?? ""} ${
+            //         rowValue?.last_name ?? ""
+            //     }`; // rowValue es el valor original (user)
+            //     return formatted
+            //         .toLowerCase()
+            //         .includes(headerValue.toLowerCase());
+            // },
         },
         {
             title: "Fecha y hora de registro",
@@ -429,7 +433,7 @@ export default function Proyecto() {
             //         .includes(headerValue.toLowerCase());
             // },
             resizable: false,
-            width: 250,
+            width: 150,
         },
         {
             title: "Comentario",
@@ -512,8 +516,8 @@ export default function Proyecto() {
             <Tabla
                 options={{
                     pagination: "local",
-                    paginationSize: 20,
-                    layout: "fitDataFill",
+                    paginationSize: 30,
+                    layout: "fitColumns",
                 }}
                 events={{
                     rowClick: (e, row) => {
