@@ -17,7 +17,7 @@ import MiCuenta from "./Pages/MiCuenta"
 import ForgotPassword from "./Pages/Auth/ForgotPassword";
 import Cotizaciones from "./Pages/Cotizaciones/Cotizaciones";
 import Nueva from "./Pages/Cotizaciones/Nueva";
-import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
+// import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
 
 
 
@@ -25,7 +25,6 @@ export default function App() {
     const { user } = useContext(AppContext);
 
     return (
-        <PrimeReactProvider>
 
             <BrowserRouter>
                 <Routes>
@@ -68,6 +67,6 @@ export default function App() {
                     </Route>
                 </Routes>
             </BrowserRouter>
-        </PrimeReactProvider>
+
     );
 }
