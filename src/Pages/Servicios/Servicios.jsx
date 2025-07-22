@@ -100,10 +100,10 @@ export default function Servicios() {
 
 
             <Tabla
-                // options={{
-                //     pagination: "local",
-                //     paginationSize: 20,
-                // }}
+                options={{
+                    pagination: "local",
+                    paginationSize: 20,
+                }}
                 events={{
                     rowClick: handleRowClick,
                 }}

@@ -17,6 +17,7 @@ import MiCuenta from "./Pages/MiCuenta"
 import ForgotPassword from "./Pages/Auth/ForgotPassword";
 import Cotizaciones from "./Pages/Cotizaciones/Cotizaciones";
 import Nueva from "./Pages/Cotizaciones/Nueva";
+import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
 
 
 
@@ -24,46 +25,49 @@ export default function App() {
     const { user } = useContext(AppContext);
 
     return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<Layout />}>
-                    <Route index element={<Home />} />
-                    <Route
-                        path="/registro"
-                        element={user ? <Home /> : <Register />}
-                    />
-                    <Route
-                        path="/login"
-                        element={user ? <Home /> : <Login />}
-                    />
-                    <Route
-                        path="/olvide-mi-contrasena"
-                        element={user ? <Home /> : <ForgotPassword />}
-                    />
-                    {user?.is_active && (
-                        <>
-                            {user.role === 'admin' && (
-                                <>
-                                    <Route path="/centros-de-venta" element={<Centros />} />
-                                    <Route path="/servicios" element={<Servicios />} />
-                                    <Route path="/cotizaciones" element={<Cotizaciones />} />
-                                    <Route path="/cotizaciones/nueva" element={<Nueva />} />
-                                    <Route path="/servicios/:id" element={<Servicio />} />
-                                </>
-                            )}
-                            <Route path="/vehiculos" element={<Vehiculos />} />
-                            <Route path="/proyectos" element={<Proyectos />} />
-                            <Route path="/proyectos/:id" element={<Proyecto />} />
-                            <Route path="/mi-cuenta" element={<MiCuenta />} />
-                            
-                        </>
-                    )}
-                    <Route
-                        path="*"
-                        element={<NotFound />}
-                    />
-                </Route>
-            </Routes>
-        </BrowserRouter>
+        <PrimeReactProvider>
+
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<Layout />}>
+                        <Route index element={<Home />} />
+                        <Route
+                            path="/registro"
+                            element={user ? <Home /> : <Register />}
+                        />
+                        <Route
+                            path="/login"
+                            element={user ? <Home /> : <Login />}
+                        />
+                        <Route
+                            path="/olvide-mi-contrasena"
+                            element={user ? <Home /> : <ForgotPassword />}
+                        />
+                        {user?.is_active && (
+                            <>
+                                {user.role === 'admin' && (
+                                    <>
+                                        <Route path="/centros-de-venta" element={<Centros />} />
+                                        <Route path="/servicios" element={<Servicios />} />
+                                        <Route path="/cotizaciones" element={<Cotizaciones />} />
+                                        <Route path="/cotizaciones/nueva" element={<Nueva />} />
+                                        <Route path="/servicios/:id" element={<Servicio />} />
+                                    </>
+                                )}
+                                <Route path="/vehiculos" element={<Vehiculos />} />
+                                <Route path="/proyectos" element={<Proyectos />} />
+                                <Route path="/proyectos/:id" element={<Proyecto />} />
+                                <Route path="/mi-cuenta" element={<MiCuenta />} />
+                                
+                            </>
+                        )}
+                        <Route
+                            path="*"
+                            element={<NotFound />}
+                        />
+                    </Route>
+                </Routes>
+            </BrowserRouter>
+        </PrimeReactProvider>
     );
 }

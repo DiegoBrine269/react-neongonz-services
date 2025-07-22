@@ -61,7 +61,7 @@ export default function Login() {
                     Contraseña
                 </label>
                 <input
-                    className="input"
+                    // className="input"
                     type="password"
                     id="password"
                     placeholder="Contraseña"

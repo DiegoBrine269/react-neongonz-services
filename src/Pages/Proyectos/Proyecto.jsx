@@ -11,6 +11,11 @@ import { ClipboardCopy, Trash2, ClipboardCheck, Car, CircleCheck, ChevronDown, C
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { format } from "@formkit/tempo";
 import RadioButtonItem from "../../components/RadioButtonItem";
+// import { Calendar } from "primereact/calendar";
+// import "primereact/resources/themes/lara-light-cyan/theme.css";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/style.css";
+
 
 
 export default function Proyecto() {
@@ -31,9 +36,20 @@ export default function Proyecto() {
         commentary: ""
     });
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [filtrosColapsados, setFiltrosColapsados] = useState(false);
+    const formFiltrosRef = useRef(null);
+    const [filtros, setFiltros] = useState([]);
+    const [selectingDate, setSelectingDate] = useState(false);
+    const [selectedDate, setSelectedDate] = useState();
+        
+    // Sets para los filtros
+    const [usuarios, setUsuarios] = useState([]);
+    const [tipos, setTipos] = useState([]);
+    
+
     const [usarPlaca, setUsarPlaca] = useState(false);
 
-    const { token, setLoading, user, totalFilas, setTotalFilas, fetchCentros, centros, fetchServicios, servicios } =
+    const { token, setLoading, user, totalFilas, setTotalFilas, fetchCentros, centros, fetchServicios, servicios, tableRef } =
         useContext(AppContext);
     // console.log(user);
 
@@ -68,6 +84,11 @@ export default function Proyecto() {
                 date: res.data.date,
             });
             setVehiculos(res.data.vehicles);
+
+            // 
+            setUsuarios([...new Set(res.data.vehicles.map((v) => v.user?.name))]);
+            setTipos([...new Set(res.data.vehicles.map((v) => v.type))]);
+
         } catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Error al cargar el proyecto");
@@ -112,6 +133,7 @@ export default function Proyecto() {
             });
             setErrors({});
             setUsarPlaca(false);
+            setFiltrosColapsados(false);
         } catch (error) {
             // toast.error("Error al agregar el vehículo");
             console.error("Error during request:", error);
@@ -355,6 +377,39 @@ export default function Proyecto() {
         }
     };
 
+    const filtrarTabla = (e, columna) => {
+        let valor = "";
+
+        if (e && e.target) {
+            valor = e.target.value;
+        } else {
+            valor = e;
+        }
+
+        const nuevosFiltros = [...filtros.filter((f) => f.field !== columna)];
+
+        if (columna === "created_at") {
+            const fechaInicio = new Date(valor);
+            const fechaFin = new Date(valor);
+            fechaFin.setDate(fechaFin.getDate() + 1);
+
+            nuevosFiltros.push(
+                { field: columna, type: ">=", value: fechaInicio.toISOString() },
+                { field: columna, type: "<", value: fechaFin.toISOString() }
+            );
+        } else {
+            nuevosFiltros.push({
+                field: columna,
+                type: "like",
+                value: valor,
+            });
+        }
+
+        setFiltros(nuevosFiltros); // guarda en estado
+        tableRef.current.setFilter(nuevosFiltros); // actualiza todos los filtros activos
+    };
+
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -382,18 +437,21 @@ export default function Proyecto() {
         }
     }, [proyecto]);
 
+
+
     const columns = [
         {
             title: "Eco.",
             field: "eco",
-            headerFilter: "input",
+            // headerFilter: "input",
             // headerFilterParams: { type: "number" },
             resizable: false,
+            width: 110,
         },
         {
             title: "Tipo",
             field: "type",
-            headerFilter: "input",
+            // headerFilter: "input",
             // headerFilter: "list",
             // headerFilterParams: { valuesLookup: true, clearable: true },
             resizable: false,
@@ -402,7 +460,7 @@ export default function Proyecto() {
         {
             title: "Registrado por",
             field: "user.name",
-            headerFilter: "input",
+            // headerFilter: "input",
             // headerFilter: "list",
             // headerFilterParams: { valuesLookup: true, clearable: true },
             resizable: false,
@@ -424,31 +482,24 @@ export default function Proyecto() {
         {
             title: "Fecha y hora de registro",
             field: "created_at",
-            // headerFilter: "input",
             formatter: (cell) => {
                 const date = cell.getValue();
-                // console.log(date);
                 return format(date, { date: "short", time: "short" }, "es");
             },
-            // headerFilterFunc: (headerValue, rowValue) => {
-            //     if (!headerValue) return true; // sin filtro, mostrar todo
-            //     const formatted = formatDateTime(rowValue); // rowValue es el valor original (created_at)
-            //     return formatted
-            //         .toLowerCase()
-            //         .includes(headerValue.toLowerCase());
-            // },
             resizable: false,
-            width: 150,
+            width: 180,
         },
+
         {
             title: "Comentario",
             field: "commentary",
-            headerFilter: "input",
+            // headerFilter: "input",
             resizable: false,
             // width: 250,
         },
     ];
 
+    
     return (
         <div className="relative">
             <div className="flex items-center gap-2">
@@ -522,13 +573,116 @@ export default function Proyecto() {
                 )}
             </div>
 
+            {/* Filtros */}
+            <div className="card" ref={formFiltrosRef}>
+                <label
+                    className="label flex m-0"
+                    onClick={() => setFiltrosColapsados((prev) => !prev)}
+                >
+                    <ChevronRight
+                        className={!filtrosColapsados ? "block" : "hidden"}
+                    />
+                    <ChevronDown
+                        className={filtrosColapsados ? "block" : "hidden"}
+                    />
+                    <h3 className="text font-bold">Filtros</h3>
+                </label>
+                <form
+                    action=""
+                    className={`pl-2 pr-1 flex flex-wrap gap-1 overflow-hidden transition-max-height ${
+                        !filtrosColapsados ? "max-h-0" : null
+                    }`}
+                    onClick={() => {
+                        formFiltrosRef.current?.scrollIntoView({
+                            behavior: "smooth",
+                        });
+                    }}
+                >
+                    <input
+                        className="input mb-1 mt-2"
+                        type="search"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        id="eco"
+                        placeholder="Económico"
+                        onChange={(e) => filtrarTabla(e, "eco")}
+                    />
+
+                    <select
+                        id="tipo"
+                        className="input mb-1"
+                        onChange={(e) => filtrarTabla(e, "type")}
+                        defaultValue=""
+                    >
+                        <option value="" selected disabled>
+                            Tipo de vehículo
+                        </option>
+                        {tipos.map((tipo) => (
+                            <option key={tipo} value={tipo}>
+                                {tipo}
+                            </option>
+                        ))}
+                    </select>
+
+                    <select
+                        id="quienRegistra"
+                        className="input mb-1"
+                        onChange={(e) => filtrarTabla(e, "user.name")}
+                        defaultValue=""
+                    >
+                        <option value="" disabled>
+                            Persona que registra
+                        </option>
+                        {usuarios.map((usuario) => (
+                            <option key={usuario} value={usuario}>
+                                {usuario}
+                            </option>
+                        ))}
+                    </select>
+
+                    <input
+                        readOnly
+                        type="text"
+                        value={
+                            selectedDate
+                                ? format(selectedDate, "full", "es")
+                                : ""
+                        }
+                        className="input mb-1"
+                        placeholder="Fecha de registro"
+                        onFocus={() => setSelectingDate(true)}
+                        // onFocus={() => setSelectingDate(true)}
+                        // onBlur={() => setSelectingDate(false)}
+                    />
+
+                    <input
+                        className="input mb-1"
+                        type="text"
+                        id="comentario"
+                        placeholder="Comentario"
+                        onChange={(e) => filtrarTabla(e, "commentary")}
+                        autoComplete="off"
+                    />
+
+                    <div className="flex justify-end">
+                        <input
+                            type="reset"
+                            className="btn btn-danger"
+                            value="Limpiar filtros"
+                            onClick={() => {
+                                setSelectedDate(null);
+                                setFiltros([]);
+                                tableRef.current.clearFilter();
+                            }}
+                        />
+                    </div>
+                </form>
+            </div>
+
             <Tabla
+                title={`${proyecto?.service?.name} - ${proyecto?.centre?.name}`}
+                tableRef={tableRef}
                 className="custom-table"
-                // options={{
-                //     pagination: "local",
-                //     paginationSize: 30,
-                //     layout: "fitColumns",
-                // }}
                 events={{
                     rowClick: (e, row) => {
                         setVehiculo(row.getData());
@@ -840,6 +994,28 @@ export default function Proyecto() {
             </ErrorBoundary>
 
             <Modal
+                isOpen={selectingDate}
+                onClose={() => setSelectingDate(false)}
+            >
+                <DayPicker
+                    className="text"
+                    animate
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(e) => {
+                        setSelectingDate(false);
+                        setSelectedDate(e);
+                        filtrarTabla(e, "created_at");
+                    }}
+                    // footer={
+                    //     selected
+                    //         ? `Selected: ${selected.toLocaleDateString()}`
+                    //         : "Pick a day."
+                    // }
+                />
+            </Modal>
+
+            <Modal
                 isOpen={isModalConsultarOpen}
                 onClose={() => setModalConsultarOpen(false)}
             >
@@ -907,7 +1083,7 @@ export default function Proyecto() {
 
             {user?.role === "admin" && vehiculos.length > 0 && (
                 <div>
-                    <h3 className="title-3 mt-5 mb-2">
+                    <h3 className="title-3 mt-5 mb-2 ">
                         Económicos en serie (para copiar y pegar)
                     </h3>
                     <div className="relative">
@@ -919,7 +1095,7 @@ export default function Proyecto() {
                             readOnly
                         />
                         <button
-                            className="absolute top-1 right-2 bg-white border border-gray-300 rounded-md p-1"
+                            className="absolute top-1 right-2 bg-white border border-gray-300 rounded-md p-1 h-fit"
                             onClick={copyTextToClipboard}
                         >
                             <ClipboardCopy className="text-gray-500" />

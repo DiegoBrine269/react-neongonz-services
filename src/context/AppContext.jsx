@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useRef } from "react";
 import clienteAxios from "../config/axios";
 import { toast } from "react-toastify";
 
@@ -17,6 +17,8 @@ export default function AppProvider({ children }) {
     const [proyectos, setProyectos] = useState([]);
 
     const [servicios, setServicios] = useState([]);
+
+    let tableRef = useRef(null);
 
 
     const toggleDarkMode = () => {
@@ -148,6 +150,7 @@ export default function AppProvider({ children }) {
                 setProyectos,
                 fetchServicios,
                 servicios,
+                tableRef
             }}
         >
             {children}
