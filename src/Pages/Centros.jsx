@@ -85,9 +85,18 @@ export default function Centros() {
     }, []);
 
     const columns = [
-        { title: "Nombre", field: "name", headerFilter: "input" },
-        { title: "Responsable", field: "responsible", headerFilter: "input" },
-        { title: "Ubicación", field: "location", headerFilter: "input", width: 400 },
+        { title: "Nombre", field: "name", headerFilter: "input", 
+            resizable: false,
+
+                 },
+        { title: "Responsable", field: "responsible", headerFilter: "input",
+            resizable: false,
+
+          },
+        { title: "Ubicación", field: "location", headerFilter: "input", width: 400,
+            resizable: false,
+
+          },
     ];
     
     return (

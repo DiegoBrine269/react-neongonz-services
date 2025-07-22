@@ -5,6 +5,7 @@ import { ReactTabulator } from "react-tabulator";
 import { Sheet, FileText } from "lucide-react";
 import { AppContext } from "@/context/AppContext.jsx";
 import * as XLSX from "xlsx";
+// import { FontAwesomeIcon } from '@fortawesome/fontawesome-svg-core'
 // import jsPDF from "jspdf";
 // import "jspdf-autotable";
 

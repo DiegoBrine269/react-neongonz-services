@@ -18,6 +18,9 @@ export default function AppProvider({ children }) {
 
     const [servicios, setServicios] = useState([]);
 
+    const [mostrarCerrados, setMostrarCerrados] = useState(false);
+
+
     let tableRef = useRef(null);
 
 
@@ -150,7 +153,9 @@ export default function AppProvider({ children }) {
                 setProyectos,
                 fetchServicios,
                 servicios,
-                tableRef
+                tableRef,
+                mostrarCerrados,
+                setMostrarCerrados,
             }}
         >
             {children}

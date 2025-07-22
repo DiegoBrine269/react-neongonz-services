@@ -15,10 +15,9 @@ export default function Proyectos() {
     
 
     // const [servicios, setServicios] = useState([]);
-    const [mostrarCerrados, setMostrarCerrados] = useState(false);
     const hoy = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
 
-    const { token, setLoading, user, fetchServicios, fetchCentros, centros, proyectos, setProyectos, servicios} = useContext(AppContext);
+    const { token, setLoading, user, fetchServicios, fetchCentros, centros, proyectos, setProyectos, servicios, mostrarCerrados, setMostrarCerrados} = useContext(AppContext);
 
     const [isModalOpen, setModalOpen] = useState(false);
 

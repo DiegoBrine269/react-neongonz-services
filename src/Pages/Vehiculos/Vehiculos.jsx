@@ -5,6 +5,8 @@ import { ReactTabulator } from "react-tabulator";
 import Modal from "@/components/Modal";
 import { tabulatorConfig } from "../../config/variables";
 import Tabla from "../../components/Tabla";
+import { format } from "@formkit/tempo";
+
 
 export default function Vehiculos() {
     const [vehiculos, setVehiculos] = useState([]);
@@ -52,16 +54,22 @@ export default function Vehiculos() {
                             title: "Económico",
                             field: "eco",
                             headerFilter: true,
+                            resizable: false,
+
                         },
                         {
                             title: "Tipo",
                             field: "type",
                             headerFilter: true,
+                            resizable: false,
+
                         },
                         {
                             title: "Centro",
                             field: "centre",
                             headerFilter: true,
+                            resizable: false,
+
                         },
                     ]}
                     layout="fitColumns"
@@ -75,8 +83,7 @@ export default function Vehiculos() {
                                 Authorization: `Bearer ${token}`,
                             },
                         },
-                        filterMode:"remote",
-
+                        filterMode: "remote",
                     }}
                     events={{
                         rowClick: (e, row) => {
@@ -85,7 +92,6 @@ export default function Vehiculos() {
                             setModalOpen(true);
                         },
                     }}
-                    
                 />
             </div>
 
@@ -110,6 +116,22 @@ export default function Vehiculos() {
                         </span>{" "}
                         <p>{vehiculo?.centre}</p>
                     </div>
+
+                    {
+                         vehiculo.projects?.length > 0 &&
+                        <div className="text">
+                            <span className="font-bold border-b-1 block border-neutral-400">
+                                Proyectos recientes
+                            </span>{" "}
+                            <ul className="text-sm list-disc pl-5">
+                                {
+                                    vehiculo.projects.map(project =>(
+                                        <li key={project.id}>{project.service.name}</li>
+                                    ))
+                                }
+                            </ul>
+                        </div>
+                    }
                 </div>
 
                 <button
