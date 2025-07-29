@@ -110,21 +110,7 @@ export default function AppProvider({ children }) {
         }
     }
 
-    async function fetchTiposProyectos () {
-        try {
-            const res = await clienteAxios.get("/api/project-types", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
 
-            setTiposProyectos(res.data);
-        } catch (error) {
-            setTiposProyectos([]);
-            console.error("Error fetching data:", error);
-            toast.error("Error al cargar los tipos de proyectos");
-        }
-    }
 
     async function fetchServicios() {
         try {
@@ -182,7 +168,7 @@ export default function AppProvider({ children }) {
                 fetchCentros,
                 centros,
                 setCentros,
-                fetchTiposProyectos,
+
 
                 proyectos,
                 setProyectos,

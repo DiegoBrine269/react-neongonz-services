@@ -41,8 +41,8 @@ const swalConfig = (danger = false) => {
 
     return {
         theme: isDark ? "dark" : "light",
-        confirmButtonColor: !danger ? dangerColors.confirmButtonColor : defaultColors.confirmButtonColor,
-        cancelButtonColor: !danger ? dangerColors.cancelButtonColor : defaultColors.cancelButtonColor,
+        confirmButtonColor: danger ? dangerColors.confirmButtonColor : defaultColors.confirmButtonColor,
+        cancelButtonColor: danger ? dangerColors.cancelButtonColor : defaultColors.cancelButtonColor,
     };
 };
 

@@ -7,7 +7,7 @@ import Modal from "../../components/Modal";
 import Swal from "sweetalert2";
 import Tabla from "../../components/Tabla";
 import { swalConfig } from "../../config/variables";
-import { ClipboardCopy, Trash2, ClipboardCheck, Car, CircleCheck, ChevronDown, ChevronRight, Pencil,Save, PackageOpen } from "lucide-react";
+import { ClipboardCopy, Trash2, ClipboardCheck, Car, CircleCheck, ChevronDown, ChevronRight, Pencil,Save, PackageOpen, Copy } from "lucide-react";
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { format } from "@formkit/tempo";
 import RadioButtonItem from "../../components/RadioButtonItem";
@@ -302,6 +302,47 @@ export default function Proyecto() {
         closeProject();
     };
 
+    const duplicarProyecto = async () => {
+        const result = await Swal.fire({
+            title: "¿Estás seguro de querer duplicar el proyecto?",
+            // text: "Esta acción es irreversible.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, duplicar proyecto",
+            cancelButtonText: "Cancelar",
+            ...swalConfig(false),
+        });
+
+        if (result.isConfirmed) {
+            setLoading(true);
+
+            try {
+                const { data } = await clienteAxios.post(`/api/projects/${id}/duplicate`,{},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+                setModalConsultarOpen(false);
+                navigate("/proyectos");
+                toast.success("Proyecto duplicado exitosamente.");
+            } catch (error) {
+                console.error("Error during request:", error);
+                if (error.response && error.response.data.errors) {
+                    setErrors(error.response.data.errors);
+                }
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
+    const handleDuplicarProyecto = async (e) => {
+        e.preventDefault();
+        duplicarProyecto();
+    };
+
     const handleEliminarProyecto = async (e) => {
         e.preventDefault();
 
@@ -559,16 +600,20 @@ export default function Proyecto() {
     
     return (
         <div className="relative">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 justify-between">
                 <h2 className="title-2 mb-0">Proyecto No. {proyecto?.id}</h2>
-                <button
+
+                <button>
+                    <Pencil className="text w-5" />
+                </button>
+                {/* <button
                     onClick={() => {
                         setEditando((prev) => !prev);
                     }}
                     className="cursor-pointer"
                 >
                     <Pencil className="text w-5" />
-                </button>
+                </button> */}
             </div>
             <div className="pl-3">
                 <p className="text">
@@ -590,27 +635,34 @@ export default function Proyecto() {
             </div>
 
             <div className="flex gap-2 mt-2">
-                {user?.role === "admin" ? (
-                    <button
-                        className="btn btn-secondary mt-0"
-                        onClick={handleToggleStatusProyecto}
-                    >
-                        {proyecto?.is_open ? (
-                            <ClipboardCheck />
-                        ) : (
-                            <PackageOpen />
-                        )}
-                        {proyecto?.is_open ? "Cerrar" : "Abrir"}
-                    </button>
-                ) : null}
-
                 {user?.role === "admin" && (
-                    <button
-                        className="btn btn-danger mt-0"
-                        onClick={handleEliminarProyecto}
-                    >
-                        <Trash2 /> Eliminar
-                    </button>
+                    <>
+                        <button
+                            className="btn btn-secondary mt-0"
+                            onClick={handleToggleStatusProyecto}
+                        >
+                            {proyecto?.is_open ? (
+                                <ClipboardCheck />
+                            ) : (
+                                <PackageOpen />
+                            )}
+                            {proyecto?.is_open ? "Cerrar" : "Abrir"}
+                        </button>
+
+                        <button
+                            className="btn bg-green-600 mt-0"
+                            onClick={handleDuplicarProyecto}
+                        >
+                            <Copy /> Duplicar
+                        </button>
+
+                        <button
+                            className="btn btn-danger mt-0"
+                            onClick={handleEliminarProyecto}
+                        >
+                            <Trash2 /> Eliminar
+                        </button>
+                    </>
                 )}
             </div>
 
@@ -961,8 +1013,13 @@ export default function Proyecto() {
                                 Tipo de vehículo
                             </label>
 
-
-                            { fetching && <ClipLoader className="mt-2" color="#10B981" size={20} />}
+                            {fetching && (
+                                <ClipLoader
+                                    className="mt-2"
+                                    color="#10B981"
+                                    size={20}
+                                />
+                            )}
                         </div>
                         <select
                             className="input"
@@ -1003,9 +1060,7 @@ export default function Proyecto() {
                                 })
                             }
                             value={formData.commentary || ""}
-                        >
-                            
-                        </textarea>
+                        ></textarea>
                         {errors.commentary && (
                             <p className="error">{errors.commentary[0]}</p>
                         )}
