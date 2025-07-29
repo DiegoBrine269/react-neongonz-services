@@ -962,7 +962,7 @@ export default function Proyecto() {
                             </label>
 
 
-                            { fetching && <ClipLoader className="mt-2" size={20} />}
+                            { fetching && <ClipLoader className="mt-2" color="#10B981" size={20} />}
                         </div>
                         <select
                             className="input"

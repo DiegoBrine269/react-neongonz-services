@@ -233,9 +233,7 @@ export default function Proyectos() {
                             </option>
                         ))}
                     </select>
-                    {errors.centre_id && (
-                        <p className="text-red-500">{errors.centre_id[0]}</p>
-                    )}
+                    {errors.centre_id && (<p className="text-red-500">{errors.centre_id[0]}</p>)}
 
                     <label className="label" htmlFor="service_id">
                         Servicio

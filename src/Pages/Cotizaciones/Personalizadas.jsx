@@ -128,7 +128,7 @@ export default function Personalizadas() {
     return (
         <div className="max-w-200 mx-auto">
             <h2 className="title-2 mb-0">Cotizaciones personalizadas</h2>
-            <p className="text text-muted">
+            <p className="text text-muted mb-2">
                 En esta sección, podrás realizar cotizaciones con conceptos y
                 precios personalizados.
             </p>
@@ -148,7 +148,7 @@ export default function Personalizadas() {
                         setAccion("edit");
                     }}
                 >
-                    Terminar una pendiente
+                    Terminar pendiente
                 </button>
             </div>
 
@@ -329,7 +329,7 @@ export default function Personalizadas() {
                             }
                         >
                             <CalendarClock />
-                            Guardar para más tarde
+                            Guardar borrador
                         </button>
                     </div>
                 </form>
