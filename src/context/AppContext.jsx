@@ -20,6 +20,9 @@ export default function AppProvider({ children }) {
 
     const [mostrarCerrados, setMostrarCerrados] = useState(false);
 
+    // Cotizaciones pendientes
+    const [pendientes, setPendientes] = useState([]);
+
 
     let tableRef = useRef(null);
 
@@ -107,6 +110,22 @@ export default function AppProvider({ children }) {
         }
     }
 
+    async function fetchTiposProyectos () {
+        try {
+            const res = await clienteAxios.get("/api/project-types", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            setTiposProyectos(res.data);
+        } catch (error) {
+            setTiposProyectos([]);
+            console.error("Error fetching data:", error);
+            toast.error("Error al cargar los tipos de proyectos");
+        }
+    }
+
     async function fetchServicios() {
         try {
             const res = await clienteAxios.get("/api/services", {
@@ -120,6 +139,20 @@ export default function AppProvider({ children }) {
             setServicios([]);
             console.error("Error fetching data:", error);
             toast.error("Error al cargar los servicios");
+        }
+    }
+
+    async function fetchPendientes() {
+        try {
+            const res = await clienteAxios.get("/api/invoices/pending", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setPendientes(res.data);
+        } catch (error) {
+            setPendientes([]);
+            toast.error("Error al cargar las cotizaciones pendientes");
         }
     }
 
@@ -149,6 +182,8 @@ export default function AppProvider({ children }) {
                 fetchCentros,
                 centros,
                 setCentros,
+                fetchTiposProyectos,
+
                 proyectos,
                 setProyectos,
                 fetchServicios,
@@ -156,6 +191,9 @@ export default function AppProvider({ children }) {
                 tableRef,
                 mostrarCerrados,
                 setMostrarCerrados,
+
+                pendientes,
+                fetchPendientes,
             }}
         >
             {children}

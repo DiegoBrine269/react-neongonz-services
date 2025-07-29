@@ -17,8 +17,6 @@ export default function Servicios() {
 
     const [formData, setFormData] = useState({
         name: "",
-        price: "",
-        description_id: "",
     });
 
     const [errors, setErrors] = useState({});
@@ -98,7 +96,6 @@ export default function Servicios() {
                 Nuevo
             </button>
 
-
             <Tabla
                 options={{
                     pagination: "local",
@@ -130,6 +127,8 @@ export default function Servicios() {
                     {errors.name && (
                         <p className="text-red-500">{errors.name[0]}</p>
                     )}
+
+                    
 
                     <input
                         className="btn"

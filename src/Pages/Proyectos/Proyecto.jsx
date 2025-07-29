@@ -15,6 +15,7 @@ import RadioButtonItem from "../../components/RadioButtonItem";
 // import "primereact/resources/themes/lara-light-cyan/theme.css";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
+import {ClipLoader} from "react-spinners";
 
 
 
@@ -45,6 +46,9 @@ export default function Proyecto() {
     // Sets para los filtros
     const [usuarios, setUsuarios] = useState([]);
     const [tipos, setTipos] = useState([]);
+
+    //Se activa cuando se está agregando un vehículo
+    const [fetching, setFetching] = useState(false);
     
 
     const [usarPlaca, setUsarPlaca] = useState(false);
@@ -82,6 +86,7 @@ export default function Proyecto() {
                 centre_id: res.data.centre.id,
                 service_id: res.data.service.id,
                 date: res.data.date,
+                commentary: res.data.commentary || "",
             });
             setVehiculos(res.data.vehicles);
 
@@ -279,7 +284,7 @@ export default function Proyecto() {
                     setModalConsultarOpen(false);
                     setVehiculo({});
 
-                    const mensaje = proyecto?.is_open ? "Proyecto abierto exitosamente." : "Proyecto cerrado exitosamente.";
+                    const mensaje = proyecto?.is_open ? "Proyecto cerrado exitosamente." : "Proyecto abierto exitosamente." ;
 
                     toast.success(mensaje);
                     setErrors({});
@@ -367,6 +372,9 @@ export default function Proyecto() {
         toggleItemInArray(setFormDataEdit, "extra_projects", item);
     };
 
+
+
+
     const textAreaRef = useRef(null);
 
     const copyTextToClipboard = () => {
@@ -428,6 +436,55 @@ export default function Proyecto() {
             fetchProyectosAbiertos();
         }
     }, [proyecto.centre]);
+
+
+    const fetchTypesOnEcoChange = async () => {
+        try {
+
+            if(formData.eco === "")
+                return;
+            
+            setFetching(true);
+
+            const res = await clienteAxios.get(
+                `/api/vehicles/${formData.eco}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            if (res.data.vehicle_type_id && res.data.vehicle_type_id !== formData.type) {
+                setFormData((prev) => ({
+                    ...prev,
+                    type: res.data.vehicle_type_id, // Asegura que sea string
+                }));
+            }
+            else {
+                setFormData((prev) => ({
+                    ...prev,
+                    type: ""
+                }));
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            // toast.error("Error al cargar los tipos de vehículos");
+        }
+        finally{
+            setFetching(false);
+        }
+    };
+
+    useEffect(() => {
+
+        const timer = setTimeout(() => {
+            fetchTypesOnEcoChange();
+
+        }, 100);
+
+        // Limpieza del timeout anterior si cambia formData.eco rápido
+        return () => clearTimeout(timer);
+    }, [formData.eco]);
 
     useEffect(() => {
         // console.log(proyecto);
@@ -526,6 +583,10 @@ export default function Proyecto() {
                     <span className="font-bold">Fecha:</span>{" "}
                     {format(proyecto?.date, "full", "es")}
                 </p>
+                <p className="text">
+                    <span className="font-bold">Comentario:</span>{" "}
+                    {proyecto?.commentary}{" "}
+                </p>
             </div>
 
             <div className="flex gap-2 mt-2">
@@ -601,7 +662,7 @@ export default function Proyecto() {
                     <input
                         className="input mb-1 mt-2"
                         type="search"
-                        inputmode="numeric"
+                        inputMode="numeric"
                         pattern="[0-9]*"
                         id="eco"
                         placeholder="Económico"
@@ -614,7 +675,7 @@ export default function Proyecto() {
                         onChange={(e) => filtrarTabla(e, "type")}
                         defaultValue=""
                     >
-                        <option value="" selected disabled>
+                        <option value="" disabled>
                             Tipo de vehículo
                         </option>
                         {tipos.map((tipo) => (
@@ -810,6 +871,25 @@ export default function Proyecto() {
                         </div>
                     )}
 
+                    <label className="label" htmlFor="commentary">
+                        Comentario
+                    </label>
+                    <textarea
+                        type="date"
+                        id="commentary"
+                        placeholder="Comentario"
+                        value={formDataEdit.commentary}
+                        onChange={(e) =>
+                            setFormDataEdit({
+                                ...formDataEdit,
+                                commentary: e.target.value,
+                            })
+                        }
+                    />
+                    {errors.commentary && (
+                        <p className="text-red-500">{errors.commentary[0]}</p>
+                    )}
+
                     <button
                         className="btn mt-4"
                         type="submit"
@@ -868,7 +948,6 @@ export default function Proyecto() {
                                         eco: e.target.value,
                                     });
                                 }}
-                                // onBlur={}
                                 autoComplete="off"
                                 autoFocus
                             />
@@ -877,9 +956,14 @@ export default function Proyecto() {
                             )}
                         </div>
 
-                        <label className="label" htmlFor="type">
-                            Tipo de vehículo
-                        </label>
+                        <div className="flex items-center gap-2">
+                            <label className="label" htmlFor="type">
+                                Tipo de vehículo
+                            </label>
+
+
+                            { fetching && <ClipLoader className="mt-2" size={20} />}
+                        </div>
                         <select
                             className="input"
                             id="type"
@@ -889,7 +973,8 @@ export default function Proyecto() {
                                     type: e.target.value,
                                 })
                             }
-                            defaultValue=""
+                            value={formData.type || ""}
+                            // defaultValue=""
                         >
                             <option value="" disabled>
                                 Seleccione un tipo
@@ -917,7 +1002,10 @@ export default function Proyecto() {
                                     commentary: e.target.value,
                                 })
                             }
-                        ></textarea>
+                            value={formData.commentary || ""}
+                        >
+                            
+                        </textarea>
                         {errors.commentary && (
                             <p className="error">{errors.commentary[0]}</p>
                         )}

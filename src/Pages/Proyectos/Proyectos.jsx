@@ -49,6 +49,7 @@ export default function Proyectos() {
                 centre_id: "",
                 service_id: "",
                 date: hoy,
+                commentary: "",
             });
             setErrors({});
         } catch (error) {
@@ -264,7 +265,7 @@ export default function Proyectos() {
                     )}
 
                     <label className="label" htmlFor="fecha">
-                        fecha
+                        Fecha
                     </label>
                     <input
                         className="input"
@@ -282,6 +283,26 @@ export default function Proyectos() {
                     />
                     {errors.date && (
                         <p className="text-red-500">{errors.date[0]}</p>
+                    )}
+
+                    <label className="label" htmlFor="commentary">
+                        Comentario
+                    </label>
+                    <textarea
+                        type="date"
+                        id="commentary"
+                        placeholder="Comentario"
+                        value={formData.commentary}
+                        // defaultValue={formData.date || new Date().toISOString().split("T")[0]}
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                commentary: e.target.value,
+                            })
+                        }
+                    />
+                    {errors.commentary && (
+                        <p className="text-red-500">{errors.commentary[0]}</p>
                     )}
 
                     <button

@@ -6,11 +6,13 @@ import clienteAxios from "../../config/axios";
 import { Printer } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format } from "@formkit/tempo";
+import { downloadBlobResponse } from "@/utils/downloadFile"; // ajusta ruta según tu estructura
+
 
 export default function Nueva() {
     const navigate = useNavigate();
 
-    const { token, setLoading, user, totalFilas, setTotalFilas, centros, fetchCentros} = useContext(AppContext);
+    const { token, setLoading, centros, fetchCentros} = useContext(AppContext);
 
     const [centro, setCentro] = useState("");
     const [errors, setErrors] = useState({});
@@ -122,45 +124,29 @@ export default function Nueva() {
                 }
             );
 
-            // Obteniendo el nombre del archivo desde el encabezado de la respuesta
-            let fileName = "Cotización.pdf"; // Valor por defecto
-            const disposition = response.headers["content-disposition"];
-            if (disposition && disposition.includes("filename=")) {
-                const match = disposition.match(
-                    /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
-                );
-                if (match && match[1]) {
-                    fileName = match[1].replace(/['"]/g, ""); // Elimina comillas si hay
-                }
-            }
-
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement("a");
-            link.href = url;
-            link.setAttribute("download", fileName); // Nombre del archivo
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
+            downloadBlobResponse(response, "Cotización.pdf");
 
             setErrors({});
             navigate('/cotizaciones');
 
         } catch (error) {
-            console.error("Error during request:", error);
+            // console.error("Error during request:", error);
             if (error.response) {
                 const reader = new FileReader();
                 reader.onload = function () {
                     try {
                         const errorData = JSON.parse(reader.result);
                         if (errorData.errors) {
+
                             setErrors(errorData.errors);
                         }
                     } catch (parseError) {
-                        console.error("Error parsing response:", parseError);
+                        // console.error("Error parsing response:", parseError);
                         toast.error("Error desconocido al generar el PDF");
                     }
                 };
                 reader.readAsText(error.response.data);
+                toast.error("Faltan precios por registrar");
             } else {
                 toast.error("Error desconocido al generar el PDF");
             }
@@ -317,7 +303,7 @@ export default function Nueva() {
                                                         <div className=" flex gap-1 flex-wrap pl-2">
                                                             {vehiculos.map((v) => (
                                                                 <label
-                                                                    className="inline-flex items-center text-xs"
+                                                                    className="inline-flex items-center text-xs mt-0"
                                                                     key={v.id}
                                                                 >
                                                                     <input

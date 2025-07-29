@@ -2,7 +2,7 @@
 import { CirclePlus } from "lucide-react";
 import { Link } from "react-router-dom";
 import Tabla from "../../components/Tabla";
-import { useContext, useState, useRef } from "react";
+import { useContext, useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 import { AppContext } from "../../context/AppContext";
 import Modal from "../../components/Modal";
@@ -13,21 +13,20 @@ import Swal from "sweetalert2";
 
 export default function Cotizaciones() {
 
-    const API_URL = import.meta.env.VITE_API_URL;
-    const [cotizacion, setCotizacion] = useState({
-    });
 
+    const [cotizacion, setCotizacion] = useState({});
 
     const [modal, setModal] = useState(false);
     const tableRef = useRef();
 
-    const { token, setLoading } = useContext(AppContext);
+    const { token, setLoading, pendientes, fetchPendientes } = useContext(AppContext);
 
     const [reloadKey, setReloadKey] = useState(0);
 
     const recargarTabla = () => {
         setReloadKey((prev) => prev + 1);
     };
+
 
     async function fetchPDF() {
         try {
@@ -99,15 +98,30 @@ export default function Cotizaciones() {
         }
     }
     
+    useEffect(() => {
+        fetchPendientes();
+    }, []);
 
     return (
         <>
             <h2 className="title-2">Cotizaciones</h2>
 
-            <Link className="btn mb-4" to="/cotizaciones/nueva">
-                <CirclePlus />
-                Nueva
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-2 mb-2">
+                <Link className="btn m-0" to="/cotizaciones/nueva">
+                    <CirclePlus />
+                    Crear cotización ordinaria
+                </Link>
+
+                <Link
+                    className="btn m-0 bg-green-700 relative"
+                    to="/cotizaciones/personalizadas"
+                >
+                    Cotizaciones personalizadas{" "}
+                    <span className=" text-xs absolute -top-3 -right-3 bg-red-900  w-6 aspect-square flex justify-center items-center rounded-full">
+                        {pendientes?.length}
+                    </span>
+                </Link>
+            </div>
 
             <div>
                 <Tabla
@@ -117,6 +131,7 @@ export default function Cotizaciones() {
                             title: "Centro",
                             field: "centre",
                             headerFilter: true,
+                            resizable: false,
                         },
                         {
                             title: "Fecha",
@@ -127,11 +142,19 @@ export default function Cotizaciones() {
                                     type: "date",
                                 },
                             },
+                            resizable: false,
+                        },
+                        {
+                            title: "Servicios",
+                            field: "services",
+                            headerFilter: true,
+                            resizable: false,
                         },
                         {
                             title: "Número",
                             field: "invoice_number",
                             headerFilter: true,
+                            resizable: false,
                         },
 
                         {
@@ -141,10 +164,19 @@ export default function Cotizaciones() {
                             headerFilterFunc: "=",
                             formatter: (cell) => {
                                 return cell.getValue()
-                                    ? formatoMoneda.format(parseInt(cell.getValue()))
+                                    ? formatoMoneda.format(
+                                          parseInt(cell.getValue())
+                                      )
                                     : null;
                             },
                             hozAlign: "right",
+                            resizable: false,
+                        },
+                        {
+                            title: "Comentarios internos",
+                            field: "internal_commentary",
+                            headerFilter: true,
+                            resizable: false,
                         },
                     ]}
                     ref={tableRef}

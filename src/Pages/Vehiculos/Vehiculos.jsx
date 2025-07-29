@@ -6,6 +6,7 @@ import Modal from "@/components/Modal";
 import { tabulatorConfig } from "../../config/variables";
 import Tabla from "../../components/Tabla";
 import { format } from "@formkit/tempo";
+import {Link} from "react-router-dom";
 
 
 export default function Vehiculos() {
@@ -126,7 +127,7 @@ export default function Vehiculos() {
                             <ul className="text-sm list-disc pl-5">
                                 {
                                     vehiculo.projects.map(project =>(
-                                        <li key={project.id}>{project.service.name}</li>
+                                        <li className="link" key={project.id}><Link to={`/proyectos/${project.id}`}>{project.service.name}</Link></li>
                                     ))
                                 }
                             </ul>
