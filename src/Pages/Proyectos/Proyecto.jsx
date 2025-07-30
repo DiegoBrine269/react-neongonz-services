@@ -603,17 +603,15 @@ export default function Proyecto() {
             <div className="flex items-center gap-2 justify-between">
                 <h2 className="title-2 mb-0">Proyecto No. {proyecto?.id}</h2>
 
-                <button>
-                    <Pencil className="text w-5" />
-                </button>
-                {/* <button
+
+                <button
                     onClick={() => {
                         setEditando((prev) => !prev);
                     }}
                     className="cursor-pointer"
                 >
                     <Pencil className="text w-5" />
-                </button> */}
+                </button>
             </div>
             <div className="pl-3">
                 <p className="text">

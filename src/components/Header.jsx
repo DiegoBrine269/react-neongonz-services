@@ -4,7 +4,7 @@ import LogoBlanco from "../assets/Logo-blanco.png";
 
 
 import { NavLink } from "react-router-dom";
-import { Menu, X, Car, Factory, Wrench, User, LogOut, Sun, Moon, LogIn, UserRoundPlus, BriefcaseBusiness, Receipt  } from "lucide-react";
+import { Menu, X, Car, Factory, Wrench, User, LogOut, Sun, Moon, LogIn, UserRoundPlus, BriefcaseBusiness, Receipt, Users  } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import { useContext } from "react";
 
@@ -47,9 +47,8 @@ export default function Header() {
                         {user && <Item to="/proyectos" text="Proyectos" children={<BriefcaseBusiness />} />}
                         {user && user.role === 'admin' && <Item to="/cotizaciones" text="Cotizaciones" children={<Receipt />} />}
                         {user && <Item to="/mi-cuenta" text="Mi cuenta" children={<User />} />}
-                        {user && (
-                            <Item to="/logout" text="Cerrar sesión" children={<LogOut />} onClick={handleLogout} />
-                        )}
+                        {user && user.role === 'admin' && <Item to="/reportes-desempeno" text="Reportes de desempeño" children={<Users />} />}
+                        {user && (<Item to="/logout" text="Cerrar sesión" children={<LogOut />} onClick={handleLogout} />)}
                         {!user && <Item to="/login" text="Iniciar Sesión" children={<LogIn />}/>}
                         {!user && <Item to="/registro" text="Crear una cuenta" children={<UserRoundPlus />}/>}
                     </>

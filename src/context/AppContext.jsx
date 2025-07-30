@@ -20,6 +20,10 @@ export default function AppProvider({ children }) {
 
     const [mostrarCerrados, setMostrarCerrados] = useState(false);
 
+    //
+    const [usuarios, setUsuarios] = useState([]);
+    
+
     // Cotizaciones pendientes
     const [pendientes, setPendientes] = useState([]);
 
@@ -91,6 +95,21 @@ export default function AppProvider({ children }) {
             window.location.href = "/"; 
         } catch (error) {
             console.error("Error during logout:", error);
+        }
+    }
+
+    async function fetchUsuarios() {
+        try {
+            const res = await clienteAxios.get("/api/users", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            setUsuarios(res.data);
+        } catch (error) {
+            setUsuarios([]);
+            toast.error("Error al cargar los usuarios");
         }
     }
 
@@ -180,6 +199,9 @@ export default function AppProvider({ children }) {
 
                 pendientes,
                 fetchPendientes,
+
+                usuarios,
+                fetchUsuarios
             }}
         >
             {children}

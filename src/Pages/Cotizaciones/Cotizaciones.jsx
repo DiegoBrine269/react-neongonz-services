@@ -126,6 +126,7 @@ export default function Cotizaciones() {
             <div>
                 <Tabla
                     key={reloadKey}
+                    className="custom-table"
                     columns={[
                         {
                             title: "Centro",
@@ -149,6 +150,7 @@ export default function Cotizaciones() {
                             field: "services",
                             headerFilter: true,
                             resizable: false,
+                            width: 220,
                         },
                         {
                             title: "Número",
@@ -164,9 +166,7 @@ export default function Cotizaciones() {
                             headerFilterFunc: "=",
                             formatter: (cell) => {
                                 return cell.getValue()
-                                    ? formatoMoneda.format(
-                                          parseInt(cell.getValue())
-                                      )
+                                    ? formatoMoneda.format(parseInt(cell.getValue()))
                                     : null;
                             },
                             hozAlign: "right",
@@ -196,6 +196,7 @@ export default function Cotizaciones() {
                     events={{
                         rowClick: (e, row) => {
                             const data = row.getData();
+                            // console.log(data);
                             setCotizacion(data);
                             setModal(true);
                         },
@@ -220,6 +221,13 @@ export default function Cotizaciones() {
                         <p>{cotizacion?.date}</p>
                     </div>
 
+                    {cotizacion?.services && <div className="text">
+                        <span className="font-bold border-b-1 block border-neutral-400">
+                            Servicios
+                        </span>{" "}
+                        <p>{cotizacion?.services}</p>
+                    </div>}
+
                     <div className="text">
                         <span className="font-bold border-b-1 block border-neutral-400">
                             Monto total
@@ -238,6 +246,13 @@ export default function Cotizaciones() {
                             Ver pdf 📄
                         </button>
                     </div>
+
+                    {cotizacion?.internal_commentary && <div className="text">
+                        <span className="font-bold border-b-1 block border-neutral-400">
+                            Comentarios internos
+                        </span>{" "}
+                        <p>{cotizacion?.internal_commentary}</p>
+                    </div>}
 
                     <div className="md:flex gap-1">
                         <button

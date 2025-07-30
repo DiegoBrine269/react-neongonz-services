@@ -18,6 +18,7 @@ import ForgotPassword from "./Pages/Auth/ForgotPassword";
 import Cotizaciones from "./Pages/Cotizaciones/Cotizaciones";
 import Nueva from "./Pages/Cotizaciones/Nueva";
 import Personalizadas from "./Pages/Cotizaciones/Personalizadas";
+import Desempeno from "@/Pages/Reportes/Desempeno"
 // import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
 
 
@@ -59,6 +60,8 @@ export default function App() {
                                 <Route path="/proyectos" element={<Proyectos />} />
                                 <Route path="/proyectos/:id" element={<Proyecto />} />
                                 <Route path="/mi-cuenta" element={<MiCuenta />} />
+                                <Route path="/reportes-desempeno" element={<Desempeno />} />
+
                                 
                             </>
                         )}

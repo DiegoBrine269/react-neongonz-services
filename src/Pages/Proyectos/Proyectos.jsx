@@ -9,15 +9,15 @@ import { useNavigate } from "react-router-dom";
 import { CirclePlus, Save } from "lucide-react";
 import Tabla from "../../components/Tabla";
 import { format } from "@formkit/tempo";
+import useSWR, { mutate } from "swr";
 
 
 export default function Proyectos() {
-    
 
     // const [servicios, setServicios] = useState([]);
     const hoy = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
 
-    const { token, setLoading, user, fetchServicios, fetchCentros, centros, proyectos, setProyectos, servicios, mostrarCerrados, setMostrarCerrados} = useContext(AppContext);
+    const { token, setLoading, user, fetchServicios, fetchCentros, centros, servicios, mostrarCerrados, setMostrarCerrados} = useContext(AppContext);
 
     const [isModalOpen, setModalOpen] = useState(false);
 
@@ -41,8 +41,7 @@ export default function Proyectos() {
                     Authorization: `Bearer ${token}`,
                 },
             });
-
-            fetchProyectos();
+            await mutate(url);
             setModalOpen(false);
             toast.success("Servicio creado correctamente");
             setFormData({
@@ -63,25 +62,20 @@ export default function Proyectos() {
         }
     };
 
-    async function fetchProyectos(page = 1) {
-        try {
-            const res = await clienteAxios.get(`/api/projects?${mostrarCerrados ? 'show_closed=1' : 'show_closed=0'}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
 
-            setProyectos(res.data);
-        } catch (error) {
-            setProyectos([]);
-            console.error("Error fetching data:", error);
-            toast.error("Error al cargar los servicios");
-        }
-    }
+    const showClosed = mostrarCerrados ? 1 : 0;
+    const url = token ? `/api/projects?show_closed=${showClosed}` : null;
+    const fetcher = async (url) => {
+        const res = await clienteAxios.get(url, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return res.data;
+    };
 
-
-
-
+    // Hook SWR
+    const { data: proyectos, error, isLoading } = useSWR(url, fetcher);
 
     const handleRowClick = (e, row) => {
         const id = row.getData().id;
@@ -92,7 +86,7 @@ export default function Proyectos() {
         const fetchData = async () => {
             // setLoading(true);
             // await Promise.all([
-                fetchProyectos();
+                // fetchProyectos();
                 fetchCentros();
                 fetchServicios();
             // ]);
@@ -102,9 +96,7 @@ export default function Proyectos() {
         fetchData();
     }, []);
 
-    useEffect(() => {
-        fetchProyectos();
-    }, [mostrarCerrados]);
+
 
     
 
