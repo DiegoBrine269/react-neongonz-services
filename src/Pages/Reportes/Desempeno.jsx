@@ -89,7 +89,7 @@ export default function Desempeno() {
                     onChange={e => setUsuario(usuarios.find(u => u.id === +e.target.value))}
                 >
                     <option disabled value="">Selecciona un usuario</option>
-                    {usuarios.map(u => <option key={u.id} value={u.id}>{u.name} {u.last_name}</option>)}
+                    {usuarios.map(u => u.is_active && <option key={u.id} value={u.id}>{u.name} {u.last_name}</option>)}
                 </select>
 
                 <div className="sm:grid grid-cols-2 gap-2">
