@@ -10,7 +10,7 @@ import Centros from "./Pages/Centros";
 import Servicios from "./Pages/Servicios/Servicios";
 import Servicio from "./Pages/Servicios/Servicio";
 import Proyectos from "./Pages/Proyectos/Proyectos";
-import Proyecto from "./Pages/Proyectos/Proyecto";
+import Proyecto from "./Pages/Proyectos/Proyecto/Proyecto";
 import "tabulator-tables/dist/css/tabulator_materialize.min.css";
 import Vehiculos from "./Pages/Vehiculos/Vehiculos";
 import MiCuenta from "./Pages/MiCuenta"

@@ -1,23 +1,27 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useContext, useState, useEffect, useRef } from "react";
-import { AppContext } from "../../context/AppContext";
-import clienteAxios from "../../config/axios";
+import { AppContext } from "@/context/AppContext";
+import clienteAxios from "@/config/axios";
 import { toast } from "react-toastify";
-import Modal from "../../components/Modal";
+import Modal from "@/components/Modal";
 import Swal from "sweetalert2";
-import Tabla from "../../components/Tabla";
-import { swalConfig } from "../../config/variables";
-import { ClipboardCopy, Trash2, ClipboardCheck, Car, CircleCheck, ChevronDown, ChevronRight, Pencil,Save, PackageOpen, Copy } from "lucide-react";
-import ErrorBoundary from '../../components/ErrorBoundary';
+import Tabla from "@/components/Tabla";
+import { swalConfig } from "@/config/variables";
+import { ClipboardCopy, Trash2, Car, CircleCheck, ChevronDown, ChevronRight, Pencil,Save } from "lucide-react";
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { format } from "@formkit/tempo";
-import RadioButtonItem from "../../components/RadioButtonItem";
+import RadioButtonItem from "@/components/RadioButtonItem";
 // import { Calendar } from "primereact/calendar";
 // import "primereact/resources/themes/lara-light-cyan/theme.css";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import {ClipLoader} from "react-spinners";
 
-
+import ErrorLabel from "@/components/UI/ErrorLabel";
+import ProyectoInfo from './ProyectoInfo';
+import ProyectoActions from "./ProyectoActions";
+import InfoRow from "@/components/UI/InfoRow";
+import CopyField from "./CopyField";
 
 export default function Proyecto() {
     const navigate = useNavigate();
@@ -53,9 +57,8 @@ export default function Proyecto() {
 
     const [usarPlaca, setUsarPlaca] = useState(false);
 
-    const { token, setLoading, user, totalFilas, setTotalFilas, fetchCentros, centros, fetchServicios, servicios, tableRef } =
-        useContext(AppContext);
-    // console.log(user);
+    const { token, setLoading, user,  fetchCentros, centros, fetchServicios, servicios, tableRef } = useContext(AppContext);
+    
 
     const [formData, setFormData] = useState({
         eco: "",
@@ -95,10 +98,10 @@ export default function Proyecto() {
             setTipos([...new Set(res.data.vehicles.map((v) => v.type))]);
 
         } catch (error) {
-            console.error("Error fetching data:", error);
             toast.error("Error al cargar el proyecto");
         }
     };
+    
 
     const fetchTypes = async () => {
         try {
@@ -109,7 +112,6 @@ export default function Proyecto() {
             });
             setTypes(res.data);
         } catch (error) {
-            console.error("Error fetching data:", error);
             toast.error("Error al cargar los tipos de vehículos");
         }
     };
@@ -140,8 +142,7 @@ export default function Proyecto() {
             setUsarPlaca(false);
             setFiltrosColapsados(false);
         } catch (error) {
-            // toast.error("Error al agregar el vehículo");
-            console.error("Error during request:", error);
+            toast.error("Error al agregar el vehículo");
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors);
             }
@@ -185,7 +186,6 @@ export default function Proyecto() {
             toast.success("Proyecto actualizado correctamente");
             setErrors({});
         } catch (error) {
-            console.error("Error during request:", error);
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors);
             }
@@ -206,7 +206,6 @@ export default function Proyecto() {
             );
             setProyectosAbiertos(res.data);
         } catch (error) {
-            console.error("Error fetching data:", error);
             toast.error("Error al cargar el proyecto");
         }
     };
@@ -244,7 +243,6 @@ export default function Proyecto() {
             toast.success("Vehículo eliminado correctamente");
             setErrors({});
         } catch (error) {
-            console.error("Error during request:", error);
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors);
             }
@@ -289,7 +287,6 @@ export default function Proyecto() {
                     toast.success(mensaje);
                     setErrors({});
                 } catch (error) {
-                    console.error("Error during request:", error);
                     if (error.response && error.response.data.errors) {
                         setErrors(error.response.data.errors);
                     }
@@ -328,7 +325,6 @@ export default function Proyecto() {
                 navigate("/proyectos");
                 toast.success("Proyecto duplicado exitosamente.");
             } catch (error) {
-                console.error("Error during request:", error);
                 if (error.response && error.response.data.errors) {
                     setErrors(error.response.data.errors);
                 }
@@ -373,7 +369,6 @@ export default function Proyecto() {
                     navigate("/proyectos");
                     toast.success("Proyecto eliminado exitosamente.");
                 } catch (error) {
-                    console.error("Error during request:", error);
                     if (error.response && error.response.data.errors) {
                         setErrors(error.response.data.errors);
                     }
@@ -508,8 +503,7 @@ export default function Proyecto() {
                 }));
             }
         } catch (error) {
-            console.error("Error fetching data:", error);
-            // toast.error("Error al cargar los tipos de vehículos");
+            toast.error("Error al cargar los tipos de vehículos");
         }
         finally{
             setFetching(false);
@@ -517,10 +511,8 @@ export default function Proyecto() {
     };
 
     useEffect(() => {
-
         const timer = setTimeout(() => {
             fetchTypesOnEcoChange();
-
         }, 100);
 
         // Limpieza del timeout anterior si cambia formData.eco rápido
@@ -541,41 +533,21 @@ export default function Proyecto() {
         {
             title: "Eco.",
             field: "eco",
-            // headerFilter: "input",
-            // headerFilterParams: { type: "number" },
             resizable: false,
             width: 110,
         },
         {
             title: "Tipo",
             field: "type",
-            // headerFilter: "input",
-            // headerFilter: "list",
-            // headerFilterParams: { valuesLookup: true, clearable: true },
             resizable: false,
             width: 100,
         },
         {
             title: "Registrado por",
             field: "user.name",
-            // headerFilter: "input",
-            // headerFilter: "list",
-            // headerFilterParams: { valuesLookup: true, clearable: true },
             resizable: false,
             width: 100,
-            // formatter: (cell) => {
-            //     const user = cell.getValue();
-            //     return `${user?.name ?? ""} ${user?.last_name ?? ""}`;
-            // },
-            // headerFilterFunc: (headerValue, rowValue) => {
-            //     if (!headerValue) return true; // sin filtro, mostrar todo
-            //     const formatted = `${rowValue?.name ?? ""} ${
-            //         rowValue?.last_name ?? ""
-            //     }`; // rowValue es el valor original (user)
-            //     return formatted
-            //         .toLowerCase()
-            //         .includes(headerValue.toLowerCase());
-            // },
+
         },
         {
             title: "Fecha y hora de registro",
@@ -591,9 +563,7 @@ export default function Proyecto() {
         {
             title: "Comentario",
             field: "commentary",
-            // headerFilter: "input",
             resizable: false,
-            // width: 250,
         },
     ];
 
@@ -602,7 +572,6 @@ export default function Proyecto() {
         <div className="relative">
             <div className="flex items-center gap-2 justify-between">
                 <h2 className="title-2 mb-0">Proyecto No. {proyecto?.id}</h2>
-
 
                 <button
                     onClick={() => {
@@ -613,73 +582,30 @@ export default function Proyecto() {
                     <Pencil className="text w-5" />
                 </button>
             </div>
-            <div className="pl-3">
-                <p className="text">
-                    <span className="font-bold">Servicio:</span>{" "}
-                    {proyecto?.service?.name}
-                </p>
-                <p className="text">
-                    <span className="font-bold">Centro de ventas:</span>{" "}
-                    {proyecto?.centre?.name}{" "}
-                </p>
-                <p className="text">
-                    <span className="font-bold">Fecha:</span>{" "}
-                    {format(proyecto?.date, "full", "es")}
-                </p>
-                <p className="text">
-                    <span className="font-bold">Comentario:</span>{" "}
-                    {proyecto?.commentary}{" "}
-                </p>
-            </div>
 
-            <div className="flex gap-2 mt-2">
-                {user?.role === "admin" && (
-                    <>
-                        <button
-                            className="btn btn-secondary mt-0"
-                            onClick={handleToggleStatusProyecto}
-                        >
-                            {proyecto?.is_open ? (
-                                <ClipboardCheck />
-                            ) : (
-                                <PackageOpen />
-                            )}
-                            {proyecto?.is_open ? "Cerrar" : "Abrir"}
-                        </button>
+            <ProyectoInfo proyecto={proyecto} />
 
-                        <button
-                            className="btn bg-green-600 mt-0"
-                            onClick={handleDuplicarProyecto}
-                        >
-                            <Copy /> Duplicar
-                        </button>
-
-                        <button
-                            className="btn btn-danger mt-0"
-                            onClick={handleEliminarProyecto}
-                        >
-                            <Trash2 /> Eliminar
-                        </button>
-                    </>
-                )}
-            </div>
+            <ProyectoActions
+                proyecto={proyecto}
+                user={user}
+                handleToggleStatusProyecto={handleToggleStatusProyecto}
+                handleDuplicarProyecto={handleDuplicarProyecto}
+                handleEliminarProyecto={handleEliminarProyecto}
+            />
 
             <h3 className="title-3 mt-2 mb-2">Lista de vehículos</h3>
             <div className="flex gap-2 mt-0">
                 {proyecto?.is_open ? (
                     <button
                         className="btn mt-0"
-                        onClick={() => {
-                            setModalAgregarOpen(true);
-                        }}
+                        onClick={() => {setModalAgregarOpen(true);}}
                     >
                         <Car />
                         Agregar
                     </button>
                 ) : (
                     <p className="text-muted mb-2">
-                        El proyecto ha sido cerrado, no es posible agregar más
-                        vehículos.
+                        El proyecto ha sido cerrado, no es posible agregar más vehículos.
                     </p>
                 )}
             </div>
@@ -690,12 +616,9 @@ export default function Proyecto() {
                     className="label flex m-0"
                     onClick={() => setFiltrosColapsados((prev) => !prev)}
                 >
-                    <ChevronRight
-                        className={!filtrosColapsados ? "block" : "hidden"}
+                    <ChevronRight className={!filtrosColapsados ? "block" : "hidden"}
                     />
-                    <ChevronDown
-                        className={filtrosColapsados ? "block" : "hidden"}
-                    />
+                    <ChevronDown className={filtrosColapsados ? "block" : "hidden"}/>
                     <h3 className="text font-bold">Filtros</h3>
                 </label>
                 <form
@@ -830,9 +753,7 @@ export default function Proyecto() {
                             </option>
                         ))}
                     </select>
-                    {errors.centre_id && (
-                        <p className="text-red-500">{errors.centre_id[0]}</p>
-                    )}
+                    <ErrorLabel>{errors?.centre_id}</ErrorLabel>
 
                     <label className="label" htmlFor="service_id">
                         Servicio
@@ -857,9 +778,7 @@ export default function Proyecto() {
                             </option>
                         ))}
                     </select>
-                    {errors.service_id && (
-                        <p className="text-red-500">{errors.service_id[0]}</p>
-                    )}
+                    <ErrorLabel>{errors?.service_id}</ErrorLabel>
 
                     <label className="label" htmlFor="fecha">
                         fecha
@@ -878,9 +797,7 @@ export default function Proyecto() {
                             })
                         }
                     />
-                    {errors.date && (
-                        <p className="text-red-500">{errors.date[0]}</p>
-                    )}
+                    <ErrorLabel>{errors?.date}</ErrorLabel>
 
                     {proyectosAbiertos?.length > 1 && (
                         <div>
@@ -936,9 +853,7 @@ export default function Proyecto() {
                             })
                         }
                     />
-                    {errors.commentary && (
-                        <p className="text-red-500">{errors.commentary[0]}</p>
-                    )}
+                    <ErrorLabel>{errors?.commentary}</ErrorLabel>
 
                     <button
                         className="btn mt-4"
@@ -1001,9 +916,7 @@ export default function Proyecto() {
                                 autoComplete="off"
                                 autoFocus
                             />
-                            {errors.eco && (
-                                <p className="error">{errors.eco[0]}</p>
-                            )}
+                            <ErrorLabel>{errors?.eco}</ErrorLabel>
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -1040,9 +953,7 @@ export default function Proyecto() {
                                 </option>
                             ))}
                         </select>
-                        {errors.type && (
-                            <p className="error">{errors.type[0]}</p>
-                        )}
+                        <ErrorLabel>{errors?.type}</ErrorLabel>
 
                         <label className="label" htmlFor="commentary">
                             Comentario (opcional)
@@ -1059,9 +970,7 @@ export default function Proyecto() {
                             }
                             value={formData.commentary || ""}
                         ></textarea>
-                        {errors.commentary && (
-                            <p className="error">{errors.commentary[0]}</p>
-                        )}
+                        <ErrorLabel>{errors?.commentary}</ErrorLabel>
 
                         {proyectosAbiertos?.length > 1 && (
                             <div>
@@ -1071,18 +980,9 @@ export default function Proyecto() {
                                         setIsCollapsed((prev) => !prev)
                                     }
                                 >
-                                    <ChevronRight
-                                        className={
-                                            isCollapsed ? "block" : "hidden"
-                                        }
-                                    />
-                                    <ChevronDown
-                                        className={
-                                            !isCollapsed ? "block" : "hidden"
-                                        }
-                                    />
-                                    Agregar a otros proyectos de forma
-                                    simultánea (opcional)
+                                    <ChevronRight className={isCollapsed ? "block" : "hidden"}/>
+                                    <ChevronDown className={!isCollapsed ? "block" : "hidden"}/>
+                                    Agregar a otros proyectos de forma simultánea (opcional)
                                 </label>
                                 <div
                                     className={`pl-2 pt-2 flex flex-wrap gap-1 overflow-hidden ${
@@ -1114,21 +1014,6 @@ export default function Proyecto() {
                                 value="Registrar"
                                 onClick={handleSubmit}
                             />
-
-                            {/* <MobileScanner
-                                onDetect={(codigo) =>{
-                                    //eliminar caracteres no deseados
-                                    let codigoR = codigo.replace(/[^0-9]/g, "");
-                                    console.log(codigoR);
-                                    const match = codigoR.match(/\b\d{5}\b/);
-
-                                    if (match) {
-                                        setFormData({ ...formData, eco: parseInt(codigoR) });
-                                    }
-
-                                }
-                                }
-                            /> */}
                         </div>
                     </form>
                 </Modal>
@@ -1148,11 +1033,6 @@ export default function Proyecto() {
                         setSelectedDate(e);
                         filtrarTabla(e, "created_at");
                     }}
-                    // footer={
-                    //     selected
-                    //         ? `Selected: ${selected.toLocaleDateString()}`
-                    //         : "Pick a day."
-                    // }
                 />
             </Modal>
 
@@ -1162,44 +1042,17 @@ export default function Proyecto() {
             >
                 <h2 className="title-3">Vehículo</h2>
                 <div className="flex flex-col gap-3 pl-2">
-                    <div className="text">
-                        <span className="font-bold border-b-1 block border-neutral-400">
-                            Económico
-                        </span>{" "}
-                        <p>{vehiculo?.eco}</p>
-                    </div>
-                    <div className="text">
-                        <span className="font-bold border-b-1 block border-neutral-400">
-                            Tipo
-                        </span>{" "}
-                        <p>{vehiculo?.type}</p>
-                    </div>
-                    <div className="text">
-                        <span className="font-bold border-b-1 block border-neutral-400">
-                            Comentario
-                        </span>{" "}
-                        <p>{vehiculo?.commentary ?? "-"}</p>
-                    </div>
-                    <div className="text">
-                        <span className="font-bold border-b-1 block border-neutral-400">
-                            Fecha y hora de registro
-                        </span>{" "}
-                        <p>
-                            {format(
-                                vehiculo?.created_at,
-                                { date: "full", time: "medium" },
-                                "es"
-                            )}
-                        </p>
-                    </div>
-                    <div className="text">
-                        <span className="font-bold border-b-1 block border-neutral-400">
-                            Registrado por
-                        </span>{" "}
-                        <p>
-                            {vehiculo?.user?.name} {vehiculo?.user?.last_name}
-                        </p>
-                    </div>
+                    <InfoRow label="Económico" value={vehiculo?.eco} />
+                    <InfoRow label="Tipo" value={vehiculo?.type} />
+                    <InfoRow label="Comentario" value={vehiculo?.commentary ?? "-"} />
+                    <InfoRow
+                        label="Fecha y hora de registro"
+                        value={format(vehiculo?.created_at, { date: "full", time: "medium" },"es")}
+                    />
+                    <InfoRow
+                        label="Registrado por"
+                        value={`${vehiculo?.user?.name}`}
+                    />
                 </div>
 
                 <div className="md:flex gap-1">
@@ -1223,26 +1076,11 @@ export default function Proyecto() {
             </Modal>
 
             {user?.role === "admin" && vehiculos.length > 0 && (
-                <div>
-                    <h3 className="title-3 mt-5 mb-2 ">
-                        Económicos en serie (para copiar y pegar)
-                    </h3>
-                    <div className="relative">
-                        <textarea
-                            ref={textAreaRef}
-                            className="mt-2"
-                            value={vehiculos.map((v) => v.eco).join(", ")}
-                            // ref={(textarea) => (this.textArea = textarea)}
-                            readOnly
-                        />
-                        <button
-                            className="absolute top-1 right-2 bg-white border border-gray-300 rounded-md p-1 h-fit"
-                            onClick={copyTextToClipboard}
-                        >
-                            <ClipboardCopy className="text-gray-500" />
-                        </button>
-                    </div>
-                </div>
+                <CopyField
+                    textAreaRef={textAreaRef}
+                    copyTextToClipboard={copyTextToClipboard}
+                    vehiculos={vehiculos}
+                />
             )}
         </div>
     );

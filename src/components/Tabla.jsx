@@ -1,6 +1,5 @@
-
-import {  useState, useRef, Suspense, useContext, useEffect} from "react";
-import { tabulatorConfig } from "../config/variables.js"
+import { useState, useRef, Suspense, useContext, useEffect } from "react";
+import { tabulatorConfig } from "../config/variables.js";
 import { ReactTabulator } from "react-tabulator";
 import { Sheet, FileText } from "lucide-react";
 import { AppContext } from "@/context/AppContext.jsx";
@@ -9,7 +8,14 @@ import * as XLSX from "xlsx";
 // import jsPDF from "jspdf";
 // import "jspdf-autotable";
 
-export default function Tabla({className, title, data, columns, options, events}) {
+export default function Tabla({
+    className,
+    title,
+    data,
+    columns,
+    options,
+    events,
+}) {
     const [totalFilas, setTotalFilas] = useState(0);
 
     // let tableRef = useRef(null);
@@ -24,7 +30,7 @@ export default function Tabla({className, title, data, columns, options, events}
     }, []);
 
     const downloadExcel = () => {
-        tableRef.current.download("xlsx", `${title||'Reporte'}.xlsx`, {
+        tableRef.current.download("xlsx", `${title || "Reporte"}.xlsx`, {
             sheetName: "Reporte",
         });
     };
@@ -35,8 +41,6 @@ export default function Tabla({className, title, data, columns, options, events}
             title: title || "Reporte", //add title to report
         });
     };
-
-
 
     return (
         <>

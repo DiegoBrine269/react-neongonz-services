@@ -7,9 +7,9 @@ import { toast } from "react-toastify";
 import { CirclePlus } from "lucide-react";
 
 export default function Centros() {
-    const [centros, setCentros] = useState([]);
+    // const [centros, setCentros] = useState([]);
     const [centro, setCentro] = useState({});
-    const { token, setLoading, totalFilas, setTotalFilas } = useContext(AppContext);
+    const { token, setLoading, centros, fetchCentros } = useContext(AppContext);
 
     const [isModalCreateOpen, setModalCreateOpen] = useState(false);
     const [isModalViewOpen, setModalViewOpen] = useState(false);
@@ -56,22 +56,6 @@ export default function Centros() {
         }
     }
 
-    async function fetchCentros ()  {
-        try {
-            const res = await clienteAxios.get("/api/centres", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            setCentros(res.data)
-
-        } catch (error) {
-            setCentros([]);
-            console.error("Error fetching data:", error);
-            toast.error("Error al cargar los centros de venta");
-        }
-    }
 
     // Consultar todas las agencias  al cargar el componente
     useEffect(() => {
@@ -85,18 +69,9 @@ export default function Centros() {
     }, []);
 
     const columns = [
-        { title: "Nombre", field: "name", headerFilter: "input", 
-            resizable: false,
-
-                 },
-        { title: "Responsable", field: "responsible", headerFilter: "input",
-            resizable: false,
-
-          },
-        { title: "Ubicación", field: "location", headerFilter: "input", width: 400,
-            resizable: false,
-
-          },
+        { title: "Nombre", field: "name", headerFilter: "input", resizable: false,},
+        { title: "Responsable", field: "responsible", headerFilter: "input", resizable: false,},
+        { title: "Ubicación", field: "location", headerFilter: "input", width: 400, resizable: false,},
     ];
     
     return (
