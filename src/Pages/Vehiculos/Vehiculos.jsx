@@ -71,6 +71,7 @@ export default function Vehiculos() {
                             field: "eco",
                             headerFilter: true,
                             resizable: false,
+                            width: 80
                         },
                         {
                             title: "Tipo",

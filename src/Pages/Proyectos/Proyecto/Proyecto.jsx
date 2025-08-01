@@ -534,7 +534,7 @@ export default function Proyecto() {
             title: "Eco.",
             field: "eco",
             resizable: false,
-            width: 110,
+            width: 85,
         },
         {
             title: "Tipo",
