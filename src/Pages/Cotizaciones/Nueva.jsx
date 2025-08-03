@@ -7,7 +7,8 @@ import { Printer } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format } from "@formkit/tempo";
 import { downloadBlobResponse } from "@/utils/downloadFile"; // ajusta ruta según tu estructura
-
+import { motion } from "motion/react";
+import {formatearDinero} from "@/utils/utils.js";
 
 export default function Nueva() {
     const navigate = useNavigate();
@@ -25,7 +26,7 @@ export default function Nueva() {
     const [seleccionarTodo, setSeleccionarTodo] = useState(false);
     const [proyectosSeleccionados, setProyectosSeleccionados] = useState([]);
 
-
+    const [subTotal, setSubTotal] = useState(0);
 
     const [formData, setFormData] = useState({
         vehicles: [],
@@ -33,12 +34,24 @@ export default function Nueva() {
     });
 
     const handleCheckboxChange = (item) => {
+        
+        const esNuevo = !seleccionados.includes(item);
+
+
+        // if(!item.price)
+        //     toast.error("No hay precios registrados para el tipo de vehículo");
+        
+        // const sub = parseFloat(subTotal)  + (esNuevo ? + parseFloat(item.price) : - parseFloat(item.price) ); 
+
+        // setSubTotal(sub);
+
         setSeleccionados(
             (prev) =>
-                prev.includes(item)
+                    !esNuevo
                     ? prev.filter((i) => i !== item) // lo quita
                     : [...prev, item] // lo agrega
         );
+
     };
 
     const handleCheckboxProyectoChange = (e) => {
@@ -61,9 +74,32 @@ export default function Nueva() {
     };
 
     useEffect(()=>{
+
+        let sub = 0;
+        const conjuntoSeleccionados = new Set(seleccionados);
+
+        conjuntoSeleccionados.forEach((s) => {
+
+            if(!s.price){
+                toast.error("Faltan precios por registrar");
+                return;
+            }
+            sub += parseInt(s.price);
+        });
+        
+        setSubTotal(sub);
+
+
+        // Eliminado duplicados
+        const unicosPorId = Array.from(
+            new Map(seleccionados.filter((item) => item !== null)
+                    .map((item) => [item.id, item]) // usar `id` como clave
+            ).values()
+        );
+
         setFormData({
             ...formData,
-            vehicles:seleccionados
+            vehicles:unicosPorId
         });
     }, [seleccionados]);
 
@@ -209,7 +245,11 @@ export default function Nueva() {
     return (
         <>
             <h2 className="title-2">Nueva cotización</h2>
-            <p className="text">Tienes {vehiculosPendientes.length ?? 0} vehículos con cotización pendiente </p>
+            <p className="text">
+                Tienes {vehiculosPendientes.length ?? 0} vehículos con
+                cotización pendiente{" "}
+            </p>
+
             <form action="">
                 {vehiculosPendientes.length > 0 && (
                     <>
@@ -238,10 +278,23 @@ export default function Nueva() {
                     </>
                 )}
 
+                {/* Subtotal */}
+                {subTotal !== 0 && <div className="sticky top-0 text-right my-3">
+                    <motion.span
+                        key={subTotal} // clave para que motion lo anime cada que cambia
+                        initial={{ scale: 0.9, opacity: 0.5 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                        className="bg-green-700 p-1 rounded-md text-white inline-block"
+                    >
+                        Subtotal: {formatearDinero(subTotal)}
+                    </motion.span>
+                </div>}
+
                 {centro && vehiculosPendientes.length > 0 && (
                     <label
                         htmlFor="seleccionar-todo"
-                        className="flex gap-1 justify-end items-center"
+                        className="flex gap-1 justify-end items-center mt-0"
                     >
                         <input
                             className="h-4 w-4"
@@ -274,11 +327,21 @@ export default function Nueva() {
                                                 name={p.id}
                                                 type="checkbox"
                                                 id={`seleccionar-proyecto-${p.id}`}
-                                                checked={proyectosSeleccionados[p.id] || false}
-                                                onChange={handleCheckboxProyectoChange}
+                                                checked={
+                                                    proyectosSeleccionados[
+                                                        p.id
+                                                    ] || false
+                                                }
+                                                onChange={
+                                                    handleCheckboxProyectoChange
+                                                }
                                             />
                                             <span className="title-3 m-0">
-                                                {`${p.service} (${format(p.date, "full", "es")})`}
+                                                {`${p.service} (${format(
+                                                    p.date,
+                                                    "full",
+                                                    "es"
+                                                )})`}
                                             </span>
                                         </label>
                                     </div>
@@ -286,42 +349,57 @@ export default function Nueva() {
                                         {(() => {
                                             const agrupados = {};
 
-                                            vehiculosPendientes?.forEach((v) => {
-                                                if (v.project_id === p.id) {
-                                                    if (!agrupados[v.type]) {
-                                                        agrupados[v.type] = [];
+                                            vehiculosPendientes?.forEach(
+                                                (v) => {
+                                                    if (v.project_id === p.id) {
+                                                        if (
+                                                            !agrupados[v.type]
+                                                        ) {
+                                                            agrupados[v.type] =
+                                                                [];
+                                                        }
+                                                        agrupados[v.type].push(
+                                                            v
+                                                        );
                                                     }
-                                                    agrupados[v.type].push(v);
                                                 }
-                                            });
+                                            );
 
                                             // 2. Renderizar los grupos
-                                            return Object.entries(agrupados).map(
-                                                ([tipo, vehiculos]) => (
-                                                    <div key={tipo}>
-                                                        <p className="text font-bold mt-1">{tipo}</p>
-                                                        <div className=" flex gap-1 flex-wrap pl-2">
-                                                            {vehiculos.map((v) => (
-                                                                <label
-                                                                    className="inline-flex items-center text-xs mt-0"
-                                                                    key={v.id}
-                                                                >
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        className="checkbox-btn peer"
-                                                                        value={v.id}
-                                                                        checked={seleccionados.includes(v)}
-                                                                        onChange={() =>handleCheckboxChange(v)}
-                                                                    />
-                                                                    <span className="checkbox-label peer-checked:bg-blue-500 peer-checked:text-white peer-checked:ring-blue-500">
-                                                                        {v.eco}
-                                                                    </span>
-                                                                </label>
-                                                            ))}
-                                                        </div>
+                                            return Object.entries(
+                                                agrupados
+                                            ).map(([tipo, vehiculos]) => (
+                                                <div key={tipo}>
+                                                    <p className="text font-bold mt-1">
+                                                        {tipo}
+                                                    </p>
+                                                    <div className=" flex gap-1 flex-wrap pl-2">
+                                                        {vehiculos.map((v) => (
+                                                            <label
+                                                                className="inline-flex items-center text-xs mt-0"
+                                                                key={v.id}
+                                                            >
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="checkbox-btn peer"
+                                                                    value={v.id}
+                                                                    checked={seleccionados.includes(
+                                                                        v
+                                                                    )}
+                                                                    onChange={() =>
+                                                                        handleCheckboxChange(
+                                                                            v
+                                                                        )
+                                                                    }
+                                                                />
+                                                                <span className="checkbox-label peer-checked:bg-blue-500 peer-checked:text-white peer-checked:ring-blue-500">
+                                                                    {v.eco}
+                                                                </span>
+                                                            </label>
+                                                        ))}
                                                     </div>
-                                                )
-                                            );
+                                                </div>
+                                            ));
                                         })()}
                                     </div>
                                 </div>

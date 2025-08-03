@@ -118,6 +118,27 @@ export default function Proyecto() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        
+
+        if (formData.centre_id && formData.centre_id !== proyecto.centre_id) {
+            const swalResult = await Swal.fire({
+                icon: "warning",
+                title: "Atención",
+                text: `El vehículo que ingresaste pertenece a ${centros.find(c => c.id == formData.centre_id).name}. Si continúas, el vehículo será reasignado de centro.`,
+                confirmButtonText: "Aceptar",
+                showCancelButton: true,
+                cancelButtonText: "Cancelar",
+                ...swalConfig({ danger: true }),
+            });
+    
+            if (!swalResult.isConfirmed) {
+                return;
+            }
+        }
+
+
+
         setLoading(true);
 
         try {
@@ -477,7 +498,7 @@ export default function Proyecto() {
     const fetchTypesOnEcoChange = async () => {
         try {
 
-            if(formData.eco === "")
+            if(formData.eco === "" || formData?.eco?.length < 5)
                 return;
             
             setFetching(true);
@@ -493,17 +514,19 @@ export default function Proyecto() {
             if (res.data.vehicle_type_id && res.data.vehicle_type_id !== formData.type) {
                 setFormData((prev) => ({
                     ...prev,
-                    type: res.data.vehicle_type_id, // Asegura que sea string
+                    type: res.data.vehicle_type_id,
+                    centre_id: res.data.centre_id
                 }));
             }
             else {
                 setFormData((prev) => ({
                     ...prev,
-                    type: ""
+                    type: "",
+                    centre_id: ""
                 }));
             }
         } catch (error) {
-            toast.error("Error al cargar los tipos de vehículos");
+            console.error(error);
         }
         finally{
             setFetching(false);

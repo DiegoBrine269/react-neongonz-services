@@ -67,7 +67,7 @@ export default function Cotizaciones() {
             showCancelButton: true,
             confirmButtonText: "Sí, eliminar cotización",
             cancelButtonText: "Cancelar",
-            ...swalConfig(),
+            ...swalConfig(true),
         });
 
         if (result.isConfirmed) {
