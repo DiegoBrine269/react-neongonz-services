@@ -145,12 +145,15 @@ export default function Desempeno() {
             {/* Resumen */}
             {conteoPorServicio.length > 0 && <div className="card rounded-lg px-3 py-2">
                 <h3 className="title-3 mb-0">Resumen</h3>
+                <table>
+                
                 {
                     conteoPorServicio.map(c => {
-                        return <p className="text">{c.name} : {c.count}</p>
+                        return <p className="text">{c.name}: <span className="font-bold">{c.count}</span></p>
                     })
 
                 }
+                </table>
             </div>}
 
             <Tabla
