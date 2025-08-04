@@ -12,6 +12,8 @@ export default function Desempeno() {
     const [usuario, setUsuario] = useState({});
 
     const [data, setData] = useState([]);
+    const [conteoPorServicio, setconteoPorServicio] = useState([]);
+
     const [formData, setFormData] = useState({
         date_start: format(new Date(), 'YYYY-MM-DD'),
         date_end: format(new Date(), 'YYYY-MM-DD'),
@@ -56,6 +58,25 @@ export default function Desempeno() {
         setData([])
     }, [usuario, formData]);
 
+    useEffect(()=>{
+        const conteo = Object.values(
+            data.reduce((acc, item) => {
+                const nombreServicio = item.project?.service?.name ?? "Sin servicio";
+
+                if (!acc[nombreServicio]) {
+                    acc[nombreServicio] = { name: nombreServicio, count: 0 };
+                }
+
+                acc[nombreServicio].count += 1;
+                return acc;
+            }, {})
+        ).sort((a, b) => b.count - a.count);
+
+
+        setconteoPorServicio(conteo);
+
+    }, [data]);
+
     const handleSubmit = async (e) =>{
         e.preventDefault();
 
@@ -66,7 +87,6 @@ export default function Desempeno() {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            // console.log(res.data);
             setData(res.data);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -121,6 +141,17 @@ export default function Desempeno() {
                     </button>
                 </div>
             </form>
+
+            {/* Resumen */}
+            {conteoPorServicio.length > 0 && <div className="card rounded-lg px-3 py-2">
+                <h3 className="title-3 mb-0">Resumen</h3>
+                {
+                    conteoPorServicio.map(c => {
+                        return <p className="text">{c.name} : {c.count}</p>
+                    })
+
+                }
+            </div>}
 
             <Tabla
                 title={`Reporte de desempeño de ${usuario?.name} ${usuario?.last_name}`}

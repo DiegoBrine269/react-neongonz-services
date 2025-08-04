@@ -113,11 +113,11 @@ export default function Cotizaciones() {
                 </Link>
 
                 <Link
-                    className="btn m-0 bg-green-700 relative"
+                    className="btn m-0 btn-secondary relative"
                     to="/cotizaciones/personalizadas"
                 >
                     Cotizaciones personalizadas{" "}
-                    <span className=" text-xs absolute -top-3 -right-3 bg-red-900  w-6 aspect-square flex justify-center items-center rounded-full">
+                    <span className="text-white text-xs absolute -top-3 -right-3 bg-red-900  w-6 aspect-square flex justify-center items-center rounded-full">
                         {pendientes?.length}
                     </span>
                 </Link>

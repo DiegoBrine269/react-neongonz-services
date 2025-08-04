@@ -106,6 +106,7 @@ export default function Servicios() {
                 }}
                 columns={columns}
                 data={servicios}
+                title="Catálogo de servicios"
             />
 
             <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>

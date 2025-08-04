@@ -196,6 +196,7 @@ export default function Proyectos() {
                 }}
                 columns={columns}
                 data={proyectos}
+                title="Listado de proyectos"
             />
 
             <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>

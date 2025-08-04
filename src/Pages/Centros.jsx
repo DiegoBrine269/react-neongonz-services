@@ -98,6 +98,7 @@ export default function Centros() {
                 }}
                 columns={columns}
                 data={centros}
+                title={"Listado de centros de venta"}
             />
 
             <Modal
