@@ -226,6 +226,8 @@ export default function Proyecto() {
                 }
             );
             setProyectosAbiertos(res.data);
+            if(res.data.length > 5 )
+                setIsCollapsed(true);
         } catch (error) {
             toast.error("Error al cargar el proyecto");
         }
