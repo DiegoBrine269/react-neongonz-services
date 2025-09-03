@@ -53,6 +53,7 @@ export default function AppProvider({ children }) {
     // Token de authentication
     const [token, setToken] = useState(localStorage.getItem("NEON_GONZ_TOKEN") || null);
     const [user, setUser] = useState(null);
+    const [requestHeader, setRequestHeader] = useState({headers: {Authorization: `Bearer ${token}`,},});
 
     async function getUser() {
         try {
@@ -74,6 +75,7 @@ export default function AppProvider({ children }) {
 
     useEffect(() => {
         if (token) getUser();
+        
     }, [token]);
 
 
@@ -174,6 +176,7 @@ export default function AppProvider({ children }) {
         <AppContext.Provider
             value={{
                 token,
+                requestHeader,
                 setToken,
                 user,
                 setUser,

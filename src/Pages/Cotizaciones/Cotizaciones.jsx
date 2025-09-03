@@ -7,19 +7,22 @@ import { toast } from "react-toastify";
 import { AppContext } from "../../context/AppContext";
 import Modal from "../../components/Modal";
 import clienteAxios from "../../config/axios";
-import { Trash2, CircleCheck } from "lucide-react";
+import { Trash2, CircleCheck, Mail, Pencil } from "lucide-react";
 import { formatoMoneda, swalConfig } from "../../config/variables";
 import Swal from "sweetalert2";
+import { format } from "@formkit/tempo";
 
 export default function Cotizaciones() {
 
 
     const [cotizacion, setCotizacion] = useState({});
+    const [pendientesEnvio, setPendientesEnvio] = useState([]);
+
 
     const [modal, setModal] = useState(false);
     const tableRef = useRef();
 
-    const { token, setLoading, pendientes, fetchPendientes } = useContext(AppContext);
+    const { token, setLoading, pendientes, fetchPendientes, requestHeader } = useContext(AppContext);
 
     const [reloadKey, setReloadKey] = useState(0);
 
@@ -27,6 +30,17 @@ export default function Cotizaciones() {
         setReloadKey((prev) => prev + 1);
     };
 
+    async function fetchPendientesEnvio() {
+        try {
+            const res = await clienteAxios.get(
+                "/api/invoices?sent_at=null&paginate=false",
+                requestHeader
+            );
+
+        } catch (error) {
+            console.log([]);
+        }
+    }
 
     async function fetchPDF() {
         try {
@@ -99,7 +113,11 @@ export default function Cotizaciones() {
     }
     
     useEffect(() => {
+        //Cotizaciones pendientes de terminar
         fetchPendientes();
+
+        //Pendientes de enviar
+        fetchPendientesEnvio();
     }, []);
 
     return (
@@ -117,9 +135,16 @@ export default function Cotizaciones() {
                     to="/cotizaciones/personalizadas"
                 >
                     Cotizaciones personalizadas{" "}
-                    <span className="text-white text-xs absolute -top-3 -right-3 bg-red-900  w-6 aspect-square flex justify-center items-center rounded-full">
-                        {pendientes?.length}
-                    </span>
+                    <span className="counter">{pendientes?.length}</span>
+                </Link>
+
+                <Link
+                    className="btn btn-secondary m-0 relative"
+                    to="/cotizaciones/enviar"
+                >
+                    <Mail />
+                    Enviar cotizaciones
+                    <span className="counter">{pendientes?.length}</span>
                 </Link>
             </div>
 
@@ -144,6 +169,13 @@ export default function Cotizaciones() {
                                 },
                             },
                             resizable: false,
+                            formatter: (cell) => {
+                                const date = new Date(
+                                    cell.getValue() + "T12:00:00"
+                                );
+
+                                return format(date, "DD/MM/YYYY");
+                            },
                         },
                         {
                             title: "Servicios",
@@ -166,7 +198,9 @@ export default function Cotizaciones() {
                             headerFilterFunc: "=",
                             formatter: (cell) => {
                                 return cell.getValue()
-                                    ? formatoMoneda.format(parseInt(cell.getValue()))
+                                    ? formatoMoneda.format(
+                                          parseInt(cell.getValue())
+                                      )
                                     : null;
                             },
                             hozAlign: "right",
@@ -218,15 +252,17 @@ export default function Cotizaciones() {
                         <span className="font-bold border-b-1 block border-neutral-400">
                             Fecha
                         </span>{" "}
-                        <p>{cotizacion?.date}</p>
+                        <p>{format(cotizacion?.date, "DD/MM/YYYY")}</p>
                     </div>
 
-                    {cotizacion?.services && <div className="text">
-                        <span className="font-bold border-b-1 block border-neutral-400">
-                            Servicios
-                        </span>{" "}
-                        <p>{cotizacion?.services}</p>
-                    </div>}
+                    {cotizacion?.services && (
+                        <div className="text">
+                            <span className="font-bold border-b-1 block border-neutral-400">
+                                Servicios
+                            </span>{" "}
+                            <p>{cotizacion?.services}</p>
+                        </div>
+                    )}
 
                     <div className="text">
                         <span className="font-bold border-b-1 block border-neutral-400">
@@ -247,14 +283,16 @@ export default function Cotizaciones() {
                         </button>
                     </div>
 
-                    {cotizacion?.internal_commentary && <div className="text">
-                        <span className="font-bold border-b-1 block border-neutral-400">
-                            Comentarios internos
-                        </span>{" "}
-                        <p>{cotizacion?.internal_commentary}</p>
-                    </div>}
+                    {cotizacion?.internal_commentary && (
+                        <div className="text">
+                            <span className="font-bold border-b-1 block border-neutral-400">
+                                Comentarios internos
+                            </span>{" "}
+                            <p>{cotizacion?.internal_commentary}</p>
+                        </div>
+                    )}
 
-                    <div className="md:flex gap-1">
+                    <div className="contenedor-botones">
                         <button
                             className="btn btn-danger"
                             onClick={handleEliminarCotizacion}
@@ -262,6 +300,15 @@ export default function Cotizaciones() {
                             <Trash2 />
                             Eliminar
                         </button>
+
+                        <Link
+                            className="btn btn-secondary"
+                            to={`/cotizaciones/nueva/${cotizacion?.id}`}
+                        >
+                            <Pencil />
+                            Editar
+                        </Link>
+
                         <button
                             className="btn"
                             onClick={() => {

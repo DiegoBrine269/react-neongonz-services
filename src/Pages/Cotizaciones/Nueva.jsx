@@ -1,3 +1,4 @@
+import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { useContext, useEffect } from "react";
 import { AppContext } from "../../context/AppContext";
@@ -12,6 +13,9 @@ import {formatearDinero} from "@/utils/utils.js";
 
 export default function Nueva() {
     const navigate = useNavigate();
+
+
+    const { id } = useParams();
 
     const { token, setLoading, centros, fetchCentros} = useContext(AppContext);
 
@@ -36,14 +40,6 @@ export default function Nueva() {
     const handleCheckboxChange = (item) => {
         
         const esNuevo = !seleccionados.includes(item);
-
-
-        // if(!item.price)
-        //     toast.error("No hay precios registrados para el tipo de vehículo");
-        
-        // const sub = parseFloat(subTotal)  + (esNuevo ? + parseFloat(item.price) : - parseFloat(item.price) ); 
-
-        // setSubTotal(sub);
 
         setSeleccionados(
             (prev) =>
@@ -78,14 +74,19 @@ export default function Nueva() {
         let sub = 0;
         const conjuntoSeleccionados = new Set(seleccionados);
 
+        let lanzarError = false;
+
         conjuntoSeleccionados.forEach((s) => {
 
             if(!s.price){
-                toast.error("Faltan precios por registrar");
+                lanzarError = true;
                 return;
             }
             sub += parseInt(s.price);
         });
+
+        if(lanzarError)
+            toast.error("Faltan precios por registrar");
         
         setSubTotal(sub);
 
@@ -183,8 +184,10 @@ export default function Nueva() {
                 };
                 reader.readAsText(error.response.data);
                 toast.error("Faltan precios por registrar");
+                return;
             } else {
                 toast.error("Error desconocido al generar el PDF");
+                return;
             }
         } finally {
             setLoading(false);
@@ -193,12 +196,11 @@ export default function Nueva() {
     
 
     useEffect(() => {
+        console.log("Cotizacion prop:", cotizacion);
         const fetchData = async () => {
             setLoading(true);
             await Promise.all([fetchCentros()]);
-
             await Promise.all([fetchVehiculos()]);
-
             setLoading(false);
         };
 

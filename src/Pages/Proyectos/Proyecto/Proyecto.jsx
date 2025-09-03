@@ -26,6 +26,8 @@ import CopyField from "./CopyField";
 export default function Proyecto() {
     const navigate = useNavigate();
 
+
+
     const { id } = useParams();
     const [editando, setEditando] = useState(false);
     const [proyectosAbiertos, setProyectosAbiertos] = useState([]);
@@ -59,6 +61,11 @@ export default function Proyecto() {
 
     const { token, setLoading, user,  fetchCentros, centros, fetchServicios, servicios, tableRef } = useContext(AppContext);
     
+    const requestHeader = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    };
 
     const [formData, setFormData] = useState({
         eco: "",
@@ -145,11 +152,7 @@ export default function Proyecto() {
             const { data } = await clienteAxios.post(
                 `/api/projects/${id}/add-vehicle`,
                 formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
+                requestHeader
             );
             fetchProyecto();
             setModalAgregarOpen(false);
@@ -195,11 +198,7 @@ export default function Proyecto() {
         try {
             const { data } = await clienteAxios.put(`/api/projects/${id}`,
                 formDataEdit,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
+                requestHeader
             );
 
             fetchProyecto();
@@ -219,11 +218,7 @@ export default function Proyecto() {
         try {
             const res = await clienteAxios.get(
                 `/api/centres/${proyecto.centre.id}/open-projects`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
+                requestHeader
             );
             setProyectosAbiertos(res.data);
             if(res.data.length > 5 )
@@ -254,11 +249,7 @@ export default function Proyecto() {
             const { data } = await clienteAxios.post(
                 `/api/projects/${id}/remove-vehicle`,
                 { id: vehiculo.id },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
+                requestHeader
             );
             fetchProyecto();
             setModalConsultarOpen(false);
@@ -507,11 +498,7 @@ export default function Proyecto() {
 
             const res = await clienteAxios.get(
                 `/api/vehicles/${formData.eco}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
+                requestHeader
             );
             if (res.data.vehicle_type_id && res.data.vehicle_type_id !== formData.type) {
                 setFormData((prev) => ({

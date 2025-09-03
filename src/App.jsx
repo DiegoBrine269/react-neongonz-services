@@ -17,7 +17,10 @@ import MiCuenta from "./Pages/MiCuenta"
 import ForgotPassword from "./Pages/Auth/ForgotPassword";
 import Cotizaciones from "./Pages/Cotizaciones/Cotizaciones";
 import Nueva from "./Pages/Cotizaciones/Nueva";
-import Personalizadas from "./Pages/Cotizaciones/Personalizadas";
+import Personalizadas from "@/Pages/Cotizaciones/Personalizadas";
+import Enviar from "@/Pages/Cotizaciones/Enviar";
+import Editar from "@/Pages/Cotizaciones/Editar";
+
 import Desempeno from "@/Pages/Reportes/Desempeno"
 // import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
 
@@ -53,6 +56,8 @@ export default function App() {
                                         <Route path="/cotizaciones" element={<Cotizaciones />} />
                                         <Route path="/cotizaciones/nueva" element={<Nueva />} />
                                         <Route path="/cotizaciones/personalizadas" element={<Personalizadas />} />
+                                        <Route path="/cotizaciones/enviar" element={<Enviar />} />
+                                        <Route path="/cotizaciones/editar/:id" element={<Editar />} />
                                         <Route path="/servicios/:id" element={<Servicio />} />
                                     </>
                                 )}

@@ -7,7 +7,8 @@ import { AppContext } from "@/context/AppContext";
 import { useNavigate } from "react-router-dom";
 import clienteAxios from "@/config/axios";
 import { toast } from "react-toastify";
-import { ca } from "react-day-picker/locale";
+import ErrorLabel from "@/components/UI/ErrorLabel";
+import { date, format } from "@formkit/tempo";
 
 export default function Personalizadas() {
 
@@ -37,6 +38,7 @@ export default function Personalizadas() {
             price: "",
             comments: "",
             internal_commentary: "",
+            date: format(new Date(), "YYYY-MM-DD"),
         });
         setErrors({});
     }, [accion]);    
@@ -143,7 +145,7 @@ export default function Personalizadas() {
                     Crear nueva
                 </button>
                 <button
-                    className="btn"
+                    className="btn btn-secondary"
                     onClick={() => {
                         setAccion("edit");
                     }}
@@ -206,7 +208,9 @@ export default function Personalizadas() {
                                         concept: selectedCot.concept,
                                         quantity: selectedCot.quantity,
                                         price: selectedCot.price,
-                                        internal_commentary: selectedCot.internal_commentary,
+                                        internal_commentary:
+                                            selectedCot.internal_commentary,
+                                        date: selectedCot.date,
                                     });
                                 }
                             }}
@@ -221,12 +225,26 @@ export default function Personalizadas() {
                                 </option>
                             ))}
                         </select>
-                        {errors.invoice_id && (
-                            <p className="text-red-500">
-                                {errors.invoice_id[0]}
-                            </p>
-                        )}
+                        <ErrorLabel>{errors?.invoice_id}</ErrorLabel>
                     </div>
+
+                    <label className="label" htmlFor="fecha">
+                        fecha
+                    </label>
+                    <input
+                        className="input"
+                        type="date"
+                        id="fecha"
+                        placeholder="fecha"
+                        value={formData?.date}
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                date: e.target.value,
+                            })
+                        }
+                    />
+                    <ErrorLabel>{errors?.date}</ErrorLabel>
 
                     <label className="label" htmlFor="concept">
                         Concepto
@@ -244,9 +262,7 @@ export default function Personalizadas() {
                         }
                         value={formData.concept ?? ""}
                     />
-                    {errors.concept && (
-                        <p className="text-red-500">{errors.concept[0]}</p>
-                    )}
+                    <ErrorLabel>{errors.concept}</ErrorLabel>
 
                     <label className="label" htmlFor="quantity">
                         Cantidad
@@ -264,9 +280,7 @@ export default function Personalizadas() {
                         }
                         value={formData.quantity ?? ""}
                     />
-                    {errors.quantity && (
-                        <p className="text-red-500">{errors.quantity[0]}</p>
-                    )}
+                    <ErrorLabel>{errors.quantity}</ErrorLabel>
 
                     <label className="label" htmlFor="price">
                         Precio
@@ -281,11 +295,9 @@ export default function Personalizadas() {
                         }
                         value={formData.price ?? ""}
                     />
-                    {errors.price && (
-                        <p className="text-red-500">{errors.price[0]}</p>
-                    )}
+                    <ErrorLabel>{errors.price}</ErrorLabel>
 
-                    <label htmlFor="comments" className="label">
+                    {/* <label htmlFor="comments" className="label">
                         Comentarios o instrucciones especiales
                     </label>
                     <textarea
@@ -298,7 +310,7 @@ export default function Personalizadas() {
                                 comments: e.target.value,
                             })
                         }
-                    ></textarea>
+                    ></textarea> */}
 
                     <label htmlFor="internal_commentary" className="label">
                         Comentarios internos
