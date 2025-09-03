@@ -125,7 +125,7 @@ body {
     }
 
     .counter {
-        @apply text-white text-xs absolute -top-3 -right-3 bg-red-900  w-6 aspect-square flex justify-center items-center rounded-full;
+        @apply text-white text-xs absolute -top-3 -right-3 bg-red-900  w-6 aspect-square flex justify-center items-center rounded-full z-2;
     }
 }
 

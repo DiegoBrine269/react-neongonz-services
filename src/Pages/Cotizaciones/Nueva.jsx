@@ -11,7 +11,7 @@ import { downloadBlobResponse } from "@/utils/downloadFile"; // ajusta ruta seg√
 import { motion } from "motion/react";
 import {formatearDinero} from "@/utils/utils.js";
 
-export default function Nueva() {
+export default function Nueva(cotizacion = null) {
     const navigate = useNavigate();
 
 

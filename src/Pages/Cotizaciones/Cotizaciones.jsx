@@ -174,7 +174,7 @@ export default function Cotizaciones() {
                                     cell.getValue() + "T12:00:00"
                                 );
 
-                                return format(date, "short");
+                                return format(date, "DD/MM/YYYY");
                             },
                         },
                         {
