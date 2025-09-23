@@ -1,6 +1,6 @@
 export function downloadBlobResponse(response, defaultName = "archivo.pdf") {
     let fileName = defaultName;
-
+    console.log(response.headers);
     const disposition = response.headers["content-disposition"];
     if (disposition && disposition.includes("filename=")) {
         const match = disposition.match(

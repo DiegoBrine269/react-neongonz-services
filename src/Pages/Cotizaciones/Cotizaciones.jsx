@@ -1,5 +1,5 @@
 
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, UserRoundPen, Trash2, CircleCheck, Mail, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 import Tabla from "../../components/Tabla";
 import { useContext, useState, useRef, useEffect } from "react";
@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 import { AppContext } from "../../context/AppContext";
 import Modal from "../../components/Modal";
 import clienteAxios from "../../config/axios";
-import { Trash2, CircleCheck, Mail, Pencil } from "lucide-react";
 import { formatoMoneda, swalConfig } from "../../config/variables";
 import Swal from "sweetalert2";
 import { format } from "@formkit/tempo";
@@ -32,10 +31,8 @@ export default function Cotizaciones() {
 
     async function fetchPendientesEnvio() {
         try {
-            const res = await clienteAxios.get(
-                "/api/invoices?sent_at=null&paginate=false",
-                requestHeader
-            );
+            const res = await clienteAxios.get("/api/invoices/email-pending", requestHeader);
+            setPendientesEnvio(res.data);
 
         } catch (error) {
             console.log([]);
@@ -63,7 +60,6 @@ export default function Cotizaciones() {
             window.URL.revokeObjectURL(url); // Limpieza
 
         } catch (error) {
-
             console.error("Error fetching data:", error);
             toast.error("Error al descargar el PDF");
         }
@@ -127,24 +123,26 @@ export default function Cotizaciones() {
             <div className="flex flex-col sm:flex-row gap-2 mb-2">
                 <Link className="btn m-0" to="/cotizaciones/nueva">
                     <CirclePlus />
-                    Crear cotización ordinaria
+                    Crear ordinaria
                 </Link>
 
                 <Link
                     className="btn m-0 btn-secondary relative"
                     to="/cotizaciones/personalizadas"
                 >
-                    Cotizaciones personalizadas{" "}
+                    <UserRoundPen/>
+                    Personalizadas{" "}
                     <span className="counter">{pendientes?.length}</span>
                 </Link>
 
                 <Link
                     className="btn btn-secondary m-0 relative"
                     to="/cotizaciones/enviar"
+                    state={{ pendientesEnvio: pendientesEnvio }}
                 >
                     <Mail />
-                    Enviar cotizaciones
-                    <span className="counter">{pendientes?.length}</span>
+                    Enviar
+                    <span className="counter">{pendientesEnvio?.length}</span>
                 </Link>
             </div>
 
@@ -153,10 +151,28 @@ export default function Cotizaciones() {
                     key={reloadKey}
                     className="custom-table"
                     columns={[
+                        //   {
+                        //     formatter: "rowSelection",  
+                        //     titleFormatter: "rowSelection",
+                        //     hozAlign: "center",
+                        //     headerSort: false,
+                        //     width: 50,
+                        // },
                         {
                             title: "Centro",
                             field: "centre",
                             headerFilter: true,
+                            resizable: false,
+                        },
+                        {
+                            title: "Monto total",
+                            field: "total",
+                            headerFilter: "number",
+                            headerFilterFunc: "=",
+                            formatter: (cell) => {
+                                return cell.getValue() ? formatoMoneda.format(parseInt(cell.getValue())): null;
+                            },
+                            hozAlign: "right",
                             resizable: false,
                         },
                         {
@@ -191,21 +207,7 @@ export default function Cotizaciones() {
                             resizable: false,
                         },
 
-                        {
-                            title: "Monto total",
-                            field: "total",
-                            headerFilter: "number",
-                            headerFilterFunc: "=",
-                            formatter: (cell) => {
-                                return cell.getValue()
-                                    ? formatoMoneda.format(
-                                          parseInt(cell.getValue())
-                                      )
-                                    : null;
-                            },
-                            hozAlign: "right",
-                            resizable: false,
-                        },
+
                         {
                             title: "Comentarios internos",
                             field: "internal_commentary",
@@ -301,13 +303,13 @@ export default function Cotizaciones() {
                             Eliminar
                         </button>
 
-                        <Link
+                        {!cotizacion.concept && <Link
                             className="btn btn-secondary"
-                            to={`/cotizaciones/nueva/${cotizacion?.id}`}
+                            to={`/cotizaciones/editar/${cotizacion?.id}`}
                         >
                             <Pencil />
                             Editar
-                        </Link>
+                        </Link>}
 
                         <button
                             className="btn"

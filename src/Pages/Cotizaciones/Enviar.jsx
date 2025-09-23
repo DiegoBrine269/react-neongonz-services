@@ -1,11 +1,108 @@
-import React from 'react'
+// import { use } from "react";
+import { useContext, useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import PeerLabel from "@/components/UI/PeerLabel";
+import TitleCheckBox from "@/components/UI/TitleCheckBox";
+import { useSelection } from "@/hooks/useSelection.js";
+import { format } from "@formkit/tempo";
+import {formatearDinero} from "@/utils/utils.js";
+import { toast } from "react-toastify";
+import { AppContext } from "@/context/AppContext";
+import clienteAxios from "@/config/axios";
 
 export default function Enviar() {
+
+    const navigate = useNavigate();
+
+    // Se reciben por props los pendientes de envío
+    const location = useLocation();
+    const { pendientesEnvio } = location.state || []; 
+    const { selected, toggle, clear, isSelected, setSelected } = useSelection();
+    const { token, setLoading, requestHeader } = useContext(AppContext);
+    const [formData, setFormData] = useState({
+        invoice_ids: selected,
+    });
+
+    // Agrupar por centre_id
+    let grouped = pendientesEnvio.reduce((acc, item) => {
+        const key = item.centre_id;
+        if (!acc[key]) {
+            acc[key] = {
+                centre: item.centre,
+                items: []
+            };
+        }
+        acc[key].items.push(item);
+        return acc;
+    }, {});
+    
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        setLoading(true);
+
+        try {
+            await clienteAxios.post(`/api/invoices/send`, formData, requestHeader);
+            navigate('/cotizaciones');
+        } catch (error) {
+            toast.error('Error al enviar las cotizaciones');
+            console.log(error);
+        } 
+        finally {
+            setLoading(false);
+        }    
+    };
+
+    useEffect(() => {
+        setFormData(prev => ({
+            ...prev,
+            invoice_ids: selected.map(item => item.id),
+        }));
+    }, [selected]);
+    
+
     return (
         <>
-            <h2 class="title-2">Módulo en construcción...</h2>
+            <h2 className="title-2">Enviar Cotizaciones</h2>
 
-            <p className="text">Gracias por tu paciencia</p>
+            <form action="">
+                {Object.entries(grouped).map(([centreId, group]) => (
+                    <div
+                        key={centreId}
+                        className="border-1 border-neutral-400 p-2 rounded mb-4"
+                    >
+                        <div key={centreId}>
+                            <TitleCheckBox
+                                name= {group.centre.id}
+                                label= {group.centre.name} 
+                                // checked={proyectosSeleccionados[p.id] || false}
+                                // onChange={handleCheckboxProyectoChange}
+                            />
+                            <h3 className="title-3 mb-1">
+                                
+                            </h3>
+                            <div className="flex gap-1 flex-wrap pl-2">                
+                                {group.items.map(item => (
+                                    <PeerLabel
+                                        key={item.id}
+                                        label={item.invoice_number}
+                                        onChange={() => toggle(item)}
+                                        tooltip={{
+                                            date: {label:'Fecha', value:format(item.date, 'DD/MM/YYYY')},
+                                            total: {label:'Total', value:formatearDinero(item.total)},
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    
+                    </div>
+                ))}
+
+                {selected.length > 0 && <input type="submit" value="Enviar" className="btn" onClick={handleSubmit} />}
+            </form>
         </>
     )
 }

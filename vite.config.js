@@ -15,7 +15,7 @@ export default defineConfig({
         host: true,
         proxy: {
             "/api": {
-                target: "http://192.168.0.11:8000",
+                target: "https://vpf0g2vq-8000.usw3.devtunnels.ms/",
                 changeOrigin: true,
                 headers: {
                     Accept: "application/json",

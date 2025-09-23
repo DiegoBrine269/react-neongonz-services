@@ -57,7 +57,7 @@ export default function App() {
                                         <Route path="/cotizaciones/nueva" element={<Nueva />} />
                                         <Route path="/cotizaciones/personalizadas" element={<Personalizadas />} />
                                         <Route path="/cotizaciones/enviar" element={<Enviar />} />
-                                        <Route path="/cotizaciones/editar/:id" element={<Nueva />} />
+                                        <Route path="/cotizaciones/editar/:id" element={<Editar />} />
                                         <Route path="/servicios/:id" element={<Servicio />} />
                                         <Route path="/reportes-desempeno" element={<Desempeno />} />
                                     </>

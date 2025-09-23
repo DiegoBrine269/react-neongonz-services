@@ -6,6 +6,7 @@ function formatearDinero(valor) {
 }
 
 
+
 export{
-    formatearDinero
+    formatearDinero,
 }

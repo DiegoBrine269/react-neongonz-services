@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+
 import { useState } from "react";
 import { useContext, useEffect } from "react";
 import { AppContext } from "../../context/AppContext";
@@ -8,19 +8,23 @@ import { Printer } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format } from "@formkit/tempo";
 import { downloadBlobResponse } from "@/utils/downloadFile"; // ajusta ruta según tu estructura
-import { motion } from "motion/react";
+import PeerLabel from "@/components/UI/PeerLabel";
+import TitleCheckBox from "@/components/UI/TitleCheckBox.jsx";
 import {formatearDinero} from "@/utils/utils.js";
+import AnimatedAmount from "@/components/UI/AnimatedAmount";
 
-export default function Nueva(cotizacion = null) {
+
+export default function Nueva() {
     const navigate = useNavigate();
-
-
-    const { id } = useParams();
+   
 
     const { token, setLoading, centros, fetchCentros} = useContext(AppContext);
 
     const [centro, setCentro] = useState("");
     const [errors, setErrors] = useState({});
+
+
+
 
     const [vehiculosPendientes, setVehiculosPendientes] = useState([]);
     const [centrosPendientes, setCentrosPendientes] = useState([]);
@@ -105,7 +109,7 @@ export default function Nueva(cotizacion = null) {
     }, [seleccionados]);
 
 
-    async function fetchVehiculos() {
+    async function fetchVehiculosPendientes() {
         setLoading(true);
         try {
             const res = await clienteAxios.get(`/api/vehicles?invoice=pending`,
@@ -133,9 +137,9 @@ export default function Nueva(cotizacion = null) {
 
 
             setVehiculosPendientes(res.data);
+            
         } catch (error) {
             setVehiculosPendientes([]);
-            console.error("Error fetching data:", error);
             toast.error("Error al cargar los vehículos");
         }
         finally
@@ -196,11 +200,10 @@ export default function Nueva(cotizacion = null) {
     
 
     useEffect(() => {
-        console.log("Cotizacion prop:", cotizacion);
         const fetchData = async () => {
             setLoading(true);
             await Promise.all([fetchCentros()]);
-            await Promise.all([fetchVehiculos()]);
+            await Promise.all([fetchVehiculosPendientes()]);
             setLoading(false);
         };
 
@@ -281,16 +284,11 @@ export default function Nueva(cotizacion = null) {
                 )}
 
                 {/* Subtotal */}
-                {subTotal !== 0 && <div className="sticky top-0 text-right my-3">
-                    <motion.span
-                        key={subTotal} // clave para que motion lo anime cada que cambia
-                        initial={{ scale: 0.9, opacity: 0.5 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
-                        className="bg-green-700 p-1 rounded-md text-white inline-block"
-                    >
-                        Subtotal: {formatearDinero(subTotal)}
-                    </motion.span>
+                {centro  && <div className="sticky top-0 text-right my-3">
+                    <AnimatedAmount
+                        keyProp={subTotal}
+                        label={`Subtotal: ${formatearDinero(subTotal)}`}
+                    />
                 </div>}
 
                 {centro && vehiculosPendientes.length > 0 && (
@@ -320,32 +318,12 @@ export default function Nueva(cotizacion = null) {
                                     className="border-1 border-neutral-400 p-2 rounded mb-4"
                                 >
                                     <div className="flex justify-between items-center mb-2">
-                                        <label
-                                            htmlFor={`seleccionar-proyecto-${p.id}`}
-                                            className="flex gap-1 justify-end items-center m-0"
-                                        >
-                                            <input
-                                                className="h-4 w-4"
-                                                name={p.id}
-                                                type="checkbox"
-                                                id={`seleccionar-proyecto-${p.id}`}
-                                                checked={
-                                                    proyectosSeleccionados[
-                                                        p.id
-                                                    ] || false
-                                                }
-                                                onChange={
-                                                    handleCheckboxProyectoChange
-                                                }
-                                            />
-                                            <span className="title-3 m-0">
-                                                {`${p.service} (${format(
-                                                    p.date,
-                                                    "full",
-                                                    "es"
-                                                )})`}
-                                            </span>
-                                        </label>
+                                        <TitleCheckBox
+                                            name= {p.id}
+                                            label= {`${p.service} (${format(p.date,"full","es")})`}
+                                            checked={proyectosSeleccionados[p.id] || false}
+                                            onChange={handleCheckboxProyectoChange}
+                                        />
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         {(() => {
@@ -354,50 +332,29 @@ export default function Nueva(cotizacion = null) {
                                             vehiculosPendientes?.forEach(
                                                 (v) => {
                                                     if (v.project_id === p.id) {
-                                                        if (
-                                                            !agrupados[v.type]
-                                                        ) {
-                                                            agrupados[v.type] =
-                                                                [];
+                                                        if (!agrupados[v.type]) {
+                                                            agrupados[v.type] = [];
                                                         }
-                                                        agrupados[v.type].push(
-                                                            v
-                                                        );
+                                                        agrupados[v.type].push(v);
                                                     }
                                                 }
                                             );
 
                                             // 2. Renderizar los grupos
-                                            return Object.entries(
-                                                agrupados
-                                            ).map(([tipo, vehiculos]) => (
+                                            return Object.entries(agrupados).map(([tipo, vehiculos]) => (
                                                 <div key={tipo}>
                                                     <p className="text font-bold mt-1">
                                                         {tipo}
                                                     </p>
-                                                    <div className=" flex gap-1 flex-wrap pl-2">
+                                                    <div className="flex gap-1 flex-wrap pl-2">
                                                         {vehiculos.map((v) => (
-                                                            <label
-                                                                className="inline-flex items-center text-xs mt-0"
+                                                            <PeerLabel
                                                                 key={v.id}
-                                                            >
-                                                                <input
-                                                                    type="checkbox"
-                                                                    className="checkbox-btn peer"
-                                                                    value={v.id}
-                                                                    checked={seleccionados.includes(
-                                                                        v
-                                                                    )}
-                                                                    onChange={() =>
-                                                                        handleCheckboxChange(
-                                                                            v
-                                                                        )
-                                                                    }
-                                                                />
-                                                                <span className="checkbox-label peer-checked:bg-blue-500 peer-checked:text-white peer-checked:ring-blue-500">
-                                                                    {v.eco}
-                                                                </span>
-                                                            </label>
+                                                                value={v.id}
+                                                                label={v.eco}
+                                                                checked={seleccionados.includes(v)}
+                                                                onChange={() => handleCheckboxChange(v)}
+                                                            />
                                                         ))}
                                                     </div>
                                                 </div>

@@ -19,6 +19,7 @@ export default function Personalizadas() {
     const [formData, setFormData] = useState({});
     const [errors, setErrors] = useState({});
     const [accion, setAccion] = useState(null); // create or update
+    const [mostrarBotones, setMostrarBotones] = useState(true);
 
     useEffect(() => {
         
@@ -135,10 +136,11 @@ export default function Personalizadas() {
                 precios personalizados.
             </p>
 
-            <div className="flex gap-2 mb-4">
+            {mostrarBotones && <div className="flex gap-2 mb-4">
                 <button
                     className="btn"
                     onClick={() => {
+                        setMostrarBotones(false);
                         setAccion("create");
                     }}
                 >
@@ -147,12 +149,13 @@ export default function Personalizadas() {
                 <button
                     className="btn btn-secondary"
                     onClick={() => {
+                        setMostrarBotones(false);
                         setAccion("edit");
                     }}
                 >
                     Terminar pendiente
                 </button>
-            </div>
+            </div>}
 
             {accion && (
                 <form action="">
@@ -249,7 +252,7 @@ export default function Personalizadas() {
                     <label className="label" htmlFor="concept">
                         Concepto
                     </label>
-                    <input
+                    <textarea
                         className="input"
                         type="text"
                         id="concept"
@@ -261,7 +264,9 @@ export default function Personalizadas() {
                             })
                         }
                         value={formData.concept ?? ""}
-                    />
+                    >
+                    </textarea>
+                    
                     <ErrorLabel>{errors.concept}</ErrorLabel>
 
                     <label className="label" htmlFor="quantity">
