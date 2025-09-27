@@ -68,7 +68,7 @@ export default function Enviar() {
         <>
             <h2 className="title-2">Enviar Cotizaciones</h2>
 
-            {pendientesEnvio > 0 ? 
+            {pendientesEnvio.length > 0 ? 
                 <form action="">
                     {Object.entries(grouped).map(([centreId, group]) => (
                         <div
