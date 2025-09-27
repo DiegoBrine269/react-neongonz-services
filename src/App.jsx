@@ -8,6 +8,8 @@ import { useContext } from "react";
 import NotFound from "@/Pages/NotFound";
 import Responsables from "@/Pages/Responsables/Responsables";
 import Centros from "@/Pages/Centros/Centros";
+import EditarCentros from "@/Pages/Centros/Editar";
+
 import Servicios from "@/Pages/Servicios/Servicios";
 import Servicio from "@/Pages/Servicios/Servicio";
 import Proyectos from "@/Pages/Proyectos/Proyectos";
@@ -53,6 +55,8 @@ export default function App() {
                                 {user.role === 'admin' && (
                                     <>
                                         <Route path="/centros-de-venta" element={<Centros />} />
+                                        <Route path="/centros-de-venta/editar/:id" element={<EditarCentros />} />
+
                                         <Route path="/responsables" element={<Responsables />} />
                                         <Route path="/servicios" element={<Servicios />} />
                                         <Route path="/cotizaciones" element={<Cotizaciones />} />

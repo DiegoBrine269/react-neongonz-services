@@ -30,7 +30,8 @@ export default function Editar() {
 
     const { token, setLoading } = useContext(AppContext);
 
-    const { selected, toggle, clear, isSelected, setSelected } = useSelection();
+    const [seleccionarTodo, setSeleccionarTodo] = useState(false);
+    const { selected, toggle, clear, isSelected, setSelected, selectAll } = useSelection();
 
     const [checkedMap, setCheckedMap] = useState({});
     const [subTotal, setSubTotal] = useState(0);
@@ -265,6 +266,30 @@ export default function Editar() {
                         label={`Subtotal: ${formatearDinero(subTotal)}`}
                     />
                 </div>
+
+                <label
+                    htmlFor="seleccionar-todo"
+                    className="flex gap-1 justify-end items-center mt-0"
+                >
+                    <input
+                        className="h-4 w-4"
+                        type="checkbox"
+                        id="seleccionar-todo"
+                        checked={seleccionarTodo}
+                        onChange={() => {
+
+                            const nuevoValor = !seleccionarTodo;
+                            setSeleccionarTodo(nuevoValor);
+                            if(nuevoValor)
+                                selectAll(vehiculosPendientes);
+                            else
+                                clear();
+                            
+                            
+                        }}
+                    />
+                    <span className="text">Seleccionar todo</span>
+                </label>
 
 
                 {proyectosPendientes?.map((p) => (

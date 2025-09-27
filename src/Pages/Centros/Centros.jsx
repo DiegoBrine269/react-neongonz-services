@@ -233,7 +233,7 @@ export default function Centros() {
 
                 <div className="contenedor-botones">
                     <button className="btn" onClick={() => setModalViewOpen(false)}>Aceptar</button>
-                    <button className="btn btn-secondary">Editar</button>
+                    <Link to={`/centros-de-venta/editar/${centro.id}`} className="btn btn-secondary">Editar</Link>
 
                 </div>
             </Modal>

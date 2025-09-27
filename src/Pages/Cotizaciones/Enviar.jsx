@@ -46,6 +46,8 @@ export default function Enviar() {
 
         try {
             await clienteAxios.post(`/api/invoices/send`, formData, requestHeader);
+            toast.success('Cotizaciones enviadas correctamente');
+            clear();
             navigate('/cotizaciones');
         } catch (error) {
             toast.error(error.response?.data?.error || 'Error al enviar las cotizaciones');

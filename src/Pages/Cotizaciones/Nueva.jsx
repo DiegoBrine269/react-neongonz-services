@@ -352,6 +352,10 @@ export default function Nueva() {
                             checked={seleccionarTodo}
                             onChange={() => {
                                 setSeleccionarTodo(!seleccionarTodo);
+
+                                
+                                
+                                
                             }}
                         />
                         <span className="text">Seleccionar todo</span>

@@ -12,7 +12,7 @@ import { date, format } from "@formkit/tempo";
 
 export default function Personalizadas() {
 
-    const { token, setLoading, centros, fetchCentros, pendientes, fetchPendientes} = useContext(AppContext);
+    const { token, setLoading, centros, fetchCentros, pendientes, fetchPendientes, responsables, fetchResponsables} = useContext(AppContext);
 
     const navigate = useNavigate();
 
@@ -22,12 +22,13 @@ export default function Personalizadas() {
     const [mostrarBotones, setMostrarBotones] = useState(true);
 
     useEffect(() => {
-        
+       
+        fetchResponsables();
         fetchPendientes();
         fetchCentros();
 
 
-        console.log("Pendientes:", pendientes);
+        // console.log("Pendientes:", pendientes);
     }, []);
 
     useEffect(() => {
@@ -183,14 +184,13 @@ export default function Personalizadas() {
                                 </option>
                             ))}
                         </select>
-                        {errors.centre_id && (
-                            <p className="text-red-500">
-                                {errors.centre_id[0]}
-                            </p>
-                        )}
+                        <ErrorLabel>{errors.centre_id}</ErrorLabel>
+
+                        
                     </div>
 
                     <div className={accion === "create" ? "hidden" : ""}>
+                        
                         <label className="label" htmlFor="invoice_id">
                             Cotización
                         </label>
@@ -214,6 +214,7 @@ export default function Personalizadas() {
                                         internal_commentary:
                                             selectedCot.internal_commentary,
                                         date: selectedCot.date,
+                                        responsible_id: selectedCot.responsible_id,
                                     });
                                 }
                             }}
@@ -230,6 +231,36 @@ export default function Personalizadas() {
                         </select>
                         <ErrorLabel>{errors?.invoice_id}</ErrorLabel>
                     </div>
+
+                    <label className="label" htmlFor="centre_id">
+                        Destinatario
+                    </label>
+                    <select
+                        id="responsible_id"
+                        className="input"
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                responsible_id: e.target.value,
+                            })
+                        }
+                        value={formData.responsible_id || ""}
+                        disabled ={!formData.centre_id}
+                    >
+                        <option value="" disabled>
+                            Seleccione un destinatario
+                        </option>
+                        {responsables
+                            .filter((responsable) =>
+                                centros.find(c=>c.id == formData.centre_id)?.responsibles?.some(r => r.id === responsable.id)
+                            )
+                            .map((responsable) => (
+                            <option key={responsable.id} value={responsable.id}>
+                                {responsable.name}
+                            </option>
+                        ))}
+                    </select>
+                    <ErrorLabel>{errors.responsible_id}</ErrorLabel>
 
                     <label className="label" htmlFor="fecha">
                         fecha

@@ -7,11 +7,32 @@ export const useSelection = (initial = []) => {
   // Función para agregar/quitar items
   const toggle = (item, checkbox = null) => {
     setSelected(prev => toggleInArray(prev, item, checkbox));
-    // console.log(selected);
   };
 
   const clear = () => setSelected([]);
   const isSelected = (item) => selected.includes(item);
 
-  return { selected, toggle, clear, isSelected, setSelected };
+    // Seleccionar todos (recibe lista de items)
+  const selectAll = (items) => {
+    setSelected(items);
+  };
+
+    // Alternar selección total: si ya están todos, limpia; si no, selecciona todos
+    const toggleAll = (items) => {
+        if (items.length === selected.length) {
+            clear();
+        } else {
+            selectAll(items);
+        }
+    };
+
+    return { 
+        selected, 
+        toggle, 
+        clear, 
+        isSelected, 
+        setSelected, 
+        selectAll, 
+        toggleAll 
+    };
 };
