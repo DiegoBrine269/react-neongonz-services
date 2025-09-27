@@ -11,6 +11,10 @@ export default function AppProvider({ children }) {
     const [darkMode, setDarkMode] = useState(false);
 
     //
+    const [responsables, setResponsables] = useState([]);
+
+
+    //
     const [centros, setCentros] = useState([]);
 
     //
@@ -131,6 +135,22 @@ export default function AppProvider({ children }) {
         }
     }
 
+        async function fetchResponsables() {
+        try {
+            const res = await clienteAxios.get("/api/responsibles", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            setResponsables(res.data);
+        } catch (error) {
+            setResponsables([]);
+            console.error("Error fetching data:", error);
+            toast.error("Error al cargar los responsables");
+        }
+    }
+
 
 
     async function fetchServicios() {
@@ -204,7 +224,10 @@ export default function AppProvider({ children }) {
                 fetchPendientes,
 
                 usuarios,
-                fetchUsuarios
+                fetchUsuarios,
+
+                fetchResponsables,
+                responsables,
             }}
         >
             {children}

@@ -5,18 +5,19 @@ import Register from "./Pages/Auth/Register";
 import Login from "./Pages/Auth/Login";
 import { AppContext } from "./context/AppContext";
 import { useContext } from "react";
-import NotFound from "./Pages/NotFound";
-import Centros from "./Pages/Centros";
-import Servicios from "./Pages/Servicios/Servicios";
-import Servicio from "./Pages/Servicios/Servicio";
-import Proyectos from "./Pages/Proyectos/Proyectos";
-import Proyecto from "./Pages/Proyectos/Proyecto/Proyecto";
+import NotFound from "@/Pages/NotFound";
+import Responsables from "@/Pages/Responsables/Responsables";
+import Centros from "@/Pages/Centros/Centros";
+import Servicios from "@/Pages/Servicios/Servicios";
+import Servicio from "@/Pages/Servicios/Servicio";
+import Proyectos from "@/Pages/Proyectos/Proyectos";
+import Proyecto from "@/Pages/Proyectos/Proyecto/Proyecto";
 import "tabulator-tables/dist/css/tabulator_materialize.min.css";
-import Vehiculos from "./Pages/Vehiculos/Vehiculos";
-import MiCuenta from "./Pages/MiCuenta"
-import ForgotPassword from "./Pages/Auth/ForgotPassword";
-import Cotizaciones from "./Pages/Cotizaciones/Cotizaciones";
-import Nueva from "./Pages/Cotizaciones/Nueva";
+import Vehiculos from "@/Pages/Vehiculos/Vehiculos";
+import MiCuenta from "@/Pages/MiCuenta"
+import ForgotPassword from "@/Pages/Auth/ForgotPassword";
+import Cotizaciones from "@/Pages/Cotizaciones/Cotizaciones";
+import Nueva from "@/Pages/Cotizaciones/Nueva";
 import Personalizadas from "@/Pages/Cotizaciones/Personalizadas";
 import Enviar from "@/Pages/Cotizaciones/Enviar";
 import Editar from "@/Pages/Cotizaciones/Editar";
@@ -52,6 +53,7 @@ export default function App() {
                                 {user.role === 'admin' && (
                                     <>
                                         <Route path="/centros-de-venta" element={<Centros />} />
+                                        <Route path="/responsables" element={<Responsables />} />
                                         <Route path="/servicios" element={<Servicios />} />
                                         <Route path="/cotizaciones" element={<Cotizaciones />} />
                                         <Route path="/cotizaciones/nueva" element={<Nueva />} />

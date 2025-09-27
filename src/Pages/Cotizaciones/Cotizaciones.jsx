@@ -10,13 +10,15 @@ import clienteAxios from "../../config/axios";
 import { formatoMoneda, swalConfig } from "../../config/variables";
 import Swal from "sweetalert2";
 import { format } from "@formkit/tempo";
+import { motion, AnimatePresence } from "framer-motion";
+
 
 export default function Cotizaciones() {
 
 
     const [cotizacion, setCotizacion] = useState({});
     const [pendientesEnvio, setPendientesEnvio] = useState([]);
-
+    const [selectedRows, setSelectedRows] = useState([]);
 
     const [modal, setModal] = useState(false);
     const tableRef = useRef();
@@ -68,6 +70,46 @@ export default function Cotizaciones() {
         }
     }
 
+    async function handleEliminarCotizaciones() {
+
+        const result = await Swal.fire({
+            title: "¿Estás segur@ de querer eliminar la(s) cotización(es)?",
+            text: "Esta acción es irreversible",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar",
+            ...swalConfig(true),
+        });
+
+        if (result.isConfirmed) {
+
+            try {
+                setLoading(true);
+                const res = await clienteAxios.delete('/api/invoices',
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                          data: {
+                            ids: selectedRows.map(r => r.id), // 👈 aquí mandas los IDs
+                        },
+                    }
+                );
+
+                toast.success("Cotizaciones eliminadas correctamente");
+                recargarTabla();
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                toast.error("Error al eliminar las cotizaciones");
+            } finally {
+                setLoading(false);
+                setSelectedRows([]);
+            }
+        }
+    }
+
     async function handleEliminarCotizacion() {
 
         const result = await Swal.fire({
@@ -107,6 +149,12 @@ export default function Cotizaciones() {
             }
         }
     }
+
+    // useEffect(() => {
+    //     if (selectedRows.length > 0) {
+            
+    //     }
+    // }, [selectedRows]);
     
     useEffect(() => {
         //Cotizaciones pendientes de terminar
@@ -120,30 +168,62 @@ export default function Cotizaciones() {
         <>
             <h2 className="title-2">Cotizaciones</h2>
 
-            <div className="flex flex-col sm:flex-row gap-2 mb-2">
-                <Link className="btn m-0" to="/cotizaciones/nueva">
-                    <CirclePlus />
-                    Crear ordinaria
-                </Link>
+            <div className="contenedor-botones">
+                <AnimatePresence mode="wait">
 
-                <Link
-                    className="btn m-0 btn-secondary relative"
-                    to="/cotizaciones/personalizadas"
-                >
-                    <UserRoundPen/>
-                    Personalizadas{" "}
-                    <span className="counter">{pendientes?.length}</span>
-                </Link>
+                
+                    {
+                        selectedRows.length > 0 ?
+                            
+                            <motion.button
 
-                <Link
-                    className="btn btn-secondary m-0 relative"
-                    to="/cotizaciones/enviar"
-                    state={{ pendientesEnvio: pendientesEnvio }}
-                >
-                    <Mail />
-                    Enviar
-                    <span className="counter">{pendientesEnvio?.length}</span>
-                </Link>
+                                className="btn btn-danger m-0"
+                                onClick={handleEliminarCotizaciones}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <Trash2 />
+                                Eliminar
+                            </motion.button
+>
+                            
+                        :
+                            <motion.div
+                                key="acciones"
+                                className="flex gap-2"
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 20 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <Link className="btn m-0" to="/cotizaciones/nueva">
+                                    <CirclePlus />
+                                    Crear ordinaria
+                                </Link>
+
+                                <Link
+                                    className="btn m-0 btn-secondary relative"
+                                    to="/cotizaciones/personalizadas"
+                                >
+                                    <UserRoundPen/>
+                                    Personalizadas{" "}
+                                    <span className="counter">{pendientes?.length}</span>
+                                </Link>
+
+                                <Link
+                                    className="btn btn-secondary m-0 relative"
+                                    to="/cotizaciones/enviar"
+                                    state={{ pendientesEnvio: pendientesEnvio }}
+                                >
+                                    <Mail />
+                                    Enviar
+                                    <span className="counter">{pendientesEnvio?.length}</span>
+                                </Link>
+                            </motion.div>
+                    }
+                </AnimatePresence>
             </div>
 
             <div>
@@ -151,12 +231,33 @@ export default function Cotizaciones() {
                     key={reloadKey}
                     className="custom-table"
                     columns={[
+                        {
+                            title: "",
+                            formatter: "rowSelection",
+                            titleFormatter: "rowSelection", // opcional: checkbox en el header para seleccionar todos
+                            hozAlign: "center",
+                            headerSort: false,
+                            width: 50
+                        },
                         //   {
                         //     formatter: "rowSelection",  
                         //     titleFormatter: "rowSelection",
                         //     hozAlign: "center",
                         //     headerSort: false,
                         //     width: 50,
+                        // },
+                        // {
+                        //     title: "Tipo",
+                        //     field: "is_budget",
+                        //     headerFilter: true,
+                        //     resizable: false,
+                        //     formatter: cell => cell.getValue() ? "PRE" : "COT",
+                        //     headerFilterFunc: (headerValue, rowValue, rowData, filterParams) => {
+                        //         // Permite filtrar por PRE o COT (case-insensitive)
+                        //         if (!headerValue) return true;
+                        //         const tipo = rowValue ? "PRE" : "COT";
+                        //         return tipo.toLowerCase().includes(headerValue.toLowerCase());
+                        //     },
                         // },
                         {
                             title: "Centro",
@@ -218,6 +319,7 @@ export default function Cotizaciones() {
                     ref={tableRef}
                     layout="fitColumns"
                     options={{
+                        // selectable: true,
                         pagination: true, //enable pagination
                         paginationMode: "remote", //enable remote pagination
                         ajaxURL: `${import.meta.env.VITE_API_URL}/api/invoices`,
@@ -235,6 +337,9 @@ export default function Cotizaciones() {
                             // console.log(data);
                             setCotizacion(data);
                             setModal(true);
+                        },
+                        rowSelectionChanged: (selectedData) => {
+                            setSelectedRows(selectedData); // Guardamos en estado
                         },
                     }}
                 />

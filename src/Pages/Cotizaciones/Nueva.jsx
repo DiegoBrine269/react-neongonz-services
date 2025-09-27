@@ -12,19 +12,17 @@ import PeerLabel from "@/components/UI/PeerLabel";
 import TitleCheckBox from "@/components/UI/TitleCheckBox.jsx";
 import {formatearDinero} from "@/utils/utils.js";
 import AnimatedAmount from "@/components/UI/AnimatedAmount";
-
+import ErrorLabel from "@/components/UI/ErrorLabel.jsx";
 
 export default function Nueva() {
     const navigate = useNavigate();
    
 
-    const { token, setLoading, centros, fetchCentros} = useContext(AppContext);
+    const { token, setLoading, centros, fetchCentros, fetchResponsables, responsables} = useContext(AppContext);
 
     const [centro, setCentro] = useState("");
     const [errors, setErrors] = useState({});
-
-
-
+    const [lanzarError, setLanzarError] = useState(false);
 
     const [vehiculosPendientes, setVehiculosPendientes] = useState([]);
     const [centrosPendientes, setCentrosPendientes] = useState([]);
@@ -38,6 +36,7 @@ export default function Nueva() {
 
     const [formData, setFormData] = useState({
         vehicles: [],
+        responsible_id: null,
         comments: null
     });
 
@@ -73,24 +72,32 @@ export default function Nueva() {
         );
     };
 
+    useEffect(() => {
+        if(lanzarError)
+            toast.error("Faltan precios por registrar");
+
+    }, [lanzarError]);
+
     useEffect(()=>{
 
         let sub = 0;
         const conjuntoSeleccionados = new Set(seleccionados);
 
-        let lanzarError = false;
+        // let lanzarError = false;
+        setLanzarError(false);
 
         conjuntoSeleccionados.forEach((s) => {
 
             if(!s.price){
-                lanzarError = true;
+                setLanzarError(true);
+                // lanzarError = true;
                 return;
             }
             sub += parseInt(s.price);
         });
 
-        if(lanzarError)
-            toast.error("Faltan precios por registrar");
+        // if(lanzarError)
+        //     toast.error("Faltan precios por registrar");
         
         setSubTotal(sub);
 
@@ -120,7 +127,8 @@ export default function Nueva() {
                 }
             );
 
-            setCentrosPendientes(Array.from(new Set(res.data.map((item) => item.centre_id))));
+            setCentrosPendientes(Array.from(new Set(res.data.map((item) => item))));
+
             setProyectosPendientes(
                 Array.from(
                     res.data
@@ -134,6 +142,8 @@ export default function Nueva() {
                         .values() // Obtén los valores únicos
                 )
             );
+
+            // console.log(res.data);  
 
 
             setVehiculosPendientes(res.data);
@@ -186,8 +196,10 @@ export default function Nueva() {
                         toast.error("Error desconocido al generar el PDF");
                     }
                 };
+
                 reader.readAsText(error.response.data);
-                toast.error("Faltan precios por registrar");
+                // console.log(mensajeError);
+                toast.error('Hubo un error al generar la cotización');
                 return;
             } else {
                 toast.error("Error desconocido al generar el PDF");
@@ -202,6 +214,7 @@ export default function Nueva() {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
+            await Promise.all([fetchResponsables()]);
             await Promise.all([fetchCentros()]);
             await Promise.all([fetchVehiculosPendientes()]);
             setLoading(false);
@@ -244,7 +257,11 @@ export default function Nueva() {
         setSeleccionarTodo(false);
         setSeleccionados([]);
         setProyectosSeleccionados([]);
-        
+        setFormData({
+            vehicles: [],
+            responsible_id: null,
+            comments: null
+        });
     }, [centro]);
 
     return (
@@ -264,22 +281,54 @@ export default function Nueva() {
                         <select
                             id="centre_id"
                             className="input"
-                            value={centro}
-                            onChange={(e) => setCentro(e.target.value)}
+                            value={centro ? centro.id : ""} // evita error si centro es null
+                            onChange={(e) =>{
+                                    // console.log(centrosPendientes);
+                                    setCentro(centros.find(c => c.id == e.target.value))
+
+                                }
+                            }
                         >
                             <option value="" disabled>
                                 Seleccione un centro de ventas
                             </option>
                             {centros
                                 .filter((centro) =>
-                                    centrosPendientes.includes(centro.id)
+                                    centrosPendientes.some(p => p.centre_id === centro.id)
                                 )
                                 .map((centro) => (
                                     <option key={centro.id} value={centro.id}>
-                                        {centro.name}
+                                    {centro.name}
+                                    </option>
+                                ))
+                            }
+                        </select>
+
+                        <label className="label" htmlFor="correo">
+                            Destinatario
+                        </label>
+                        <select
+                            id="centre_id"
+                            className="input"
+                            value={formData.responsible_id ?? ""}
+                            onChange={(e) => setFormData({...formData, responsible_id: e.target.value})}
+                            defaultValue={""}
+                        >
+                            <option value="" disabled>
+                                Seleccione un destinatario
+                            </option>
+                            {responsables
+                                .filter((responsable) =>
+                                    centro.responsibles?.some(r => r.id === responsable.id)
+                                )
+                                .map((responsable) => (
+                                    <option key={responsable.id} value={responsable.id}>
+                                        {responsable.name}
                                     </option>
                                 ))}
                         </select>
+                        <ErrorLabel>{errors?.responsible_id}</ErrorLabel>
+
                     </>
                 )}
 
@@ -309,10 +358,10 @@ export default function Nueva() {
                     </label>
                 )}
 
-                {centro !== "" && (
+                {centro && (
                     <div className="pt-2">
                         {proyectosPendientes.map((p) =>
-                            p.centre_id == centro ? (
+                            p.centre_id == centro.id ? (
                                 <div
                                     key={p.id}
                                     className="border-1 border-neutral-400 p-2 rounded mb-4"
@@ -365,7 +414,7 @@ export default function Nueva() {
                             ) : null
                         )}
 
-                        {seleccionados.length > 0 && (
+                        {seleccionados.length > 0 && !lanzarError && (
                             <>
                                 <label htmlFor="comments" className="label">
                                     Comentarios o instrucciones especiales

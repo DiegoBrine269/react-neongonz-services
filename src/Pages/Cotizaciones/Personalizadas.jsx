@@ -44,14 +44,14 @@ export default function Personalizadas() {
         setErrors({});
     }, [accion]);    
 
-    const handleSubmit = async (e, saveForLater = false) => {
+    const handleSubmit = async (e, saveForLater = false, is_budget = false) => {
         e.preventDefault();
         setLoading(true);
 
         try {
             const response = await clienteAxios.post(
                 `/api/invoices/create-custom`,
-                {...formData, completed: !saveForLater},
+                {...formData, completed: !saveForLater, is_budget: is_budget},
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -337,6 +337,7 @@ export default function Personalizadas() {
                             <Printer />
                             Generar
                         </button>
+
                         <button
                             className="btn mt-4 bg-green-700"
                             onClick={(e) =>
@@ -347,6 +348,12 @@ export default function Personalizadas() {
                         >
                             <CalendarClock />
                             Guardar borrador
+                        </button>
+
+                        
+                        <button className="btn btn-secondary mt-4" onClick={e=>handleSubmit(e, false, true)}>
+                            <Printer />
+                            Presupuesto
                         </button>
                     </div>
                 </form>

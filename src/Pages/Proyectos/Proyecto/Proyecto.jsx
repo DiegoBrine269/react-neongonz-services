@@ -22,6 +22,7 @@ import ProyectoInfo from './ProyectoInfo';
 import ProyectoActions from "./ProyectoActions";
 import InfoRow from "@/components/UI/InfoRow";
 import CopyField from "./CopyField";
+import useSWR, {mutate} from "swr";
 
 export default function Proyecto() {
     const navigate = useNavigate();
@@ -31,7 +32,7 @@ export default function Proyecto() {
     const { id } = useParams();
     const [editando, setEditando] = useState(false);
     const [proyectosAbiertos, setProyectosAbiertos] = useState([]);
-    const [proyecto, setProyecto] = useState({});
+    // const [proyecto, setProyecto] = useState({});
     const [vehiculos, setVehiculos] = useState([]);
     const [types, setTypes] = useState([]);
     const [isModalAgregarOpen, setModalAgregarOpen] = useState(false);
@@ -67,6 +68,17 @@ export default function Proyecto() {
         },
     };
 
+        const { data: proyecto, error, isLoading } = useSWR(
+            token ? [`/api/projects/${id}`, token] : null, // null evita llamadas si no hay token
+            ([url, token]) => fetcher(url, token),
+            {
+                refreshInterval: 30000,
+                revalidateOnFocus: true, 
+                revalidateOnReconnect: false, // no recarga al reconectarse
+                shouldRetryOnError: false, // evita reintentos infinitos
+            }
+        );
+
     const [formData, setFormData] = useState({
         eco: "",
         type: "",
@@ -83,6 +95,13 @@ export default function Proyecto() {
         date: "",
         extra_projects: [],
     });
+
+    const fetcher = (url, token) =>
+        clienteAxios.get(url, {
+            headers: {
+            Authorization: `Bearer ${token}`,
+            },
+        }).then(res => res.data);
 
     const fetchProyecto = async () => {
         try {
@@ -154,7 +173,8 @@ export default function Proyecto() {
                 formData,
                 requestHeader
             );
-            fetchProyecto();
+            // fetchProyecto();
+            mutate([`/api/projects/${id}`, token]);
             setModalAgregarOpen(false);
             toast.success("Vehículo agregado correctamente");
             setFormData({
@@ -201,7 +221,8 @@ export default function Proyecto() {
                 requestHeader
             );
 
-            fetchProyecto();
+            // fetchProyecto();
+            mutate([`/api/projects/${id}`, token]);
             setEditando(false);
             toast.success("Proyecto actualizado correctamente");
             setErrors({});
@@ -251,7 +272,8 @@ export default function Proyecto() {
                 { id: vehiculo.id },
                 requestHeader
             );
-            fetchProyecto();
+            // fetchProyecto();
+            mutate([`/api/projects/${id}`, token]);
             setModalConsultarOpen(false);
             setVehiculo({});
             toast.success("Vehículo eliminado correctamente");
@@ -292,7 +314,8 @@ export default function Proyecto() {
                             },
                         }
                     );
-                    fetchProyecto();
+                    // fetchProyecto();
+                    mutate([`/api/projects/${id}`, token]);
                     setModalConsultarOpen(false);
                     setVehiculo({});
 
@@ -470,9 +493,7 @@ export default function Proyecto() {
 
     useEffect(() => {
         const fetchData = async () => {
-            setLoading(true);
-            await fetchProyecto();
-            setLoading(false);
+
             await fetchCentros();
             await fetchServicios();
             await fetchTypes();
@@ -482,10 +503,26 @@ export default function Proyecto() {
     }, []);
 
     useEffect(() => {
-        if (proyecto.centre && proyecto.centre.id) {
-            fetchProyectosAbiertos();
+        if (proyecto) {
+            setFormDataEdit({
+            centre_id: proyecto.centre.id,
+            service_id: proyecto.service.id,
+            date: proyecto.date,
+            commentary: proyecto.commentary || "",
+            });
+
+            setVehiculos(proyecto.vehicles);
+
+            setUsuarios([...new Set(proyecto.vehicles.map((v) => v.user?.name))]);
+            setTipos([...new Set(proyecto.vehicles.map((v) => v.type))]);
         }
-    }, [proyecto.centre]);
+    }, [proyecto]);
+
+    // useEffect(() => {
+    //     if (proyecto.centre && proyecto.centre.id) {
+    //         fetchProyectosAbiertos();
+    //     }
+    // }, [proyecto.centre]);
 
 
     const fetchTypesOnEcoChange = async () => {
@@ -533,7 +570,7 @@ export default function Proyecto() {
 
     useEffect(() => {
         // console.log(proyecto);
-        if (proyecto.related_projects){
+        if (proyecto?.related_projects){
             setFormDataEdit({...formDataEdit, extra_projects: JSON.parse(proyecto?.related_projects),});
             setFormData({...formData, extra_projects: JSON.parse(proyecto?.related_projects),});
         }

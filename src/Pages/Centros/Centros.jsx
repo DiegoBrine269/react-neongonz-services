@@ -1,10 +1,11 @@
 import { useContext, useEffect, useState } from "react";
-import Tabla from "../components/Tabla";
-import clienteAxios from "../config/axios";
-import { AppContext } from "../context/AppContext";
-import Modal from "../components/Modal";
+import Tabla from "@/components/Tabla";
+import clienteAxios from "@/config/axios";
+import { AppContext } from "@/context/AppContext";
+import Modal from "@/components/Modal";
 import { toast } from "react-toastify";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, UsersRound } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Centros() {
     // const [centros, setCentros] = useState([]);
@@ -60,9 +61,9 @@ export default function Centros() {
     // Consultar todas las agencias  al cargar el componente
     useEffect(() => {
         const fetchData = async () => {
-            setLoading(true);
+            // setLoading(true);
             await fetchCentros();
-            setLoading(false);
+            // setLoading(false);
         };
 
         fetchData();
@@ -70,22 +71,49 @@ export default function Centros() {
 
     const columns = [
         { title: "Nombre", field: "name", headerFilter: "input", resizable: false,},
-        { title: "Responsable", field: "responsible", headerFilter: "input", resizable: false,},
+        { 
+            title: "Responsable(s)", 
+            headerFilter: "input", 
+            field: "responsibles",
+            resizable: false,
+            formatter: cell => 
+                Array.isArray(cell.getValue())
+                    ? cell.getValue().map(item => item.name).join(', ')
+                    : '',
+            headerFilterFunc: (headerValue, rowValue) => {
+                if (!headerValue) return true;
+                if (Array.isArray(rowValue)) {
+                    return rowValue.some(item =>
+                        item.name.toLowerCase().includes(headerValue.toLowerCase())
+                    );
+                }   
+            }
+        },
         { title: "Ubicación", field: "location", headerFilter: "input", width: 400, resizable: false,},
     ];
     
     return (
         <>
             <h2 className="title-2">Centros de venta</h2>
-            <button
-                className="btn mb-4"
-                onClick={() => {
-                    setModalCreateOpen(true);
-                }}
-            >
-                <CirclePlus />
-                Nuevo
-            </button>
+
+            <div className="contenedor-botones">
+                <button
+                    className="btn"
+                    onClick={() => {
+                        setModalCreateOpen(true);
+                    }}
+                >
+                    <CirclePlus />
+                    Nuevo
+                </button>
+
+                <Link to={'/responsables'} className="btn btn-secondary">
+                    <UsersRound/>
+                    Ver listado de responsables
+                </Link>
+            </div>
+
+            
 
 
             <Tabla
@@ -144,7 +172,7 @@ export default function Centros() {
                     )}
 
                     <label className="label" htmlFor="location">
-                        Unicación
+                        Ubicación
                     </label>
                     <input
                         className="input"
@@ -188,7 +216,11 @@ export default function Centros() {
                         <span className="font-bold border-b-1 block border-neutral-400">
                             Responsable
                         </span>{" "}
-                        <p>{centro?.responsible}</p>
+                        <p>
+                            {
+                                Array.isArray(centro.responsibles) ? centro.responsibles.map(item => item.name).join(', '): ''
+                            }
+                        </p>
                     </div>
 
                     <div className="text">
@@ -197,6 +229,12 @@ export default function Centros() {
                         </span>{" "}
                         <p>{centro?.location}</p>
                     </div>
+                </div>
+
+                <div className="contenedor-botones">
+                    <button className="btn" onClick={() => setModalViewOpen(false)}>Aceptar</button>
+                    <button className="btn btn-secondary">Editar</button>
+
                 </div>
             </Modal>
         </>

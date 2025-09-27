@@ -95,7 +95,7 @@ export default function MiCuenta() {
                 </p>
             </div>
 
-            <div className="mt-4">
+            <div className="contenedor-botones">
                 <button
                     className="btn mt-0"
                     onClick={() => {

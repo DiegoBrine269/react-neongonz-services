@@ -89,12 +89,27 @@ body {
     }
 
     .contenedor-botones {
-        @apply flex gap-2 mt-2 justify-end;
+        @apply flex gap-2 my-2 ;
     }
 
-    /* .btn .svg {
 
-    } */
+    /* checkbox de cada fila */
+    .tabulator-cell .tabulator-row-handle {
+        background-color: transparent;
+    }
+
+    /* casilla en el header (seleccionar todos) */
+    .tabulator-col .tabulator-row-handle {
+        background-color: transparent;
+    }
+
+    /* estilo del check */
+    .tabulator .tabulator-row .tabulator-cell input[type="checkbox"], .tabulator-col-content input[type="checkbox"] {
+        accent-color: #608b10; /* cambia color del check (soportado en navegadores modernos) */
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
 
     .btn-danger {
         @apply bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600;
@@ -140,6 +155,15 @@ video {
   width: 100% !important;
   height: auto !important;
   display: block !important;
+}
+
+.confeti {
+  animation: saltar 1s infinite alternate;
+}
+
+@keyframes saltar {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-5px); }
 }
 
 /* * {

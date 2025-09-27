@@ -23,6 +23,7 @@ export default function Enviar() {
         invoice_ids: selected,
     });
 
+
     // Agrupar por centre_id
     let grouped = pendientesEnvio.reduce((acc, item) => {
         const key = item.centre_id;
@@ -36,7 +37,7 @@ export default function Enviar() {
         return acc;
     }, {});
     
-
+    // console.log({grouped});
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -47,7 +48,7 @@ export default function Enviar() {
             await clienteAxios.post(`/api/invoices/send`, formData, requestHeader);
             navigate('/cotizaciones');
         } catch (error) {
-            toast.error('Error al enviar las cotizaciones');
+            toast.error(error.response?.data?.error || 'Error al enviar las cotizaciones');
             console.log(error);
         } 
         finally {
@@ -67,42 +68,49 @@ export default function Enviar() {
         <>
             <h2 className="title-2">Enviar Cotizaciones</h2>
 
-            <form action="">
-                {Object.entries(grouped).map(([centreId, group]) => (
-                    <div
-                        key={centreId}
-                        className="border-1 border-neutral-400 p-2 rounded mb-4"
-                    >
-                        <div key={centreId}>
-                            <TitleCheckBox
-                                name= {group.centre.id}
-                                label= {group.centre.name} 
-                                // checked={proyectosSeleccionados[p.id] || false}
-                                // onChange={handleCheckboxProyectoChange}
-                            />
-                            <h3 className="title-3 mb-1">
-                                
-                            </h3>
-                            <div className="flex gap-1 flex-wrap pl-2">                
-                                {group.items.map(item => (
-                                    <PeerLabel
-                                        key={item.id}
-                                        label={item.invoice_number}
-                                        onChange={() => toggle(item)}
-                                        tooltip={{
-                                            date: {label:'Fecha', value:format(item.date, 'DD/MM/YYYY')},
-                                            total: {label:'Total', value:formatearDinero(item.total)},
-                                        }}
-                                    />
-                                ))}
+            {pendientesEnvio > 0 ? 
+                <form action="">
+                    {Object.entries(grouped).map(([centreId, group]) => (
+                        <div
+                            key={centreId}
+                            className="border-1 border-neutral-400 p-2 rounded mb-4"
+                        >
+                            <div key={centreId}>
+                                <TitleCheckBox
+                                    name= {group.centre.id}
+                                    label= {group.centre.name} 
+                                    // checked={proyectosSeleccionados[p.id] || false}
+                                    // onChange={handleCheckboxProyectoChange}
+                                />
+                                <h3 className="title-3 mb-1">
+                                    
+                                </h3>
+                                <div className="flex gap-1 flex-wrap pl-2">                
+                                    {group.items.map(item => (
+                                        <PeerLabel
+                                            key={item.id}
+                                            label={`${item.invoice_number} ${item.is_budget ? '(Presupuesto)' : ''}`}
+                                            onChange={() => toggle(item)}
+                                            tooltip={{
+                                                concept: {label:'Concepto', value:item.concept},
+                                                date: {label:'Fecha', value:format(item.date, 'DD/MM/YYYY')},
+                                                total: {label:'Total', value:formatearDinero(item.total)},
+                                            }}
+                                        />
+                                    ))}
+                                </div>
                             </div>
+                        
                         </div>
-                    
-                    </div>
-                ))}
+                    ))
+                    }
 
-                {selected.length > 0 && <input type="submit" value="Enviar" className="btn" onClick={handleSubmit} />}
-            </form>
+                    {selected.length > 0 && <input type="submit" value="Enviar" className="btn" onClick={handleSubmit} />}
+                </form>
+                :
+                <p class=" text confeti">🎉 ¡Felicitaciones, estás al día! 🎉</p>
+
+            }
         </>
     )
 }
