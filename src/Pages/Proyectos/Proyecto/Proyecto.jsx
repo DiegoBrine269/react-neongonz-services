@@ -123,7 +123,7 @@ export default function Proyecto() {
             setTipos([...new Set(res.data.vehicles.map((v) => v.type))]);
 
         } catch (error) {
-            toast.error("Error al cargar el proyecto");
+            console.error("Error al cargar el proyecto", error);
         }
     };
     
@@ -233,7 +233,7 @@ export default function Proyecto() {
             if(res.data.length > 5 )
                 setIsCollapsed(true);
         } catch (error) {
-            toast.error("Error al cargar el proyecto");
+            console.error("Error al cargar el proyecto", error);
         }
     };
 
@@ -481,14 +481,16 @@ export default function Proyecto() {
 
     useEffect(() => {
         const fetchData = async () => {
-            await fetchProyectosAbiertos();
             await fetchCentros();
             await fetchServicios();
             await fetchTypes();
+            // await fetchProyectosAbiertos();
         };
 
         fetchData();
     }, []);
+
+
 
     useEffect(() => {
         if (proyecto) {
@@ -503,6 +505,7 @@ export default function Proyecto() {
 
             setUsuarios([...new Set(proyecto.vehicles.map((v) => v.user?.name))]);
             setTipos([...new Set(proyecto.vehicles.map((v) => v.type))]);
+            fetchProyectosAbiertos();
         }
     }, [proyecto]);
 
