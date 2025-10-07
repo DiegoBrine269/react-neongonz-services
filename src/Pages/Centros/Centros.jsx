@@ -6,11 +6,12 @@ import Modal from "@/components/Modal";
 import { toast } from "react-toastify";
 import { CirclePlus, UsersRound } from "lucide-react";
 import { Link } from "react-router-dom";
+import  ErrorLabel  from '@/components/UI/ErrorLabel.jsx';
 
 export default function Centros() {
     // const [centros, setCentros] = useState([]);
     const [centro, setCentro] = useState({});
-    const { token, setLoading, centros, fetchCentros } = useContext(AppContext);
+    const { token, setLoading, centros, fetchCentros, fetchResponsables, responsables } = useContext(AppContext);
 
     const [isModalCreateOpen, setModalCreateOpen] = useState(false);
     const [isModalViewOpen, setModalViewOpen] = useState(false);
@@ -18,7 +19,7 @@ export default function Centros() {
 
     const [formData, setFormData] = useState({
         name: "",
-        responsible: "",
+        responsible_id: "",
         location: "",
     });
 
@@ -64,6 +65,7 @@ export default function Centros() {
             // setLoading(true);
             await fetchCentros();
             // setLoading(false);
+            await fetchResponsables();
         };
 
         fetchData();
@@ -152,24 +154,29 @@ export default function Centros() {
                         <p className="text-red-500">{errors.name[0]}</p>
                     )}
 
-                    <label className="label" htmlFor="responsible">
+                    <label className="label" htmlFor="responsible_id">
                         Responsable del centro
                     </label>
-                    <input
+                    <select  
+                        id="responsible_id"
                         className="input"
-                        type="text"
-                        id="responsible"
-                        placeholder="Responsable del centro"
-                        onChange={(e) =>
-                            setFormData({
-                                ...formData,
-                                responsible: e.target.value,
-                            })
+                        value={formData.responsible_id}
+                        onChange={e => setFormData({...formData, responsible_id: e.target.value})}    
+                    >
+                        <option value="">Selecciona un responsable</option>
+                        {
+                            responsables?.map(responsible => (
+                                <option
+                                    key={responsible.id}
+                                    value={responsible.id}
+                                >
+                                    {responsible.name}
+                                </option>
+                            ))
                         }
-                    />
-                    {errors.responsible && (
-                        <p className="text-red-500">{errors.responsible[0]}</p>
-                    )}
+                    </select>
+
+                    <ErrorLabel>{errors.responsible_id}</ErrorLabel>
 
                     <label className="label" htmlFor="location">
                         Ubicación

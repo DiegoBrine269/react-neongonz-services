@@ -34,7 +34,6 @@ export default function Proyecto() {
     const [proyectosAbiertos, setProyectosAbiertos] = useState([]);
     // const [proyecto, setProyecto] = useState({});
     const [vehiculos, setVehiculos] = useState([]);
-    const [types, setTypes] = useState([]);
     const [isModalAgregarOpen, setModalAgregarOpen] = useState(false);
     const [isModalConsultarOpen, setModalConsultarOpen] = useState(false);
     const [errors, setErrors] = useState({});
@@ -60,7 +59,7 @@ export default function Proyecto() {
 
     const [usarPlaca, setUsarPlaca] = useState(false);
 
-    const { token, setLoading, user,  fetchCentros, centros, fetchServicios, servicios, tableRef } = useContext(AppContext);
+    const { token, setLoading, user,  fetchCentros, centros, fetchServicios, servicios, tableRef, fetchTypes, types } = useContext(AppContext);
     
     const requestHeader = {
         headers: {
@@ -129,18 +128,7 @@ export default function Proyecto() {
     };
     
 
-    const fetchTypes = async () => {
-        try {
-            const res = await clienteAxios.get(`/api/vehicles-types`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            setTypes(res.data);
-        } catch (error) {
-            toast.error("Error al cargar los tipos de vehículos");
-        }
-    };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -493,7 +481,7 @@ export default function Proyecto() {
 
     useEffect(() => {
         const fetchData = async () => {
-
+            await fetchProyectosAbiertos();
             await fetchCentros();
             await fetchServicios();
             await fetchTypes();

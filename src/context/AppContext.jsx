@@ -26,6 +26,9 @@ export default function AppProvider({ children }) {
 
     //
     const [usuarios, setUsuarios] = useState([]);
+
+    //
+    const [types, setTypes] = useState([]);
     
 
     // Cotizaciones pendientes
@@ -183,6 +186,19 @@ export default function AppProvider({ children }) {
         }
     }
 
+    const fetchTypes = async () => {
+        try {
+            const res = await clienteAxios.get(`/api/vehicles-types`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setTypes(res.data);
+        } catch (error) {
+            toast.error("Error al cargar los tipos de vehículos");
+        }
+    };
+
     //Menú de navegación
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -228,6 +244,9 @@ export default function AppProvider({ children }) {
 
                 fetchResponsables,
                 responsables,
+
+                types,
+                fetchTypes,
             }}
         >
             {children}
