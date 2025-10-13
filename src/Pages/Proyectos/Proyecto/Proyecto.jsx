@@ -102,31 +102,6 @@ export default function Proyecto() {
             },
         }).then(res => res.data);
 
-    const fetchProyecto = async () => {
-        try {
-            const res = await clienteAxios.get(`/api/projects/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            setProyecto(res.data);
-            setFormDataEdit({
-                centre_id: res.data.centre.id,
-                service_id: res.data.service.id,
-                date: res.data.date,
-                commentary: res.data.commentary || "",
-            });
-            setVehiculos(res.data.vehicles);
-
-            // 
-            setUsuarios([...new Set(res.data.vehicles.map((v) => v.user?.name))]);
-            setTipos([...new Set(res.data.vehicles.map((v) => v.type))]);
-
-        } catch (error) {
-            console.error("Error al cargar el proyecto", error);
-        }
-    };
-    
 
 
 
@@ -484,7 +459,7 @@ export default function Proyecto() {
             await fetchCentros();
             await fetchServicios();
             await fetchTypes();
-            // await fetchProyectosAbiertos();
+            await fetchProyectosAbiertos();
         };
 
         fetchData();
@@ -494,17 +469,27 @@ export default function Proyecto() {
 
     useEffect(() => {
         if (proyecto) {
+            // console.log(proyecto.centre.id);
             setFormDataEdit({
-            centre_id: proyecto.centre.id,
-            service_id: proyecto.service.id,
-            date: proyecto.date,
-            commentary: proyecto.commentary || "",
+                centre_id: proyecto.centre.id,
+                service_id: proyecto.service.id,
+                date: proyecto.date,
+                commentary: proyecto.commentary || "",
             });
 
             setVehiculos(proyecto.vehicles);
 
             setUsuarios([...new Set(proyecto.vehicles.map((v) => v.user?.name))]);
             setTipos([...new Set(proyecto.vehicles.map((v) => v.type))]);
+            fetchProyectosAbiertos();
+
+            if (proyecto?.related_projects){
+                setFormDataEdit({...formDataEdit, extra_projects: JSON.parse(proyecto?.related_projects),});
+                setFormData({...formData, extra_projects: JSON.parse(proyecto?.related_projects),});
+            }
+        }
+
+        if (proyecto.centre && proyecto.centre.id) {
             fetchProyectosAbiertos();
         }
     }, [proyecto]);
@@ -559,13 +544,7 @@ export default function Proyecto() {
         return () => clearTimeout(timer);
     }, [formData.eco]);
 
-    useEffect(() => {
-        // console.log(proyecto);
-        if (proyecto?.related_projects){
-            setFormDataEdit({...formDataEdit, extra_projects: JSON.parse(proyecto?.related_projects),});
-            setFormData({...formData, extra_projects: JSON.parse(proyecto?.related_projects),});
-        }
-    }, [proyecto]);
+
 
 
 
