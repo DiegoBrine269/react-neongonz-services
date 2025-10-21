@@ -86,15 +86,18 @@ export default function Servicios() {
     return (
         <>
             <h2 className="title-2">Catálogo de servicios</h2>
-            <button
-                className="btn mb-4"
-                onClick={() => {
-                    setModalOpen(true);
-                }}
-            >
-                <CirclePlus />
-                Nuevo
-            </button>
+            
+            <div className="contenedor-botones">
+                <button
+                    className="btn"
+                    onClick={() => {
+                        setModalOpen(true);
+                    }}
+                >
+                    <CirclePlus />
+                    Nuevo
+                </button>
+            </div>
 
             <Tabla
                 options={{

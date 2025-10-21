@@ -13,6 +13,8 @@ import TitleCheckBox from "@/components/UI/TitleCheckBox.jsx";
 import {formatearDinero} from "@/utils/utils.js";
 import AnimatedAmount from "@/components/UI/AnimatedAmount";
 import ErrorLabel from "@/components/UI/ErrorLabel.jsx";
+import {useSelection} from "@/hooks/useSelection";
+
 
 export default function Nueva() {
     const navigate = useNavigate();
@@ -40,37 +42,20 @@ export default function Nueva() {
         comments: null
     });
 
-    const handleCheckboxChange = (item) => {
-        
-        const esNuevo = !seleccionados.includes(item);
+    const { selected, toggle, clear, isSelected, setSelected, selectAll } = useSelection();
 
-        setSeleccionados(
-            (prev) =>
-                    !esNuevo
-                    ? prev.filter((i) => i !== item) // lo quita
-                    : [...prev, item] // lo agrega
-        );
+    const [checkedMap, setCheckedMap] = useState({});
+    const handleCheckboxChange = (name, items, toggleSelected) => (e) => {
+        const { checked } = e.target;
 
+        setCheckedMap(prev => ({ ...prev, [name]: checked }));
+
+        items.forEach(item => {
+            if(item.project.id === parseInt(name))
+                toggleSelected(item, checked);
+        });
     };
 
-    const handleCheckboxProyectoChange = (e) => {
-        const { name, checked } = e.target;
-
-        setProyectosSeleccionados((prev) => ({
-            ...prev,
-            [name]: checked,
-        }));
-
-        vehiculosPendientes.forEach((v) => 
-            setSeleccionados((prev) =>
-                v.project_id === parseInt(name)
-                    ? checked
-                        ? [...prev, v]
-                        : prev.filter((i) => i !== v)
-                    : prev
-            )
-        );
-    };
 
     useEffect(() => {
         if(lanzarError)
@@ -79,10 +64,10 @@ export default function Nueva() {
     }, [lanzarError]);
 
     useEffect(()=>{
-
+        // debugger
         let sub = 0;
-        const conjuntoSeleccionados = new Set(seleccionados);
-
+        const conjuntoSeleccionados = new Set(selected);
+        console.log(selected);
         // let lanzarError = false;
         setLanzarError(false);
 
@@ -113,7 +98,7 @@ export default function Nueva() {
             ...formData,
             vehicles:unicosPorId
         });
-    }, [seleccionados]);
+    }, [selected]);
 
 
     async function fetchVehiculosPendientes() {
@@ -262,6 +247,11 @@ export default function Nueva() {
             responsible_id: null,
             comments: null
         });
+
+        if(centro?.responsibles?.length === 1)
+            setFormData({...formData, responsible_id: centro.responsibles[0].id})
+    
+    
     }, [centro]);
 
     return (
@@ -333,7 +323,7 @@ export default function Nueva() {
                 )}
 
                 {/* Subtotal */}
-                {centro  && <div className="sticky top-0 text-right my-3">
+                {centro  && <div className="sticky top-0 text-right my-3 z-3">
                     <AnimatedAmount
                         keyProp={subTotal}
                         label={`Subtotal: ${formatearDinero(subTotal)}`}
@@ -374,8 +364,8 @@ export default function Nueva() {
                                         <TitleCheckBox
                                             name= {p.id}
                                             label= {`${p.service} (${format(p.date,"full","es")})`}
-                                            checked={proyectosSeleccionados[p.id] || false}
-                                            onChange={handleCheckboxProyectoChange}
+                                            checked={checkedMap[p.id] || false}
+                                            onChange={handleCheckboxChange(p.id, vehiculosPendientes, toggle)}
                                         />
                                     </div>
                                     <div className="flex flex-col gap-2">
@@ -405,8 +395,9 @@ export default function Nueva() {
                                                                 key={v.id}
                                                                 value={v.id}
                                                                 label={v.eco}
-                                                                checked={seleccionados.includes(v)}
-                                                                onChange={() => handleCheckboxChange(v)}
+                                                                checked={isSelected(v)}
+                                                                onChange={() => toggle(v)}
+
                                                             />
                                                         ))}
                                                     </div>

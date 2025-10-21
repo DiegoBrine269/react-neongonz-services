@@ -32,7 +32,9 @@ export default function ForgotPassword() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
             />
-            <button type="submit" className="btn">Enviar link</button>
+            <div className="contenedor-botones">
+                <button type="submit" className="btn">Enviar link</button>
+            </div>
             <p>{message}</p>
         </form>
     );

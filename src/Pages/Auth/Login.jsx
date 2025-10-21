@@ -73,12 +73,15 @@ export default function Login() {
                     <p className="text-red-500">{errors.password[0]}</p>
                 )}
 
-                <input
-                    className="btn"
-                    type="submit"
-                    value="Iniciar sesión"
-                    onClick={handleLogin}
-                />
+                <div className="contenedor-botones">
+                    <input
+                        className="btn"
+                        type="submit"
+                        value="Iniciar sesión"
+                        onClick={handleLogin}
+                    />
+
+                </div>
 
                 <Link className="text-end block text-blue-500 underline" to="/olvide-mi-contrasena">Olvidé mi contraseña 😬</Link>
             </form>

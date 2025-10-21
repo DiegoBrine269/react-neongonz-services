@@ -15,7 +15,7 @@ export default function ProyectoActions({
     return (
         <>
             {user?.role === "admin" && (
-                <div className="flex gap-2 mt-2">
+                <div className="contenedor-botones">
                     <button
                         className="btn btn-secondary mt-0"
                         onClick={handleToggleStatusProyecto}

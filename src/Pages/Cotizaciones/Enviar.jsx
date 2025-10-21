@@ -18,7 +18,7 @@ export default function Enviar() {
     const location = useLocation();
     const { pendientesEnvio } = location.state || []; 
     const { selected, toggle, clear, isSelected, setSelected } = useSelection();
-    const { token, setLoading, requestHeader } = useContext(AppContext);
+    const { token, setLoading, requestHeader, fetchPendientesEnvio } = useContext(AppContext);
     const [formData, setFormData] = useState({
         invoice_ids: selected,
     });
@@ -59,6 +59,7 @@ export default function Enviar() {
     };
 
     useEffect(() => {
+        fetchPendientesEnvio();
         setFormData(prev => ({
             ...prev,
             invoice_ids: selected.map(item => item.id),

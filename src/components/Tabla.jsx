@@ -88,7 +88,7 @@ export default function Tabla({
                         }}
                     />
                 </Suspense>
-                <div className="flex justify-end gap-1">
+                <div className="flex justify-end gap-2 mt-2">
                     <button
                         className="btn bg-orange-900 w-fit"
                         onClick={() => downloadPdf()}

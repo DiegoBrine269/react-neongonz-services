@@ -111,7 +111,7 @@ export default function Centros() {
 
                 <Link to={'/responsables'} className="btn btn-secondary">
                     <UsersRound/>
-                    Ver listado de responsables
+                    Responsables
                 </Link>
             </div>
 

@@ -149,7 +149,7 @@ export default function Proyecto() {
             setUsarPlaca(false);
             setFiltrosColapsados(false);
         } catch (error) {
-            toast.error("Error al agregar el vehículo");
+            // toast.error("Error al agregar el vehículo");
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors);
             }
@@ -481,7 +481,7 @@ export default function Proyecto() {
 
             setUsuarios([...new Set(proyecto.vehicles.map((v) => v.user?.name))]);
             setTipos([...new Set(proyecto.vehicles.map((v) => v.type))]);
-            fetchProyectosAbiertos();
+            // fetchProyectosAbiertos();
 
             if (proyecto?.related_projects){
                 setFormDataEdit({...formDataEdit, extra_projects: JSON.parse(proyecto?.related_projects),});
@@ -495,11 +495,11 @@ export default function Proyecto() {
 
     }, [proyecto]);
 
-    // useEffect(() => {
-    //     if (proyecto.centre && proyecto.centre.id) {
-    //         fetchProyectosAbiertos();
-    //     }
-    // }, [proyecto.centre]);
+    useEffect(() => {
+        if (proyecto?.centre?.id) {
+            fetchProyectosAbiertos();
+        }
+    }, [proyecto?.centre?.id]);
 
 
     const fetchTypesOnEcoChange = async () => {
@@ -614,10 +614,10 @@ export default function Proyecto() {
             />
 
             <h3 className="title-3 mt-2 mb-2">Lista de vehículos</h3>
-            <div className="flex gap-2 mt-0">
+            <div className="contenedor-botones">
                 {proyecto?.is_open ? (
                     <button
-                        className="btn mt-0"
+                        className="btn"
                         onClick={() => {setModalAgregarOpen(true);}}
                     >
                         <Car />
@@ -889,7 +889,19 @@ export default function Proyecto() {
             <ErrorBoundary>
                 <Modal
                     isOpen={isModalAgregarOpen}
-                    onClose={() => setModalAgregarOpen(false)}
+                    onClose={() => {
+                        setModalAgregarOpen(false)
+                        setFormData({
+                            eco: "",
+                            type: "",
+                            project_id: id,
+                            user_id: user.id,
+                            commentary: "",
+                            extra_projects: [],
+                            usar_placa: false,
+                        });
+                        setErrors({});
+                    }}
                 >
                     <h2 className="title-3">Agregar vehículo al proyecto</h2>
                     <form action="">
@@ -928,6 +940,7 @@ export default function Proyecto() {
                                 value={formData.eco}
                                 min={1}
                                 onChange={(e) => {
+                                    setErrors({...errors, eco: null});
                                     setFormData({
                                         ...formData,
                                         eco: e.target.value,
@@ -1075,7 +1088,7 @@ export default function Proyecto() {
                     />
                 </div>
 
-                <div className="md:flex gap-1">
+                <div className="contenedor-botones">
                     <button
                         className="btn btn-danger"
                         onClick={handleEliminarVehiculo}

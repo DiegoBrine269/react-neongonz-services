@@ -119,12 +119,14 @@ export default function Register() {
                 />
 
 
-                <input
-                    className="btn"
-                    type="submit"
-                    value="Crear cuenta"
-                    onClick={handleRegister}
-                />
+                <div className="contenedor-botones">                   
+                    <input
+                        className="btn"
+                        type="submit"
+                        value="Crear cuenta"
+                        onClick={handleRegister}
+                    />
+                </div>
             </form>
         </>
     );

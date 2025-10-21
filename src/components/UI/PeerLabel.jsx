@@ -15,7 +15,7 @@ export default function PeerLabel({checked, value, onChange, label, tooltip=fals
             </span>
 
         
-            {tooltip && <span className="absolute left-1/2 -top-6 -translate-x-1/2 w-max max-w-xs bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 z-20">
+            {tooltip && <span className="absolute left-1/2 -top-6 -translate-x-1/2 w-max max-w-xs bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 z-6">
                 {Object.values(tooltip).map((item, idx) => (
                     item.value && <div key={idx}>
                         <span className="font-bold ">{item.label}:</span> {item.value}

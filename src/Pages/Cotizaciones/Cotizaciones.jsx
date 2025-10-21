@@ -17,13 +17,13 @@ export default function Cotizaciones() {
 
 
     const [cotizacion, setCotizacion] = useState({});
-    const [pendientesEnvio, setPendientesEnvio] = useState([]);
+
     const [selectedRows, setSelectedRows] = useState([]);
 
     const [modal, setModal] = useState(false);
     const tableRef = useRef();
 
-    const { token, setLoading, pendientes, fetchPendientes, requestHeader } = useContext(AppContext);
+    const { token, setLoading, pendientes, fetchPendientes,  pendientesEnvio, fetchPendientesEnvio, requestHeader } = useContext(AppContext);
 
     const [reloadKey, setReloadKey] = useState(0);
 
@@ -31,15 +31,7 @@ export default function Cotizaciones() {
         setReloadKey((prev) => prev + 1);
     };
 
-    async function fetchPendientesEnvio() {
-        try {
-            const res = await clienteAxios.get("/api/invoices/email-pending", requestHeader);
-            setPendientesEnvio(res.data);
 
-        } catch (error) {
-            console.log([]);
-        }
-    }
 
     async function fetchPDF() {
         try {
@@ -192,7 +184,7 @@ export default function Cotizaciones() {
                         :
                             <motion.div
                                 key="acciones"
-                                className="flex gap-2"
+                                className="contenedor-botones"
                                 initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 20 }}

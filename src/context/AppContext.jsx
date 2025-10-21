@@ -34,6 +34,9 @@ export default function AppProvider({ children }) {
     // Cotizaciones pendientes
     const [pendientes, setPendientes] = useState([]);
 
+    const [pendientesEnvio, setPendientesEnvio] = useState([]);
+
+
 
     let tableRef = useRef(null);
 
@@ -186,6 +189,16 @@ export default function AppProvider({ children }) {
         }
     }
 
+    async function fetchPendientesEnvio() {
+        try {
+            const res = await clienteAxios.get("/api/invoices/email-pending", requestHeader);
+            setPendientesEnvio(res.data);
+
+        } catch (error) {
+            console.log([]);
+        }
+    }
+
     const fetchTypes = async () => {
         try {
             const res = await clienteAxios.get(`/api/vehicles-types`, {
@@ -238,6 +251,8 @@ export default function AppProvider({ children }) {
 
                 pendientes,
                 fetchPendientes,
+                pendientesEnvio,
+                fetchPendientesEnvio,
 
                 usuarios,
                 fetchUsuarios,
