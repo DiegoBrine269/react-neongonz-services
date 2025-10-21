@@ -30,7 +30,7 @@ export default function Nueva() {
     const [centrosPendientes, setCentrosPendientes] = useState([]);
     const [proyectosPendientes, setProyectosPendientes] = useState([]);
 
-    const [seleccionados, setSeleccionados] = useState([]);
+
     const [seleccionarTodo, setSeleccionarTodo] = useState(false);
     const [proyectosSeleccionados, setProyectosSeleccionados] = useState([]);
 
@@ -67,8 +67,7 @@ export default function Nueva() {
         // debugger
         let sub = 0;
         const conjuntoSeleccionados = new Set(selected);
-        console.log(selected);
-        // let lanzarError = false;
+    
         setLanzarError(false);
 
         conjuntoSeleccionados.forEach((s) => {
@@ -89,7 +88,7 @@ export default function Nueva() {
 
         // Eliminado duplicados
         const unicosPorId = Array.from(
-            new Map(seleccionados.filter((item) => item !== null)
+            new Map(selected.filter((item) => item !== null)
                     .map((item) => [item.id, item]) // usar `id` como clave
             ).values()
         );
@@ -208,21 +207,6 @@ export default function Nueva() {
         fetchData();
     }, []);
 
-    useEffect(() => {
-        if(seleccionarTodo){
-            // console.log("Seleccionando todo");
-            // debugger
-            vehiculosPendientes.forEach(v => {
-                if(v.centre_id == centro && !seleccionados.includes(v)) 
-                    setSeleccionados((prev) => [...prev, v]);
-            });
-
-            return;
-        }    
-
-        setSeleccionados([]);
-        
-    }, [seleccionarTodo]);
 
 
     // useEffect(() => {
@@ -240,8 +224,10 @@ export default function Nueva() {
 
     useEffect(() => {
         setSeleccionarTodo(false);
-        setSeleccionados([]);
+        clear();
+        setLanzarError(false);
         setProyectosSeleccionados([]);
+        setCheckedMap({})
         setFormData({
             vehicles: [],
             responsible_id: null,
@@ -341,11 +327,15 @@ export default function Nueva() {
                             id="seleccionar-todo"
                             checked={seleccionarTodo}
                             onChange={() => {
-                                setSeleccionarTodo(!seleccionarTodo);
 
-                                
-                                
-                                
+                                const nuevoValor = !seleccionarTodo;
+                                setSeleccionarTodo(nuevoValor);
+                                console.log(vehiculosPendientes)
+                                if(nuevoValor)
+                                    selectAll(vehiculosPendientes.filter(v => v.centre_id === centro.id))
+                                else
+                                    clear();
+
                             }}
                         />
                         <span className="text">Seleccionar todo</span>
@@ -408,8 +398,8 @@ export default function Nueva() {
                                 </div>
                             ) : null
                         )}
-
-                        {seleccionados.length > 0 && !lanzarError && (
+                        
+                        {selected.length > 0 && !lanzarError && (
                             <>
                                 <label htmlFor="comments" className="label">
                                     Comentarios o instrucciones especiales
