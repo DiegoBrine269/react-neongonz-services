@@ -288,7 +288,7 @@ export default function Nueva() {
                             className="input"
                             value={formData.responsible_id ?? ""}
                             onChange={(e) => setFormData({...formData, responsible_id: e.target.value})}
-                            defaultValue={""}
+
                         >
                             <option value="" disabled>
                                 Seleccione un destinatario

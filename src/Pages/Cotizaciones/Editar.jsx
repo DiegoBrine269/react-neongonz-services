@@ -27,8 +27,10 @@ export default function Editar() {
 
     const [idsPreviamenteSeleccionados, setIdsPreviamenteSeleccionados] = useState([]);
 
+    const [centro, setCentro] = useState({});
 
-    const { token, setLoading } = useContext(AppContext);
+    
+    const { token, setLoading, responsables, fetchResponsables, fetchCentros, centros } = useContext(AppContext);
 
     const [seleccionarTodo, setSeleccionarTodo] = useState(false);
     const { selected, toggle, clear, isSelected, setSelected, selectAll } = useSelection();
@@ -36,7 +38,8 @@ export default function Editar() {
     const [checkedMap, setCheckedMap] = useState({});
     const [subTotal, setSubTotal] = useState(0);
     const [formData, setFormData] = useState({
-        date: format(cotizacion?.date, "YYYY-MM-DD")
+        date: format(cotizacion?.date, "YYYY-MM-DD"),
+
     });
 
     const [errors, setErrors] = useState({});
@@ -64,7 +67,8 @@ export default function Editar() {
             // navigate('/cotizaciones');
 
         } catch (error) {
-            // console.error("Error during request:", error);
+            // setErrors()
+            console.error("Error during request:", error);
             if (error.response) {
                 const reader = new FileReader();
                 reader.onload = function () {
@@ -80,7 +84,7 @@ export default function Editar() {
                     }
                 };
                 reader.readAsText(error.response.data);
-                toast.error("Faltan precios por registrar");
+                toast.error("Hubo un error al actualizar la cotización");
                 return;
             } else {
                 toast.error("Error desconocido al generar el PDF");
@@ -113,24 +117,6 @@ export default function Editar() {
             
             console.log(res.data.vehicles);
             setIdsPreviamenteSeleccionados(res.data.vehicles.map(v => v.id));
-
-
-
-            // setVehiculosPendientes(res.data.vehicles);
-            // setProyectosPendientes(
-            //     Array.from(
-            //         res.data.vehicles
-            //             .map((item) => item.project) // Extrae los proyectos
-            //             .reduce((acc, project) => {
-            //                 if (!acc.has(project.id)) {
-            //                     acc.set(project.id, project); // Usa un Map para evitar duplicados
-            //                 }
-            //                 return acc;
-            //             }, new Map())
-            //             .values() // Obtén los valores únicos
-            //     )
-            // );
-
         } catch (error) {
             toast.error("Error al cargar la cotización");
             console.error("Error fetching data:", error);
@@ -177,15 +163,24 @@ export default function Editar() {
         }
     }
 
+
     useEffect(() => {
-        
-        const fetchData  = async ()=>  {
+        const fetchData = async () => {
             setLoading(true);
-            await fetchCotizacion(id);
+            await Promise.all([fetchCotizacion(id)]);
+            await Promise.all([fetchResponsables()]);
+            await Promise.all([fetchCentros()]);
             setLoading(false);
-        }
+        };
+
         fetchData();
+
     }, []);
+
+    useEffect(() => {
+        if(centros.length === 0) return;
+        setCentro(centros.find(c => c.id === cotizacion?.centre_id) || {});
+    }, [centros]);
 
     useEffect(() => {   
         if(!cotizacion) return; 
@@ -196,6 +191,11 @@ export default function Editar() {
         }
 
         fetchData();
+        setFormData({
+            ...formData,
+            date: format(cotizacion?.date, "YYYY-MM-DD"),
+            responsible_id: cotizacion?.responsible_id,
+        });
     }, [cotizacion]);
 
 
@@ -258,6 +258,31 @@ export default function Editar() {
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                 />
                 <ErrorLabel>{errors?.date}</ErrorLabel>
+
+                <label className="label" htmlFor="correo">
+                    Destinatario
+                </label>
+                <select
+                    id="centre_id"
+                    className="input"
+                    value={formData.responsible_id ?? cotizacion?.responsible_id ?? ""}
+                    onChange={(e) => setFormData({...formData, responsible_id: e.target.value})}
+
+                >
+                    <option value="" disabled>
+                        Seleccione un destinatario
+                    </option>
+                    {responsables
+                        .filter((responsable) =>
+                            centro?.responsibles?.some(r => r.id === responsable.id)
+                        )
+                        .map((responsable) => (
+                            <option key={responsable.id} value={responsable.id}>
+                                {responsable.name}
+                            </option>
+                        ))}
+                </select>
+                <ErrorLabel>{errors?.responsible_id}</ErrorLabel>
 
                 {/* Subtotal */}
                 <div className="sticky top-0 text-right my-3">
