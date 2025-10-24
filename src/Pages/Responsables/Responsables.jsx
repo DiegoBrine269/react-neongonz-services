@@ -61,15 +61,18 @@ export default function Responsables() {
         <>
             <h2 className="title-2">Responsables de Centros</h2>
 
-                <button
-                    className="btn"
-                    onClick={() => {
-                        setModalCreateOpen(true);
-                    }}
-                >
-                    <CirclePlus />
-                    Nuevo
-                </button>
+                <div className="contenedor-botones">
+                    <button
+                        className="btn"
+                        onClick={() => {
+                            setModalCreateOpen(true);
+                        }}
+                    >
+                        <CirclePlus />
+                        Nuevo
+                    </button>
+
+                </div>
             <Tabla
                 columns={columns}
                 data={responsables}

@@ -231,6 +231,7 @@ export default function Proyectos() {
                     <label className="label" htmlFor="service_id">
                         Servicio
                     </label>
+
                     <select
                         id="service_id"
                         className="input"
@@ -245,15 +246,14 @@ export default function Proyectos() {
                         <option value="" disabled>
                             Seleccione un servicio
                         </option>
-                        {servicios.map((centro) => (
-                            <option key={centro.id} value={centro.id}>
-                                {centro.name}
+                        {servicios.map((s) => (
+                            <option key={s.id} value={s.id}>
+                                {s.name}
                             </option>
                         ))}
                     </select>
-                    {errors.service_id && (
-                        <p className="text-red-500">{errors.service_id[0]}</p>
-                    )}
+
+
 
                     <label className="label" htmlFor="fecha">
                         Fecha

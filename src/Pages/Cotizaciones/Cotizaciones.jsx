@@ -40,18 +40,23 @@ export default function Cotizaciones() {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
-                responseType: "blob",
+                // responseType: "blob",
             });
 
-            const blob = new Blob([res.data], { type: "application/pdf" });
-            const url = window.URL.createObjectURL(blob);
+            const pdfUrl = res.data.url;
+            console.log(pdfUrl);
 
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `${cotizacion?.path}`;
-            link.click();
+            window.open(pdfUrl, "_blank");
 
-            window.URL.revokeObjectURL(url); // Limpieza
+            // const blob = new Blob([res.data], { type: "application/pdf" });
+            // const url = window.URL.createObjectURL(blob);
+
+            // const link = document.createElement("a");
+            // link.href = url;
+            // link.download = `${cotizacion?.path}`;
+            // link.click();
+
+            // window.URL.revokeObjectURL(url); // Limpieza
 
         } catch (error) {
             console.error("Error fetching data:", error);

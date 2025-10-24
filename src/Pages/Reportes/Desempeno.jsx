@@ -134,7 +134,7 @@ export default function Desempeno() {
                     </div>
                 </div>
 
-                <div className="flex justify-end">
+                <div className="contenedor-botones">
                     <button type="submit" className="btn" onClick={handleSubmit}>
                         <UserSearch/>
                         Consultar

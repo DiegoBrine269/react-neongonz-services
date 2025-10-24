@@ -114,7 +114,9 @@ body {
         min-width: 100%;
     }
 
-
+    .tabulator-tableholder {
+        @apply max-h-72
+    }
 
     /* checkbox de cada fila */
     .tabulator-cell .tabulator-row-handle {
