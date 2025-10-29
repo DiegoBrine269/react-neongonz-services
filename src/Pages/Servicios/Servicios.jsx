@@ -133,13 +133,14 @@ export default function Servicios() {
                     )}
 
                     
-
-                    <input
-                        className="btn"
-                        type="submit"
-                        value="Guardar"
-                        onClick={handleSubmit}
-                    />
+                    <div className="contenedor-botones">
+                        <input
+                            className="btn"
+                            type="submit"
+                            value="Guardar"
+                            onClick={handleSubmit}
+                        />
+                    </div>
                 </form>
             </Modal>
         </>

@@ -174,12 +174,15 @@ export default function MiCuenta() {
                         <p className="text-red-500">{errors.last_name[0]}</p>
                     )}
 
-                    <input
-                        className="btn"
-                        type="submit"
-                        value="Actualizar"
-                        onClick={handleActualizarDatos}
-                    />
+                    <div className="contenedor-botones">
+                        <input
+                            className="btn"
+                            type="submit"
+                            value="Actualizar"
+                            onClick={handleActualizarDatos}
+                        />
+
+                    </div>
                 </form>
             </Modal>
 

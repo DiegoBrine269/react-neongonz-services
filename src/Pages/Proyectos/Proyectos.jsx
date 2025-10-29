@@ -232,7 +232,19 @@ export default function Proyectos() {
                         Servicio
                     </label>
 
-                    <select
+
+                    
+                    <input type="text" name="" id="service" autoComplete="false" placeholder="Elige un servicio"/>
+                    
+                    {/* Sugerencias */}
+                    {/* <div className="">
+                        {servicios.map((s) => (
+                            <div key={s.id} value={s.id}>
+                                {s.name}
+                            </div>
+                        ))}
+                    </div> */}
+                    {/* <select
                         id="service_id"
                         className="input"
                         onChange={(e) =>
@@ -251,7 +263,7 @@ export default function Proyectos() {
                                 {s.name}
                             </option>
                         ))}
-                    </select>
+                    </select> */}
 
 
 

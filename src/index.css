@@ -96,26 +96,22 @@ body {
     }
 
     .contenedor-botones {
-        @apply flex gap-2 items-center my-2;
-        flex-wrap: wrap; /* solo hará wrap cuando falte espacio */
+        @apply flex gap-2 items-center my-2 flex-wrap;
     }
 
     /* permitir que los botones ocupen solo lo que necesiten pero se encojan/ocupar espacio disponible */
     .contenedor-botones .btn {
-        @apply w-auto;            /* quitar w-full que fuerza 100% */
-        flex: 1 1 160px;         /* flex-grow:1, flex-shrink:1, base 130px */
-        min-width: 160px;        /* ancho mínimo antes de forzar el wrap */
-        max-width: 100%;
+        
+        @apply flex-[1_1_160px] min-w-[160px] max-w-full w-auto md:flex-none;
     }
 
     /* si queda un único elemento, que ocupe 100% */
-    .contenedor-botones > *:only-child {
-        flex: 1 1 100%;
-        min-width: 100%;
-    }
+    /* .contenedor-botones > *:only-child {
+        @apply flex-[1_1_100%] min-w-[100%] w-full md:flex-none;
+    } */
 
     .tabulator-tableholder {
-        @apply max-h-72
+        @apply max-h-[50vh] md:max-h-96;
     }
 
     /* checkbox de cada fila */

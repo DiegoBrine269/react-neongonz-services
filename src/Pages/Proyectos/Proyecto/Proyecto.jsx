@@ -45,6 +45,8 @@ export default function Proyecto() {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [filtrosColapsados, setFiltrosColapsados] = useState(false);
     const formFiltrosRef = useRef(null);
+    const textAreaRef = useRef(null);
+
     const [filtros, setFiltros] = useState([]);
     const [selectingDate, setSelectingDate] = useState(false);
     const [selectedDate, setSelectedDate] = useState();
@@ -154,7 +156,8 @@ export default function Proyecto() {
                 setErrors(error.response.data.errors);
             }
         } finally {
-            setLoading(false);
+            formFiltrosRef.reset();
+            tableRef.current.clearFilter();
         }
     };
 
@@ -409,10 +412,6 @@ export default function Proyecto() {
     };
 
 
-
-
-    const textAreaRef = useRef(null);
-
     const copyTextToClipboard = () => {
         if (textAreaRef.current) {
             textAreaRef.current.select();
@@ -459,7 +458,7 @@ export default function Proyecto() {
             await fetchCentros();
             await fetchServicios();
             await fetchTypes();
-            await fetchProyectosAbiertos();
+            // await fetchProyectosAbiertos();
         };
 
         fetchData();
@@ -660,6 +659,7 @@ export default function Proyecto() {
                         id="eco"
                         placeholder="Económico"
                         onChange={(e) => filtrarTabla(e, "eco")}
+
                     />
 
                     <select
@@ -682,7 +682,7 @@ export default function Proyecto() {
                         id="quienRegistra"
                         className="input mb-1"
                         onChange={(e) => filtrarTabla(e, "user.name")}
-                        defaultValue=""
+                        // value={}
                     >
                         <option value="" disabled>
                             Persona que registra
@@ -720,6 +720,7 @@ export default function Proyecto() {
 
                     <div className="flex justify-end">
                         <input
+                            // ref={}
                             type="reset"
                             className="btn btn-danger"
                             value="Limpiar filtros"
