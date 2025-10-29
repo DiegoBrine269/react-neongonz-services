@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, useRef } from "react";
+import { useContext, useEffect, useState, useRef, useMemo } from "react";
 // import "../../node_modules/react-tabulator/css/materialize/tabulator_materialize.min.css";
 
 import clienteAxios from "../../config/axios";
@@ -10,6 +10,9 @@ import { CirclePlus, Save } from "lucide-react";
 import Tabla from "../../components/Tabla";
 import { format } from "@formkit/tempo";
 import useSWR, { mutate } from "swr";
+import { flushSync } from "react-dom";
+import Fuse from "fuse.js";
+import ErrorLabel from '@/components/UI/ErrorLabel';
 
 
 export default function Proyectos() {
@@ -20,12 +23,20 @@ export default function Proyectos() {
     const { token, setLoading, user, fetchServicios, fetchCentros, centros, servicios, mostrarCerrados, setMostrarCerrados} = useContext(AppContext);
 
     const [isModalOpen, setModalOpen] = useState(false);
-
+    const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
+    const  inputBuscarServicioRef  = useRef(null);
+    const [serviciosFiltrados, setServiciosFiltrados] = useState(servicios);
     const [formData, setFormData] = useState({
         centre_id: "",
         service_id: "",
         date: hoy,
     });
+
+    // const fuse = new Fuse(servicios, {
+        
+    //     keys: ["name"],       // campo a buscar
+    //     threshold: 0.3,       // sensibilidad (0 exacto, 1 muy laxo)
+    // });
 
     const [errors, setErrors] = useState({});
 
@@ -62,6 +73,23 @@ export default function Proyectos() {
         }
     };
 
+    const normalize = (s) =>  s
+        ?.toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") || "";
+
+      // Fuse minimal: usa el mismo campo, pero normalizado por getFn
+    const fuse = useMemo(
+        () =>
+        new Fuse(servicios, {
+            keys: ["name"],
+            threshold: 0.3,
+            ignoreLocation: true,
+            minMatchCharLength: 1,
+            getFn: (obj) => normalize(obj.name), // 👈 normaliza solo aquí
+        }),
+        [servicios]
+    );
 
     const showClosed = mostrarCerrados ? 1 : 0;
     const url = token ? `/api/projects?show_closed=${showClosed}` : null;
@@ -96,8 +124,45 @@ export default function Proyectos() {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        setServiciosFiltrados(servicios);
+    }, [servicios]);
 
 
+    const handleSelectServicios = ()=> {
+        flushSync(() => setMostrarSugerencias(true));
+        inputBuscarServicioRef?.current.focus();
+    };
+
+    const handleClickServicio = (e)=> {
+        const servicioId = e.currentTarget.getAttribute("value");
+        const servicioName = e.currentTarget.textContent;
+
+        setFormData({
+            ...formData,
+            service_id: servicioId,
+            service_name: servicioName,
+        });
+
+        setMostrarSugerencias(false);
+    };
+
+
+    const handleFiltrarServicios = (e)=> {
+        // const texto = e.target.value.trim();
+        // if (texto === "") {
+        //     setServiciosFiltrados(servicios);
+        //     return;
+        // }
+
+        // const resultados = fuse.search(texto);
+        // setServiciosFiltrados(resultados.map((r) => r.item));
+
+            const q = normalize(e.target.value.trim());
+            if (!q) return setServiciosFiltrados(servicios);
+            const res = fuse.search(q).map((r) => r.item);
+            setServiciosFiltrados(res);
+    };
     
 
     const columns = [
@@ -226,46 +291,37 @@ export default function Proyectos() {
                             </option>
                         ))}
                     </select>
-                    {errors.centre_id && (<p className="text-red-500">{errors.centre_id[0]}</p>)}
+                    {<ErrorLabel>{errors.centre_id}</ErrorLabel>}
 
                     <label className="label" htmlFor="service_id">
                         Servicio
                     </label>
 
 
-                    
-                    <input type="text" name="" id="service" autoComplete="false" placeholder="Elige un servicio"/>
-                    
-                    {/* Sugerencias */}
-                    {/* <div className="">
-                        {servicios.map((s) => (
-                            <div key={s.id} value={s.id}>
-                                {s.name}
+                    <div className="relative">
+                        <input type="text" name="" id="service" autoComplete="false" placeholder="Elige un servicio" readOnly onClick={handleSelectServicios} value={formData.service_name ?? ""}/>
+                        {<ErrorLabel>{errors.service_id}</ErrorLabel>}
+                        {/* Sugerencias */}
+                        {<div className={`${mostrarSugerencias? 'absolue' : 'hidden'} max-w-full rounded-md cursor-pointer p-3 bg-white dark:bg-neutral-800 w-full top-full border shadow-2xl`}>
+                            
+
+                            <input ref={inputBuscarServicioRef} type="text" className="input sticky top-0" placeholder="Buscar servicio" onChange={handleFiltrarServicios}/>
+
+                            <div className="overflow-scroll max-h-40 h-auto">
+                                {serviciosFiltrados.map((s) => (
+                                    <div 
+                                        key={s.id} 
+                                        value={s.id} 
+                                        className="text  px-2 py-1 border-b-1 cursor-pointer hover:dark:bg-neutral-800 hover:bg-gray-200"
+                                        onClick={handleClickServicio}
+                                    >
+                                        {s.name}
+                                    </div>
+                                ))}
+
                             </div>
-                        ))}
-                    </div> */}
-                    {/* <select
-                        id="service_id"
-                        className="input"
-                        onChange={(e) =>
-                            setFormData({
-                                ...formData,
-                                service_id: e.target.value,
-                            })
-                        }
-                        defaultValue=""
-                    >
-                        <option value="" disabled>
-                            Seleccione un servicio
-                        </option>
-                        {servicios.map((s) => (
-                            <option key={s.id} value={s.id}>
-                                {s.name}
-                            </option>
-                        ))}
-                    </select> */}
-
-
+                        </div>}
+                    </div>
 
                     <label className="label" htmlFor="fecha">
                         Fecha
@@ -276,7 +332,6 @@ export default function Proyectos() {
                         id="fecha"
                         placeholder="fecha"
                         value={formData.date}
-                        // defaultValue={formData.date || new Date().toISOString().split("T")[0]}
                         onChange={(e) =>
                             setFormData({
                                 ...formData,
@@ -284,9 +339,7 @@ export default function Proyectos() {
                             })
                         }
                     />
-                    {errors.date && (
-                        <p className="text-red-500">{errors.date[0]}</p>
-                    )}
+                    {errors.date && (<p className="text-red-500">{errors.date[0]}</p>)}
 
                     <label className="label" htmlFor="commentary">
                         Comentario
@@ -296,7 +349,6 @@ export default function Proyectos() {
                         id="commentary"
                         placeholder="Comentario"
                         value={formData.commentary}
-                        // defaultValue={formData.date || new Date().toISOString().split("T")[0]}
                         onChange={(e) =>
                             setFormData({
                                 ...formData,
