@@ -156,6 +156,7 @@ export default function Proyecto() {
                 setErrors(error.response.data.errors);
             }
         } finally {
+            setLoading(false)
             formFiltrosRef.reset();
             tableRef.current.clearFilter();
         }
