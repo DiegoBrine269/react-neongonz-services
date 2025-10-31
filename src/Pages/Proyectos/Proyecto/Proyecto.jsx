@@ -684,6 +684,7 @@ export default function Proyecto() {
                         className="input mb-1"
                         onChange={(e) => filtrarTabla(e, "user.name")}
                         // value={}
+                        defaultValue=""
                     >
                         <option value="" disabled>
                             Persona que registra
@@ -725,7 +726,8 @@ export default function Proyecto() {
                             type="reset"
                             className="btn btn-danger"
                             value="Limpiar filtros"
-                            onClick={() => {
+                            onClick={(e) => {
+                                // e.
                                 setSelectedDate(null);
                                 setFiltros([]);
                                 tableRef.current.clearFilter();
