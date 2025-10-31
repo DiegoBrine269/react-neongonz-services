@@ -1093,13 +1093,18 @@ export default function Proyecto() {
                 </div>
 
                 <div className="contenedor-botones">
-                    <button
-                        className="btn btn-danger"
-                        onClick={handleEliminarVehiculo}
-                    >
-                        <Trash2 />
-                        Eliminar del proyecto
-                    </button>
+                    {
+                        //Mostrar solo si es del mismo usuario, o bien si es admin
+                        (user?.role === "admin" || vehiculo?.user?.id === user?.id)
+                        &&
+                        <button
+                            className="btn btn-danger"
+                            onClick={handleEliminarVehiculo}
+                        >
+                            <Trash2 />
+                            Eliminar del proyecto
+                        </button>
+                    }
                     <button
                         className="btn"
                         onClick={() => {

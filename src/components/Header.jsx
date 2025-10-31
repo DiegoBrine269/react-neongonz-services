@@ -1,7 +1,7 @@
 
 import Logo from "../assets/Logo.png";
 import LogoBlanco from "../assets/Logo-blanco.png";
-
+import { motion, AnimatePresence } from "framer-motion";
 
 import { NavLink } from "react-router-dom";
 import { Menu, X, Car, Factory, Wrench, User, LogOut, Sun, Moon, LogIn, UserRoundPlus, BriefcaseBusiness, Receipt, Users  } from "lucide-react";
@@ -79,11 +79,20 @@ export default function Header() {
                     <Items />
                 </div>
 
-                {isMenuOpen && (
-                    <div className="xl:hidden bg-white dark:bg-neutral-800 dark:text-neutral-200 shadow-md rounded-lg p-4 absolute top-16 left-0 right-0 mx-auto w-11/12 z-10">
-                        <Items />
-                    </div>
-                )}
+                <AnimatePresence>
+                    {isMenuOpen && (
+                        <motion.div
+                        key="mobile-menu"
+                        initial={{ opacity: 0, y: -12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -12 }}
+                        transition={{ duration: 0.18, ease: "easeInOut" }}
+                        className="xl:hidden bg-white dark:bg-neutral-800 dark:text-neutral-200 shadow-md rounded-lg p-4 absolute top-16 left-0 right-0 mx-auto w-11/12 z-10"
+                        >
+                            <Items />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
             <div className="absolute top-0 right-0 p-5">
