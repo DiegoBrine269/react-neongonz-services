@@ -576,6 +576,13 @@ export default function Proyecto() {
                 const date = cell.getValue();
                 return format(date, { date: "short", time: "short" }, "es");
             },
+            accessorDownload: (value) => format(value, "YYYY-MM-DD HH:mm:ss"),
+            // mutator: (value, data, type, params, component) => {
+            //     // value viene en crudo (ISO) — devolvemos la versión formateada usada en la celda
+            //     const fecha = new Date(value);
+
+            //     return fecha.toLocaleString()
+            // },
             resizable: false,
             width: 180,
         },
