@@ -59,13 +59,21 @@ export default function Enviar() {
     };
 
     useEffect(() => {
-        fetchPendientesEnvio();
+        // fetchPendientesEnvio();
         setFormData(prev => ({
             ...prev,
             invoice_ids: selected.map(item => item.id),
         }));
     }, [selected]);
     
+    useEffect(() => {
+        fetchPendientesEnvio();
+        // setFormData(prev => ({
+        //     ...prev,
+        //     invoice_ids: selected.map(item => item.id),
+        // }));
+    }, []);
+
 
     return (
         <>

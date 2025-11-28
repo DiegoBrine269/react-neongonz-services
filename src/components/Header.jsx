@@ -1,5 +1,7 @@
 
 import Logo from "../assets/Logo.png";
+import Gorro from "../assets/gorro-navidad.png";
+
 import LogoBlanco from "../assets/Logo-blanco.png";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -66,11 +68,23 @@ export default function Header() {
                     >
                         {isMenuOpen ? <X /> : <Menu onClick={handleToggle} />}
                     </button>
-                    <NavLink to="/">
+                    <NavLink to="/" className="relative">
                         <img
                             src={darkMode ? LogoBlanco : Logo}
                             alt="Logo"
                             className="w-12 xl:w-16"
+                        />
+                        <img
+                            src={Gorro}
+                            alt="Gorro de Navidad"
+                            className="
+                                w-10 xl:w-12
+                                absolute 
+                                -top-2 -right-2
+                                -translate-y-2 translate-x-2      /* Ajuste fino */
+                                xl:-translate-y-3 xl:translate-x-3
+                                pointer-events-none
+                            "
                         />
                     </NavLink>
                 </nav>

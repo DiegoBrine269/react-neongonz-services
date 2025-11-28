@@ -7,7 +7,6 @@ body {
 }
 
 
-
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer components {

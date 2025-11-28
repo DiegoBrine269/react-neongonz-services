@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState, useEffect, useRef, useCallback  } from "react";
 import { AppContext } from "@/context/AppContext";
 import clienteAxios from "@/config/axios";
 import { toast } from "react-toastify";
@@ -7,7 +7,7 @@ import Modal from "@/components/Modal";
 import Swal from "sweetalert2";
 import Tabla from "@/components/Tabla";
 import { swalConfig } from "@/config/variables";
-import { ClipboardCopy, Trash2, Car, CircleCheck, ChevronDown, ChevronRight, Pencil,Save } from "lucide-react";
+import { ClipboardCopy, Trash2, Car, CircleCheck, ChevronDown, ChevronRight, Pencil,Save, Camera as CameraIcon } from "lucide-react";
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { format } from "@formkit/tempo";
 import RadioButtonItem from "@/components/RadioButtonItem";
@@ -23,6 +23,12 @@ import ProyectoActions from "./ProyectoActions";
 import InfoRow from "@/components/UI/InfoRow";
 import CopyField from "./CopyField";
 import useSWR, {mutate} from "swr";
+
+import Webcam from "react-webcam";
+import Tesseract from "tesseract.js";
+
+import Camera from 'react-html5-camera-photo';
+import 'react-html5-camera-photo/build/css/index.css';
 
 export default function Proyecto() {
     const navigate = useNavigate();
@@ -51,6 +57,10 @@ export default function Proyecto() {
     const [selectingDate, setSelectingDate] = useState(false);
     const [selectedDate, setSelectedDate] = useState();
         
+    const [tesseractError, setTesseractError] = useState(null);
+
+    const webcamRef = useRef(null);
+
     // Sets para los filtros
     const [usuarios, setUsuarios] = useState([]);
     const [tipos, setTipos] = useState([]);
@@ -69,16 +79,16 @@ export default function Proyecto() {
         },
     };
 
-        const { data: proyecto, error, isLoading } = useSWR(
-            token ? [`/api/projects/${id}`, token] : null, // null evita llamadas si no hay token
-            ([url, token]) => fetcher(url, token),
-            {
-                refreshInterval: 30000,
-                revalidateOnFocus: true, 
-                revalidateOnReconnect: false, // no recarga al reconectarse
-                shouldRetryOnError: false, // evita reintentos infinitos
-            }
-        );
+    const { data: proyecto, error, isLoading } = useSWR(
+        token ? [`/api/projects/${id}`, token] : null, // null evita llamadas si no hay token
+        ([url, token]) => fetcher(url, token),
+        {
+            refreshInterval: 30000,
+            revalidateOnFocus: true, 
+            revalidateOnReconnect: false, // no recarga al reconectarse
+            shouldRetryOnError: false, // evita reintentos infinitos
+        }
+    );
 
     const [formData, setFormData] = useState({
         eco: "",
@@ -102,7 +112,7 @@ export default function Proyecto() {
             headers: {
             Authorization: `Bearer ${token}`,
             },
-        }).then(res => res.data);
+    }).then(res => res.data);
 
 
 
@@ -536,6 +546,7 @@ export default function Proyecto() {
         }
     };
 
+
     useEffect(() => {
         const timer = setTimeout(() => {
             fetchTypesOnEcoChange();
@@ -546,7 +557,9 @@ export default function Proyecto() {
     }, [formData.eco]);
 
 
+    const handleAbrirCamara = () => {
 
+    }
 
 
     const columns = [
@@ -597,6 +610,9 @@ export default function Proyecto() {
     
     return (
         <div className="relative">
+                {/* <Camera
+                    // onTakePhoto = { (dataUri) => { handleTakePhoto(dataUri); } }
+                /> */}
             <div className="flex items-center gap-2 justify-between">
                 <h2 className="title-2 mb-0">Proyecto No. {proyecto?.id}</h2>
 
@@ -659,6 +675,8 @@ export default function Proyecto() {
                         });
                     }}
                 >
+
+    
                     <input
                         className="input mb-1 mt-2"
                         type="search"
@@ -669,6 +687,7 @@ export default function Proyecto() {
                         onChange={(e) => filtrarTabla(e, "eco")}
 
                     />
+
 
                     <select
                         id="tipo"
@@ -941,25 +960,30 @@ export default function Proyecto() {
                         </label>
 
                         <div>
-                            <input
-                                className="input"
-                                type={usarPlaca ? "text" : "number"}
-                                id="eco"
-                                placeholder={
-                                    usarPlaca ? "No. de placa" : "Económico"
-                                }
-                                value={formData.eco}
-                                min={1}
-                                onChange={(e) => {
-                                    setErrors({...errors, eco: null});
-                                    setFormData({
-                                        ...formData,
-                                        eco: e.target.value,
-                                    });
-                                }}
-                                autoComplete="off"
-                                autoFocus
-                            />
+                            <div className="flex gap-2">
+                                <input
+                                    className="input"
+                                    type={usarPlaca ? "text" : "number"}
+                                    id="eco"
+                                    placeholder={
+                                        usarPlaca ? "No. de placa" : "Económico"
+                                    }
+                                    value={formData.eco}
+                                    min={1}
+                                    onChange={(e) => {
+                                        setErrors({...errors, eco: null});
+                                        setFormData({
+                                            ...formData,
+                                            eco: e.target.value,
+                                        });
+                                    }}
+                                    autoComplete="off"
+                                    autoFocus
+                                />
+                                <button className="btn bg-green-600" onClick={handleAbrirCamara} type="button">
+                                    <CameraIcon/>
+                                </button>
+                            </div>
                             <ErrorLabel>{errors?.eco}</ErrorLabel>
                         </div>
 
