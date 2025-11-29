@@ -8,6 +8,7 @@ import { useContext } from "react";
 import { ToastContainer } from "react-toastify";
 import { PacmanLoader, PulseLoader } from "react-spinners";
 import useNetworkStatus from "../hooks/useNetworkStatus";
+import Snowfall from "react-snowfall";
 
 export default function Layout() {
     const {isMenuOpen, setIsMenuOpen, loading} = useContext(AppContext);
@@ -16,6 +17,15 @@ export default function Layout() {
 
     return (
         <>
+            <Snowfall
+                className="pointer-events-none fixed inset-0 w-full"
+                // Changes the snowflake color
+                // color="red"
+                // Applied to the canvas element
+                // style={{ background: '#fff' }}
+                // Controls the number of snowflakes that are created (default 150)
+                snowflakeCount={100}
+            />
             {loading && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
                     <PacmanLoader color="#ffffff" />

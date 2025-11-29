@@ -24,6 +24,7 @@
     "react-dom": "^19.0.0",
     "react-html5-camera-photo": "^1.5.11",
     "react-router-dom": "^7.5.0",
+    "react-snowfall": "^2.3.0",
     "react-speech-recognition": "^4.0.0",
     "react-spinners": "^0.16.1",
     "react-tabulator": "^0.21.0",
