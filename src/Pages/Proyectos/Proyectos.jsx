@@ -13,6 +13,7 @@ import useSWR, { mutate } from "swr";
 import { flushSync } from "react-dom";
 import Fuse from "fuse.js";
 import ErrorLabel from '@/components/UI/ErrorLabel';
+import SearchInput from "@/components/UI/SearchInput";
 
 
 export default function Proyectos() {
@@ -23,9 +24,8 @@ export default function Proyectos() {
     const { token, setLoading, user, fetchServicios, fetchCentros, centros, servicios, mostrarCerrados, setMostrarCerrados} = useContext(AppContext);
 
     const [isModalOpen, setModalOpen] = useState(false);
-    const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
-    const  inputBuscarServicioRef  = useRef(null);
-    const [serviciosFiltrados, setServiciosFiltrados] = useState(servicios);
+    
+
     const [formData, setFormData] = useState({
         centre_id: "",
         service_id: "",
@@ -73,23 +73,9 @@ export default function Proyectos() {
         }
     };
 
-    const normalize = (s) =>  s
-        ?.toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "") || "";
 
-      // Fuse minimal: usa el mismo campo, pero normalizado por getFn
-    const fuse = useMemo(
-        () =>
-        new Fuse(servicios, {
-            keys: ["name"],
-            threshold: 0.3,
-            ignoreLocation: true,
-            minMatchCharLength: 1,
-            getFn: (obj) => normalize(obj.name), // 👈 normaliza solo aquí
-        }),
-        [servicios]
-    );
+
+    
 
     const showClosed = mostrarCerrados ? 1 : 0;
     const url = token ? `/api/projects?show_closed=${showClosed}` : null;
@@ -124,46 +110,21 @@ export default function Proyectos() {
         fetchData();
     }, []);
 
-    useEffect(() => {
-        setServiciosFiltrados(servicios);
-    }, [servicios]);
-
-
-    const handleSelectServicios = ()=> {
-        flushSync(() => setMostrarSugerencias(true));
-        inputBuscarServicioRef?.current.focus();
-    };
-
-    const handleClickServicio = (e)=> {
-        const servicioId = e.currentTarget.getAttribute("value");
-        const servicioName = e.currentTarget.textContent;
-
-        setFormData({
-            ...formData,
-            service_id: servicioId,
-            service_name: servicioName,
-        });
-
-        setMostrarSugerencias(false);
-    };
-
-
-    const handleFiltrarServicios = (e)=> {
-        // const texto = e.target.value.trim();
-        // if (texto === "") {
-        //     setServiciosFiltrados(servicios);
-        //     return;
-        // }
-
-        // const resultados = fuse.search(texto);
-        // setServiciosFiltrados(resultados.map((r) => r.item));
-
-            const q = normalize(e.target.value.trim());
-            if (!q) return setServiciosFiltrados(servicios);
-            const res = fuse.search(q).map((r) => r.item);
-            setServiciosFiltrados(res);
-    };
     
+    const handleServiceSelect = (id, name) => {
+        setFormData(prev => ({
+            ...prev,
+            service_id: id,
+            service_name: name,
+        }));
+    };
+
+    const handleCentreSelect = (id) => {
+        setFormData(prev => ({
+            ...prev,
+            centre_id: id,
+        }));
+    };
 
     const columns = [
         {
@@ -271,57 +232,25 @@ export default function Proyectos() {
                     <label className="label" htmlFor="centre_id">
                         Centro de ventas
                     </label>
-                    <select
-                        id="centre_id"
-                        className="input"
-                        onChange={(e) =>
-                            setFormData({
-                                ...formData,
-                                centre_id: e.target.value,
-                            })
-                        }
-                        defaultValue=""
-                    >
-                        <option value="" disabled>
-                            Seleccione un centro de ventas
-                        </option>
-                        {centros.map((centro) => (
-                            <option key={centro.id} value={centro.id}>
-                                {centro.name}
-                            </option>
-                        ))}
-                    </select>
-                    {<ErrorLabel>{errors.centre_id}</ErrorLabel>}
+                    <SearchInput
+                        htmlId="centre_id"
+                        lista={centros}
+                        error={errors.centre_id}
+                        onSelectItem={handleCentreSelect}
+                        placeholder="Elige un centro de ventas"
+                    />
 
                     <label className="label" htmlFor="service_id">
                         Servicio
                     </label>
 
-
-                    <div className="relative">
-                        <input type="text" name="" id="service" autoComplete="false" placeholder="Elige un servicio" readOnly onClick={handleSelectServicios} value={formData.service_name ?? ""}/>
-                        {<ErrorLabel>{errors.service_id}</ErrorLabel>}
-                        {/* Sugerencias */}
-                        {<div className={`${mostrarSugerencias? 'absolue' : 'hidden'} max-w-full rounded-md cursor-pointer p-3 bg-white dark:bg-neutral-800 w-full top-full border shadow-2xl`}>
-                            
-
-                            <input ref={inputBuscarServicioRef} type="text" className="input sticky top-0" placeholder="Buscar servicio" onChange={handleFiltrarServicios}/>
-
-                            <div className="overflow-scroll max-h-40 h-auto">
-                                {serviciosFiltrados.map((s) => (
-                                    <div 
-                                        key={s.id} 
-                                        value={s.id} 
-                                        className="text  px-2 py-1 border-b-1 cursor-pointer hover:dark:bg-neutral-800 hover:bg-gray-200"
-                                        onClick={handleClickServicio}
-                                    >
-                                        {s.name}
-                                    </div>
-                                ))}
-
-                            </div>
-                        </div>}
-                    </div>
+                    <SearchInput
+                        htmlId="service_id"
+                        lista={servicios}
+                        error={errors.service_id}
+                        onSelectItem={handleServiceSelect}
+                        placeholder="Elige un servicio"
+                    />
 
                     <label className="label" htmlFor="fecha">
                         Fecha

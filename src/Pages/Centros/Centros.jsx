@@ -197,12 +197,15 @@ export default function Centros() {
                         <p className="text-red-500">{errors.location[0]}</p>
                     )}
 
-                    <input
-                        className="btn"
-                        type="submit"
-                        value="Guardar"
-                        onClick={handleSubmit}
-                    />
+                    <div className="contenedor-botones">
+                        <input
+                            className="btn"
+                            type="submit"
+                            value="Guardar"
+                            onClick={handleSubmit}
+                        />
+
+                    </div>
                 </form>
             </Modal>
 

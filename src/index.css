@@ -39,6 +39,11 @@ body {
     label {
         @apply block text-sm leading-6 text-slate-900 first-letter:capitalize mt-2;
     }
+    
+    .label {
+        @apply font-bold text-sm text-slate-900 dark:text-slate-200;
+    }
+
 
     .checkbox-btn {
         @apply hidden;
@@ -84,9 +89,6 @@ body {
         @apply text-sm font-normal text-slate-500 dark:text-slate-400;
     }
 
-    .label {
-        @apply text-sm font-medium text-slate-900 dark:text-slate-200;
-    }
 
     .card {
         @apply bg-white dark:bg-neutral-800 rounded-lg shadow-md p-2 mb-2;

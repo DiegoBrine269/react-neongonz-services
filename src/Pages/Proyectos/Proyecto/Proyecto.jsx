@@ -23,12 +23,14 @@ import ProyectoActions from "./ProyectoActions";
 import InfoRow from "@/components/UI/InfoRow";
 import CopyField from "./CopyField";
 import useSWR, {mutate} from "swr";
+import SearchInput from "@/components/UI/SearchInput";
 
 import Webcam from "react-webcam";
 import Tesseract from "tesseract.js";
 
 import Camera from 'react-html5-camera-photo';
 import 'react-html5-camera-photo/build/css/index.css';
+
 
 export default function Proyecto() {
     const navigate = useNavigate();
@@ -561,6 +563,21 @@ export default function Proyecto() {
 
     }
 
+    const handleServiceSelect = (id, name) => {
+        setFormDataEdit(prev => ({
+            ...prev,
+            service_id: id,
+            service_name: name,
+        }));
+    };
+
+    const handleCentreSelect = (id) => {
+        setFormDataEdit(prev => ({
+            ...prev,
+            centre_id: id,
+        }));
+    };
+
 
     const columns = [
         {
@@ -783,52 +800,26 @@ export default function Proyecto() {
                     <label className="label" htmlFor="centre_id">
                         Centro de ventas
                     </label>
-                    <select
-                        id="centre_id"
-                        className="input"
-                        onChange={(e) =>
-                            setFormDataEdit({
-                                ...formDataEdit,
-                                centre_id: e.target.value,
-                            })
-                        }
-                        value={formDataEdit?.centre_id || ""}
-                    >
-                        <option value="" disabled>
-                            Seleccione un centro de ventas
-                        </option>
-                        {centros.map((centro) => (
-                            <option key={centro.id} value={centro.id}>
-                                {centro.name}
-                            </option>
-                        ))}
-                    </select>
-                    <ErrorLabel>{errors?.centre_id}</ErrorLabel>
+                    <SearchInput
+                        htmlId="centre_id"
+                        lista={centros}
+                        error={errors.centre_id}
+                        onSelectItem={handleCentreSelect}
+                        placeholder="Elige un centro de ventas"
+                        initialValue={proyecto?.centre_id}
+                    />
 
                     <label className="label" htmlFor="service_id">
                         Servicio
                     </label>
-                    <select
-                        id="service_id"
-                        className="input"
-                        onChange={(e) =>
-                            setFormDataEdit({
-                                ...formDataEdit,
-                                service_id: e.target.value,
-                            })
-                        }
-                        value={formDataEdit?.service_id || ""}
-                    >
-                        <option value="" disabled>
-                            Seleccione un servicio
-                        </option>
-                        {servicios.map((centro) => (
-                            <option key={centro.id} value={centro.id}>
-                                {centro.name}
-                            </option>
-                        ))}
-                    </select>
-                    <ErrorLabel>{errors?.service_id}</ErrorLabel>
+                    <SearchInput
+                        htmlId="service_id"
+                        lista={servicios}
+                        error={errors.service_id}
+                        onSelectItem={handleServiceSelect}
+                        placeholder="Elige un servicio"
+                        initialValue={proyecto?.service_id}
+                    />
 
                     <label className="label" htmlFor="fecha">
                         fecha
@@ -980,9 +971,9 @@ export default function Proyecto() {
                                     autoComplete="off"
                                     autoFocus
                                 />
-                                <button className="btn bg-green-600" onClick={handleAbrirCamara} type="button">
+                                {/* <button className="btn bg-green-600" onClick={handleAbrirCamara} type="button">
                                     <CameraIcon/>
-                                </button>
+                                </button> */}
                             </div>
                             <ErrorLabel>{errors?.eco}</ErrorLabel>
                         </div>

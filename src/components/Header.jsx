@@ -80,7 +80,7 @@ export default function Header() {
                             className="
                                 w-10 xl:w-12
                                 absolute 
-                                -top-2 -right-2
+                                -top-[9px] -right-[12px]
                                 -translate-y-2 translate-x-2      /* Ajuste fino */
                                 xl:-translate-y-3 xl:translate-x-3
                                 pointer-events-none
