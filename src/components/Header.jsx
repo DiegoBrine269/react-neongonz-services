@@ -59,7 +59,7 @@ export default function Header() {
 
 
     return (
-        <header className="relative bg-gray-100 dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700 py-2">
+        <header className="relative bg-gray-100 dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700 py-2 snow">
             <div className="px-4 md:px-24 lg:px-48">
                 <nav className="px-0 items-center gap-4 justify-start xl:justify-center">
                     <button

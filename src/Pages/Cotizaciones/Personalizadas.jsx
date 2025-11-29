@@ -126,6 +126,7 @@ export default function Personalizadas() {
             navigate("/cotizaciones");
         } catch (error) {
             setErrors(error.response.data.errors || {});
+            toast.error("Error al guardar la cotización");
         }
     };
 
@@ -363,7 +364,7 @@ export default function Personalizadas() {
                         }
                     ></textarea>
 
-                    <div className="flex gap-2">
+                    <div className="contenedor-botones">
                         <button className="btn mt-4" onClick={handleSubmit}>
                             <Printer />
                             Generar

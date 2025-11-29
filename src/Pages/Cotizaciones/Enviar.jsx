@@ -17,13 +17,13 @@ export default function Enviar() {
     // Se reciben por props los pendientes de envío
     const location = useLocation();
     const { pendientesEnvio } = location.state || []; 
-    const { selected, toggle, clear, isSelected, setSelected } = useSelection();
+    const { selected, toggle, clear, isSelected, setSelected, handleCheckboxChange } = useSelection();
     const { token, setLoading, requestHeader, fetchPendientesEnvio } = useContext(AppContext);
     const [formData, setFormData] = useState({
         invoice_ids: selected,
     });
 
-
+    console.log('pendientesEnvio', pendientesEnvio);
     // Agrupar por centre_id
     let grouped = pendientesEnvio.reduce((acc, item) => {
         const key = item.centre_id;
@@ -36,8 +36,6 @@ export default function Enviar() {
         acc[key].items.push(item);
         return acc;
     }, {});
-    
-    // console.log({grouped});
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -91,7 +89,7 @@ export default function Enviar() {
                                     name= {group.centre.id}
                                     label= {group.centre.name} 
                                     // checked={proyectosSeleccionados[p.id] || false}
-                                    // onChange={handleCheckboxProyectoChange}
+                                    onChange={handleCheckboxChange(centreId, pendientesEnvio, (item) => item.centre_id)}
                                 />
                                 <h3 className="title-3 mb-1">
                                     
@@ -102,6 +100,8 @@ export default function Enviar() {
                                             key={item.id}
                                             label={`${item.invoice_number} ${item.is_budget ? '(Presupuesto)' : ''}`}
                                             onChange={() => toggle(item)}
+                                            checked={isSelected(item)}
+
                                             tooltip={{
                                                 concept: {label:'Concepto', value:item.concept},
                                                 date: {label:'Fecha', value:format(item.date, 'DD/MM/YYYY')},

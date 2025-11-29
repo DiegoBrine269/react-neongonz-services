@@ -42,19 +42,8 @@ export default function Nueva() {
         comments: null
     });
 
-    const { selected, toggle, clear, isSelected, setSelected, selectAll } = useSelection();
+    const { selected, toggle, clear, isSelected, setSelected, selectAll, handleCheckboxChange, checkedMap, setCheckedMap } = useSelection();
 
-    const [checkedMap, setCheckedMap] = useState({});
-    const handleCheckboxChange = (name, items, toggleSelected) => (e) => {
-        const { checked } = e.target;
-
-        setCheckedMap(prev => ({ ...prev, [name]: checked }));
-
-        items.forEach(item => {
-            if(item.project.id === parseInt(name))
-                toggleSelected(item, checked);
-        });
-    };
 
 
     useEffect(() => {
@@ -355,7 +344,7 @@ export default function Nueva() {
                                             name= {p.id}
                                             label= {`${p.service} (${format(p.date,"full","es")})`}
                                             checked={checkedMap[p.id] || false}
-                                            onChange={handleCheckboxChange(p.id, vehiculosPendientes, toggle)}
+                                            onChange={handleCheckboxChange(p.id, vehiculosPendientes, (item) => item.project.id )}
                                         />
                                     </div>
                                     <div className="flex flex-col gap-2">

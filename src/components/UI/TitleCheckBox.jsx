@@ -12,7 +12,7 @@ export default function TitleCheckBox({name, label, checked, onChange, }) {
                 checked={checked}
                 onChange={onChange}
             />
-            <span className="title-3 m-0">
+            <span className="title-3 m-0 select-none">
                 {label}
             </span>
         </label>

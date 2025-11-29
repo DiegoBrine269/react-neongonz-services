@@ -7,6 +7,8 @@ body {
 }
 
 
+
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer components {
@@ -101,7 +103,7 @@ body {
     /* permitir que los botones ocupen solo lo que necesiten pero se encojan/ocupar espacio disponible */
     .contenedor-botones .btn {
         
-        @apply flex-[1_1_160px] min-w-[160px] max-w-full w-auto md:flex-none;
+        @apply !m-0 flex-[1_1_160px] min-w-[160px] max-w-full w-auto md:flex-none;
     }
 
     /* si queda un único elemento, que ocupe 100% */
