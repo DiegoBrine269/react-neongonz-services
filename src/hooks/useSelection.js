@@ -32,7 +32,6 @@ export const useSelection = (initial = []) => {
         (name, items, getKey) =>
         (e) => {
             console.log("handleCheckboxChange", name, e.target.checked);
-            debugger
             const { checked } = e.target;
 
             setCheckedMap((prev) => ({ ...prev, [name]: checked }));

@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { CalendarClock, Printer } from "lucide-react";
+import { CalendarClock, Printer, Trash2, ListPlus } from "lucide-react";
 import { downloadBlobResponse } from "@/utils/downloadFile"; 
 import { useContext } from "react";
 import { AppContext } from "@/context/AppContext";
@@ -9,6 +9,11 @@ import clienteAxios from "@/config/axios";
 import { toast } from "react-toastify";
 import ErrorLabel from "@/components/UI/ErrorLabel";
 import { date, format } from "@formkit/tempo";
+import FilaCotizacion from './FilaCotizacion';
+import 'animate.css';
+import { useForm, useFieldArray } from 'react-hook-form';
+import Swal from "sweetalert2";
+import { swalConfig } from "@/config/variables";
 
 export default function Personalizadas() {
 
@@ -16,28 +21,38 @@ export default function Personalizadas() {
 
     const navigate = useNavigate();
 
+    const {register, control, handleSubmit } = useForm({
+            defaultValues: {
+            items: [{ concept: '', quantity: '', price: '' }]
+        }
+    });
+
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: 'items'
+    });
+
+    const removeAll = () => {
+        remove(fields.map((_, index) => index));
+    }
+
     const [formData, setFormData] = useState({});
+    const [completed, setCompleted] = useState(false);
+    const [isBudget, setIsBudget] = useState(false);
     const [errors, setErrors] = useState({});
     const [accion, setAccion] = useState(null); // create or update
     const [mostrarBotones, setMostrarBotones] = useState(true);
 
     useEffect(() => {
-       
         fetchResponsables();
         fetchPendientes();
         fetchCentros();
-
-
-        // console.log("Pendientes:", pendientes);
     }, []);
 
     useEffect(() => {
         setFormData({
             invoice_id: "",
             centre_id: "",
-            concept: "",
-            quantity: "",
-            price: "",
             comments: "",
             internal_commentary: "",
             date: format(new Date(), "YYYY-MM-DD"),
@@ -45,23 +60,68 @@ export default function Personalizadas() {
         setErrors({});
     }, [accion]);    
 
-    const handleSubmit = async (e, saveForLater = false, is_budget = false) => {
-        e.preventDefault();
+    const handleClickEliminar = async () => {
+        const result = await Swal.fire({
+            title: "¿Estás segur@ de querer eliminar la cotización?",
+            text: "Esta acción es irreversible",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar cotización",
+            cancelButtonText: "Cancelar",
+            ...swalConfig(true),
+        });
+
+        if (result.isConfirmed) {
+            setLoading(true);
+
+            try {
+                setLoading(true);
+                const res = await clienteAxios.delete(`/api/invoices/${formData.invoice_id}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                toast.success("Cotización eliminada correctamente");
+                fetchPendientes();
+                setFormData({});
+                removeAll();
+                
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                toast.error("Error al eliminar la cotización");
+            } finally {
+                setLoading(false);
+            }
+        }
+    
+    }
+
+    const onSubmit = async (data) => {
         setLoading(true);
+
+        const payload = {
+            ...formData,
+            rows: data.items,
+            completed: completed,
+            is_budget: isBudget,
+        };
 
         try {
             const response = await clienteAxios.post(
                 `/api/invoices/create-custom`,
-                {...formData, completed: !saveForLater, is_budget: is_budget},
+                payload,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
-                    responseType: saveForLater ? "json" : "blob",
+                    responseType: !completed ? "json" : "blob",
                 }
             );
 
-            if(!saveForLater){
+            if(completed){
                 downloadBlobResponse(response, "Cotización.pdf");
             }
 
@@ -101,34 +161,6 @@ export default function Personalizadas() {
         }
     };
 
-    const updateCotizacion = async (e, saveForLater = false) => {
-        e.preventDefault();
-        try {
-
-            if(!formData.invoice_id) 
-                return;
-
-            const response = await clienteAxios.put(
-                `/api/invoices/${formData.invoice_id}`,
-                {
-                    ...formData,
-                    completed: !saveForLater,
-                    total: formData.quantity * formData.price,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-
-            toast.success("Cotización guardada como borrador");
-            navigate("/cotizaciones");
-        } catch (error) {
-            setErrors(error.response.data.errors || {});
-            toast.error("Error al guardar la cotización");
-        }
-    };
 
     return (
         <div className="max-w-200 mx-auto">
@@ -155,12 +187,12 @@ export default function Personalizadas() {
                         setAccion("edit");
                     }}
                 >
-                    Terminar pendiente
+                    Ver pendientes
                 </button>
             </div>}
 
             {accion && (
-                <form action="">
+                <form action="" onSubmit={handleSubmit(onSubmit)}>
                     <div className={accion === "edit" ? "hidden" : ""}>
                         <label className="label" htmlFor="centre_id">
                             Centro de ventas
@@ -216,6 +248,16 @@ export default function Personalizadas() {
                                             selectedCot.internal_commentary,
                                         date: selectedCot.date,
                                         responsible_id: selectedCot.responsible_id,
+                                    });
+
+                                    removeAll();
+
+                                    selectedCot.rows.forEach((row) =>{
+                                        append({
+                                            concept: row.concept,
+                                            quantity: row.quantity,
+                                            price: row.price,
+                                        });
                                     });
                                 }
                             }}
@@ -281,73 +323,47 @@ export default function Personalizadas() {
                     />
                     <ErrorLabel>{errors?.date}</ErrorLabel>
 
-                    <label className="label" htmlFor="concept">
-                        Concepto
-                    </label>
-                    <textarea
-                        className="input"
-                        type="text"
-                        id="concept"
-                        placeholder="Concepto"
-                        onChange={(e) =>
-                            setFormData({
-                                ...formData,
-                                concept: e.target.value,
-                            })
-                        }
-                        value={formData.concept ?? ""}
-                    >
-                    </textarea>
-                    
-                    <ErrorLabel>{errors.concept}</ErrorLabel>
+                    {fields.map((field, index) => (
+                        <div key={field.id} className="my-3 relative border p-2 rounded-lg border-neutral-400">
+                            
+                            <div className="flex justify-between mb-1 center-items">
+                                <p className="text ">Fila {index+1}</p>
+                                <button className="btn btn-danger !w-auto !p-1 m-0" type="button" onClick={() => remove(index)}>
+                                    <Trash2
+                                        className="h-4 w-4"
+                                    />
+                                </button>
+                            </div>
+                            
+                            <div className="grid grid-cols-[1fr_4fr_2fr] gap-1">
+                                <input
+                                    {...register(`items.${index}.quantity`)}
+                                    placeholder="Cantidad"
+                                    className="input"
+                                    type="number"
+                                />
+                                <input
+                                    {...register(`items.${index}.concept`)}
+                                    placeholder="Concepto"
+                                    className="input"
+                                />
+                                <input
+                                    {...register(`items.${index}.price`)}
+                                    placeholder="Precio"
+                                    className="input"
+                                    type="number"
+                                />
+                            </div>
 
-                    <label className="label" htmlFor="quantity">
-                        Cantidad
-                    </label>
-                    <input
-                        className="input"
-                        type="number"
-                        id="quantity"
-                        placeholder="Cantidad"
-                        onChange={(e) =>
-                            setFormData({
-                                ...formData,
-                                quantity: e.target.value,
-                            })
-                        }
-                        value={formData.quantity ?? ""}
-                    />
-                    <ErrorLabel>{errors.quantity}</ErrorLabel>
+                        </div>
+                    ))}
 
-                    <label className="label" htmlFor="price">
-                        Precio
-                    </label>
-                    <input
-                        className="input"
-                        type="number"
-                        id="price"
-                        placeholder="Precio"
-                        onChange={(e) =>
-                            setFormData({ ...formData, price: e.target.value })
-                        }
-                        value={formData.price ?? ""}
-                    />
-                    <ErrorLabel>{errors.price}</ErrorLabel>
-
-                    {/* <label htmlFor="comments" className="label">
-                        Comentarios o instrucciones especiales
-                    </label>
-                    <textarea
-                        value={formData.comments ?? ""}
-                        id="comments"
-                        placeholder="Comentarios o instrucciones especiales"
-                        onChange={(e) =>
-                            setFormData({
-                                ...formData,
-                                comments: e.target.value,
-                            })
-                        }
-                    ></textarea> */}
+                    <div className="flex justify-end mt-2">
+                        <button className="w-auto btn" type="button" onClick={() => append({ concept: '', quantity: '', price: '' })}>
+                            <ListPlus/>
+                            Agregar fila
+                        </button>
+                    </div>
 
                     <label htmlFor="internal_commentary" className="label">
                         Comentarios internos
@@ -365,28 +381,44 @@ export default function Personalizadas() {
                     ></textarea>
 
                     <div className="contenedor-botones">
-                        <button className="btn mt-4" onClick={handleSubmit}>
+                        <button 
+                            className="btn" 
+                            type="submit"
+                            onClick={()=> setCompleted(true)}
+                        >
                             <Printer />
                             Generar
                         </button>
 
                         <button
-                            className="btn mt-4 bg-green-700"
-                            onClick={(e) =>
-                                accion === "create"
-                                    ? handleSubmit(e, true)
-                                    : updateCotizacion(e, true)
-                            }
+                            className="btn bg-green-700"
+                            type="submit"
+                            onClick={()=> setCompleted(false)}
                         >
                             <CalendarClock />
-                            Guardar borrador
+                            Borrador
                         </button>
 
-                        
-                        <button className="btn btn-secondary mt-4" onClick={e=>handleSubmit(e, false, true)}>
+                        <button 
+                            className="btn btn-secondary" 
+                            type="submit"
+                            onClick={() => {
+                                setIsBudget(true);
+                                setCompleted(true);
+                            }}
+                        >
                             <Printer />
                             Presupuesto
                         </button>
+
+                        {formData.invoice_id && <button 
+                            className="btn btn-danger" 
+                            type="button"
+                            onClick={handleClickEliminar}
+                        >
+                            <Trash2 />
+                            Eliminar
+                        </button>}
                     </div>
                 </form>
             )}

@@ -234,28 +234,9 @@ export default function Cotizaciones() {
                             titleFormatter: "rowSelection", // opcional: checkbox en el header para seleccionar todos
                             hozAlign: "center",
                             headerSort: false,
-                            width: 50
+                            width: 50,
+                            resizeable: false,
                         },
-                        //   {
-                        //     formatter: "rowSelection",  
-                        //     titleFormatter: "rowSelection",
-                        //     hozAlign: "center",
-                        //     headerSort: false,
-                        //     width: 50,
-                        // },
-                        // {
-                        //     title: "Tipo",
-                        //     field: "is_budget",
-                        //     headerFilter: true,
-                        //     resizable: false,
-                        //     formatter: cell => cell.getValue() ? "PRE" : "COT",
-                        //     headerFilterFunc: (headerValue, rowValue, rowData, filterParams) => {
-                        //         // Permite filtrar por PRE o COT (case-insensitive)
-                        //         if (!headerValue) return true;
-                        //         const tipo = rowValue ? "PRE" : "COT";
-                        //         return tipo.toLowerCase().includes(headerValue.toLowerCase());
-                        //     },
-                        // },
                         {
                             title: "Centro",
                             field: "centre",
