@@ -24,7 +24,12 @@ export default function Proyectos() {
     const { token, setLoading, user, fetchServicios, fetchCentros, centros, servicios, mostrarCerrados, setMostrarCerrados} = useContext(AppContext);
 
     const [isModalOpen, setModalOpen] = useState(false);
-    
+        
+    const [reloadKey, setReloadKey] = useState(0);
+
+    const recargarTabla = () => {
+        setReloadKey((prev) => prev + 1);
+    };
 
     const [formData, setFormData] = useState({
         centre_id: "",
@@ -52,7 +57,7 @@ export default function Proyectos() {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            await mutate(url);
+            recargarTabla();
             setModalOpen(false);
             toast.success("Servicio creado correctamente");
             setFormData({
@@ -78,18 +83,18 @@ export default function Proyectos() {
     
 
     const showClosed = mostrarCerrados ? 1 : 0;
-    const url = token ? `/api/projects?show_closed=${showClosed}` : null;
-    const fetcher = async (url) => {
-        const res = await clienteAxios.get(url, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return res.data;
-    };
+    // const url = token ? `/api/projects?show_closed=${showClosed}` : null;
+    // const fetcher = async (url) => {
+    //     const res = await clienteAxios.get(url, {
+    //         headers: {
+    //             Authorization: `Bearer ${token}`,
+    //         },
+    //     });
+    //     return res.data;
+    // };
 
     // Hook SWR
-    const { data: proyectos, error, isLoading } = useSWR(url, fetcher);
+    // const { data: proyectos, error, isLoading } = useSWR(url, fetcher);
 
     const handleRowClick = (e, row) => {
         const id = row.getData().id;
@@ -203,25 +208,34 @@ export default function Proyectos() {
                         id="mostrarCerrados"
                         checked={mostrarCerrados}
                         onChange={() => {
+                            recargarTabla();
                             setMostrarCerrados(!mostrarCerrados);
                         }}
                     />
-                    <span className="text">Mostrar proyectos cerrados</span>
+                    <span className="text">Mostrar cerrados</span>
                 </label>
             )}
 
             <Tabla
+                key={reloadKey}
                 className="custom-table"
                 options={{
-                    pagination: "local",
-                    paginationSize: 20,
-                    layout: "fitDataStretch",
-                }}
+                        // selectable: true,
+                        pagination: true, //enable pagination
+                        paginationMode: "remote", //enable remote pagination
+                        ajaxURL: `${import.meta.env.VITE_API_URL}/api/projects?show_closed=${showClosed}`, //set url for ajax request
+                        ajaxConfig: {
+                            method: "GET",
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        },
+                        filterMode: "remote",
+                    }}
                 events={{
                     rowClick: handleRowClick,
                 }}
                 columns={columns}
-                data={proyectos}
                 title="Listado de proyectos"
             />
 

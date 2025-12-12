@@ -48,15 +48,7 @@ export default function Cotizaciones() {
 
             window.open(pdfUrl, "_blank");
 
-            // const blob = new Blob([res.data], { type: "application/pdf" });
-            // const url = window.URL.createObjectURL(blob);
 
-            // const link = document.createElement("a");
-            // link.href = url;
-            // link.download = `${cotizacion?.path}`;
-            // link.click();
-
-            // window.URL.revokeObjectURL(url); // Limpieza
 
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -235,7 +227,7 @@ export default function Cotizaciones() {
                             hozAlign: "center",
                             headerSort: false,
                             width: 50,
-                            resizeable: false,
+                            resizable: false,
                         },
                         {
                             title: "Centro",
