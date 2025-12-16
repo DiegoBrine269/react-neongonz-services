@@ -157,13 +157,18 @@ export default function Proyectos() {
             title: "No. vehiculos",
             hozAlign: "right",
             field: "total_vehicles",
-            headerFilter: "input",
+            // headerFilter: "input",
             resizable: false,
         },
         {
             title: "Fecha",
             field: "date",
-            headerFilter: "input",
+            headerFilter: true,
+            headerFilterParams: {
+                elementAttributes: {
+                    type: "date",
+                },
+            },
             resizable: false,
             formatter: (cell) => {
                 const date = new Date(cell.getValue() + "T12:00:00");
@@ -175,7 +180,7 @@ export default function Proyectos() {
         {
             title: "Estatus",
             field: "is_open",
-            headerFilter: "input",
+            // headerFilter: "input",
             formatter: (cell) => {
                 return cell.getValue() ? "Abierto" : "Cerrado";
             },
@@ -285,7 +290,7 @@ export default function Proyectos() {
                     {errors.date && (<p className="text-red-500">{errors.date[0]}</p>)}
 
                     <label className="label" htmlFor="commentary">
-                        Comentario
+                        Comentario (opcional)
                     </label>
                     <textarea
                         type="date"

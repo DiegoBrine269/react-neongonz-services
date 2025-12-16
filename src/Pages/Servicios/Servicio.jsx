@@ -14,10 +14,11 @@ export default function Servicio() {
     const [errors, setErrors] = useState({});
     // const [vehicles_types_prices, setVehiclesTypesPrices] = useState([]);
 
-    const { token, setLoading } = useContext(AppContext);
+    const { token, setLoading, fetchCentros, centros } = useContext(AppContext);
 
     const [formData, setFormData] = useState({
         id: '',
+        centre_id: null,
         name: '',
         vehicles_types_prices: []
     });
@@ -48,6 +49,33 @@ export default function Servicio() {
         }
     }
 
+    const getPrice = (typeId) => {
+        const centreId =
+            formData.centre_id !== null && formData.centre_id !== undefined
+                ? Number(formData.centre_id)
+                : null;
+
+        const prices = formData.vehicles_types_prices ?? [];
+
+        if (centreId !== null) {
+            const specific = prices.find(
+                p =>
+                    p.vehicle_type_id === typeId &&
+                    Number(p.centre_id) === centreId
+            );
+            if (specific) return specific.price;
+        }
+
+        const general = prices.find(
+            p =>
+                p.vehicle_type_id === typeId &&
+                (p.centre_id === null || p.centre_id === undefined)
+        );
+
+        return general?.price ?? "";
+    };
+
+
     const fetchTypes = async () => {
         setLoading(true);
         try {
@@ -68,19 +96,30 @@ export default function Servicio() {
     const handleSubmit = async () => {
         setLoading(true);
         try {
-            const { data } = await clienteAxios.put(`/api/services/${id}`, formData, {
+
+            //Eliminar {} de vehicles_types_prices
+            const cleanedPrices = formData.vehicles_types_prices.filter(
+                price => Object.keys(price).length !== 0
+            );
+
+            const payload = {
+                ...formData,
+                vehicles_types_prices: cleanedPrices,
+            };
+
+            await clienteAxios.put(`/api/services/${id}`, payload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
+            // setFormData({
+            //     id: '',
+            //     name: '',
+            //     vehicles_types_prices: []
+            // });
             fetchServicio();
             toast.success("Servicio actualizado correctamente");
             setErrors([]);
-            setFormData({
-                id: '',
-                name: '',
-                vehicles_types_prices: []
-            });
         } catch (error) {
             console.error("Error during login:", error);
             if (error.response && error.response.data.errors) {
@@ -92,9 +131,42 @@ export default function Servicio() {
         }
     };
 
+
+    useEffect(() => {
+        // Reset vehicle prices when centre_id changes
+ 
+        // console.log()
+ 
+        // debugger
+        setFormData((prev) => ({
+            ...prev,
+            vehicles_types_prices: []
+        }));        
+
+        if(formData.centre_id){
+            setFormData((prev) => ({
+                ...prev,
+                // vehicles_types_prices: servicio.vehicle_types.filter((price => price.pivot.centre_id === formData.centre_id))
+                vehicles_types_prices: servicio.vehicle_types.map((item) => item.pivot.centre_id === formData.centre_id ? item.pivot : {})
+                
+            }));
+        
+            return;
+        }
+
+        setFormData((prev) => ({
+            ...prev,
+            vehicles_types_prices: servicio?.vehicle_types?.map((item) => item.pivot )
+
+        }));
+
+
+    }, [formData.centre_id]);
+
     useEffect(() => {
         fetchServicio();
         fetchTypes();
+        fetchCentros();
     }, []);
 
     useEffect(() => {
@@ -104,8 +176,7 @@ export default function Servicio() {
                 name: servicio.name,
             }));
         }
-    }
-    , [servicio]);
+    }, [servicio]);
 
 
     return (
@@ -129,6 +200,32 @@ export default function Servicio() {
                 />
                 {errors.name && <p className="error">{errors.name}</p>}
 
+                <label htmlFor="name" className="label">
+                    Centro
+                </label>
+                <select 
+                    id="centre_id"
+                    value={formData.centre_id || ''}
+                    onChange={(e) => {
+                        const centreId = e.target.value;
+                        setFormData((prev) => ({
+                            ...prev,
+                            centre_id: centreId ? Number(centreId) : null,
+                        }));
+
+                    }}
+                >
+                    <option value="">Para todos los centros de venta</option>
+                    {centros.map((centre) => (
+                        <option
+                            key={centre.id}
+                            value={centre.id}
+                        >
+                            {centre.name}
+                        </option>
+                    ))}
+                </select>
+
                 {types.map((type) => (
                     <div key={type.id}>
                         <label htmlFor={type.id} className="label">
@@ -139,7 +236,9 @@ export default function Servicio() {
                             type="number"
                             min="0"
                             step="50"
-                            value={formData.vehicles_types_prices.find((price) => price.vehicle_type_id === type.id)?.price }
+                            value={getPrice(type.id)}
+                            // value={formData.vehicles_types_prices.find((price) => price.vehicle_type_id === type.id)?.price ?? "" }
+
                             placeholder="Precio"
                             onChange={(e) => {
                                 const newValue = e.target.value;

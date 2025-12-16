@@ -122,19 +122,21 @@ export default function Proyecto() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        
+        const detectedCentreId = await fetchTypesOnEcoChange();
 
-        if (formData.centre_id && formData.centre_id !== proyecto.centre_id) {
+        const centreToCheck = detectedCentreId ?? formData.centre_id;
+
+        if (centreToCheck && centreToCheck !== proyecto.centre_id) {
             const swalResult = await Swal.fire({
                 icon: "warning",
                 title: "Atención",
-                text: `El vehículo que ingresaste pertenece a ${centros.find(c => c.id == formData.centre_id).name}. Si continúas, el vehículo será reasignado de centro.`,
+                text: `El vehículo que ingresaste pertenece a ${centros.find(c => c.id == centreToCheck).name}. Si continúas, el vehículo será reasignado de centro.`,
                 confirmButtonText: "Aceptar",
                 showCancelButton: true,
                 cancelButtonText: "Cancelar",
                 ...swalConfig({ danger: true }),
             });
-    
+
             if (!swalResult.isConfirmed) {
                 return;
             }
@@ -631,7 +633,7 @@ export default function Proyecto() {
                     // onTakePhoto = { (dataUri) => { handleTakePhoto(dataUri); } }
                 /> */}
             <div className="flex items-center gap-2 justify-between">
-                <h2 className="title-2 mb-0">Proyecto No. {proyecto?.id}</h2>
+                <h2 className="title-2 mb-0">{proyecto?.service.name} - {proyecto?.centre.name}</h2>
 
                 <button
                     onClick={() => {
@@ -1068,10 +1070,11 @@ export default function Proyecto() {
 
                         <div className="flex gap-2 mt-2">
                             <input
-                                className="btn"
+                                className="btn disabled:opacity-50 disabled:cursor-not-allowed flex-1"
                                 type="submit"
                                 value="Registrar"
                                 onClick={handleSubmit}
+                                disabled={fetching}
                             />
                         </div>
                     </form>

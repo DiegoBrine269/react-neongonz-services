@@ -335,17 +335,17 @@ export default function Personalizadas() {
                                 </button>
                             </div>
                             
-                            <div className="grid grid-cols-[1fr_4fr_2fr] gap-1">
+                            <div className="grid grid-cols-[1fr_4fr_2fr] gap-1 items-start">
                                 <input
                                     {...register(`items.${index}.quantity`)}
                                     placeholder="Cantidad"
                                     className="input"
                                     type="number"
                                 />
-                                <input
+                                <textarea
                                     {...register(`items.${index}.concept`)}
                                     placeholder="Concepto"
-                                    className="input"
+                                    className="min-h-9 field-sizing-content"
                                 />
                                 <input
                                     {...register(`items.${index}.price`)}
@@ -354,7 +354,6 @@ export default function Personalizadas() {
                                     type="number"
                                 />
                             </div>
-
                         </div>
                     ))}
 
