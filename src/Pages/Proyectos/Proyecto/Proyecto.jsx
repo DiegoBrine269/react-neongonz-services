@@ -50,7 +50,7 @@ export default function Proyecto() {
         type: "",
         commentary: ""
     });
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(true);
     const [filtrosColapsados, setFiltrosColapsados] = useState(false);
     const formFiltrosRef = useRef(null);
     const textAreaRef = useRef(null);
