@@ -70,6 +70,7 @@ export default function Proyecto() {
     //Se activa cuando se está agregando un vehículo
     const [fetching, setFetching] = useState(false);
     
+    const inputEcoRef = useRef(null);
 
     const [usarPlaca, setUsarPlaca] = useState(false);
 
@@ -633,7 +634,7 @@ export default function Proyecto() {
                     // onTakePhoto = { (dataUri) => { handleTakePhoto(dataUri); } }
                 /> */}
             <div className="flex items-center gap-2 justify-between">
-                <h2 className="title-2 mb-0">{proyecto?.service.name} - {proyecto?.centre.name}</h2>
+                <h2 className="title-2 mb-0 text-center w-full lg:text-left">{proyecto?.service.name} - {proyecto?.centre.name}</h2>
 
                 <button
                     onClick={() => {
@@ -944,6 +945,7 @@ export default function Proyecto() {
                                         eco: "",
                                     });
                                     setUsarPlaca((prev) => !prev);
+                                    inputEcoRef.current.focus();
                                 }}
                             />
                             Usar no. de placa
@@ -955,6 +957,7 @@ export default function Proyecto() {
                         <div>
                             <div className="flex gap-2">
                                 <input
+                                    ref={inputEcoRef}
                                     className="input"
                                     type={usarPlaca ? "text" : "number"}
                                     id="eco"

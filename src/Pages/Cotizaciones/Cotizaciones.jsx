@@ -139,11 +139,34 @@ export default function Cotizaciones() {
         }
     }
 
-    // useEffect(() => {
-    //     if (selectedRows.length > 0) {
+    const handleFacturar = async () => {
+        try {
+            setLoading(true);
+            const res = await clienteAxios.post(`/api/invoices/${cotizacion?.id}/sat`, 
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
             
-    //     }
-    // }, [selectedRows]);
+            
+
+            toast.success("Factura emitida correctamente");
+            setModal(false);
+            setCotizacion({});
+            recargarTabla();
+
+        }   
+        catch (error) { 
+            console.error("Error fetching data:", error);
+            toast.error("Error al emitir la factura");
+        } finally {
+            setLoading(false);
+        }
+    }
     
     useEffect(() => {
         //Cotizaciones pendientes de terminar
@@ -394,6 +417,16 @@ export default function Cotizaciones() {
                         >
                             <CircleCheck />
                             Aceptar
+                        </button>
+
+                        <button
+                            className="btn"
+                            onClick={() => {
+                                handleFacturar();
+                            }}
+                        >
+                            <CircleCheck />
+                            Emitir factura
                         </button>
                     </div>
                 </div>
