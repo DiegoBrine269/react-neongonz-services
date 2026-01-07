@@ -35,7 +35,7 @@ export default function ForgotPassword() {
             <div className="contenedor-botones">
                 <button type="submit" className="btn">Enviar link</button>
             </div>
-            <p>{message}</p>
+            <p className="text">{message}</p>
         </form>
     );
 }
