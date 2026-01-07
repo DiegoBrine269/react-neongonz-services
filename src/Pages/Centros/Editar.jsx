@@ -15,7 +15,7 @@ export default function Editar() {
     const [centro, setCentro] = useState({});
     const [errors, setErrors] = useState({});
     
-    const { token, setLoading, fetchResponsables, responsables} = useContext(AppContext);
+    const { token, setLoading, fetchResponsables, responsables, fetchCustomers, customers} = useContext(AppContext);
     
     const { selected, toggle, clear, isSelected, setSelected, selectAll } = useSelection();
 
@@ -52,7 +52,6 @@ export default function Editar() {
         }
     }
 
-
     const fetchCentro = async (id) => {
         try {
             const res = await clienteAxios.get(`/api/centres/${id}`, {
@@ -77,6 +76,7 @@ export default function Editar() {
     useEffect(() => {
         fetchCentro(id);
         fetchResponsables();
+        fetchCustomers();
     }, [id]);
 
     
@@ -102,6 +102,23 @@ export default function Editar() {
                     onChange={e => setFormData({...formData, name: e.target.value})}
                 />
                 <ErrorLabel>{errors?.name}</ErrorLabel>
+
+                <label htmlFor="name" className="label">Cliente:</label>
+                <select
+                    onChange={e => setFormData({...formData, customer_id: e.target.value})}
+                    value={formData.customer_id || ''}
+                >
+                    <option value="">Selecciona un cliente</option>
+                     {customers?.map(customer => (
+                        <option 
+                            key={customer.id}
+                            value={customer.id}
+                        >
+                            {customer.legal_name}
+                        </option>
+                    ))} 
+                </select>
+                <ErrorLabel>{errors?.customer_id}</ErrorLabel>
 
                 <label htmlFor="location" className="label">Ubicación:</label>
                 <input 

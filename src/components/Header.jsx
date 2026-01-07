@@ -75,18 +75,19 @@ export default function Header() {
                             alt="Logo"
                             className="w-12 xl:w-16"
                         />
-                        <img
+                        {/* Activar en navidad */}
+                        {/* <img
                             src={Gorro}
                             alt="Gorro de Navidad"
                             className="
                                 w-10 xl:w-12
                                 absolute 
                                 -top-[9px] -right-[12px]
-                                -translate-y-2 translate-x-2      /* Ajuste fino */
+                                -translate-y-2 translate-x-2      
                                 xl:-translate-y-3 xl:translate-x-3
                                 pointer-events-none
                             "
-                        />
+                        /> */}
                     </NavLink>
                 </nav>
 

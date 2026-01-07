@@ -29,6 +29,9 @@ export default function AppProvider({ children }) {
 
     //
     const [types, setTypes] = useState([]);
+
+    //
+    const [customers, setCustomers] = useState([]);
     
 
     // Cotizaciones pendientes
@@ -157,7 +160,15 @@ export default function AppProvider({ children }) {
         }
     }
 
+    async function fetchCustomers() {
+        try {
+            const res = await clienteAxios.get("/api/customers", requestHeader);
+            setCustomers(res.data);
 
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     async function fetchServicios() {
         try {
@@ -262,6 +273,9 @@ export default function AppProvider({ children }) {
 
                 types,
                 fetchTypes,
+
+                customers,
+                fetchCustomers,
             }}
         >
             {children}

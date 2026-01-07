@@ -83,7 +83,7 @@ export default function Login() {
 
                 </div>
 
-                <Link className="text-end block text-blue-500 underline" to="/olvide-mi-contrasena">Olvidé mi contraseña 😬</Link>
+                <Link className="text-end block text-blue-500 underline" to="/forgot-password">Olvidé mi contraseña 😬</Link>
             </form>
         </>
     );

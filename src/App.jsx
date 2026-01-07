@@ -25,6 +25,7 @@ import Enviar from "@/Pages/Cotizaciones/Enviar";
 import Editar from "@/Pages/Cotizaciones/Editar";
 
 import Desempeno from "@/Pages/Reportes/Desempeno"
+import ResetPassword from "@/Pages/Auth/ResetPassword";
 // import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
 
 
@@ -47,8 +48,12 @@ export default function App() {
                             element={user ? <Home /> : <Login />}
                         />
                         <Route
-                            path="/olvide-mi-contrasena"
+                            path="/forgot-password"
                             element={user ? <Home /> : <ForgotPassword />}
+                        />
+                        <Route
+                            path="/reset-password"
+                            element={user ? <NotFound /> : <ResetPassword />}
                         />
                         {user?.is_active && (
                             <>
