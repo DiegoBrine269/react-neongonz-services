@@ -23,6 +23,12 @@ export default function Servicio() {
         sat_unit_key: '',
         vehicles_types_prices: []
     });
+
+    const currentCentreId =
+        formData.centre_id === "" || formData.centre_id === undefined || formData.centre_id === null
+            ? null
+            : Number(formData.centre_id);
+
     
 
     const fetchServicio = async () => {
@@ -52,28 +58,20 @@ export default function Servicio() {
 
     const getPrice = (typeId) => {
         const centreId =
-            formData.centre_id !== null && formData.centre_id !== undefined
-                ? Number(formData.centre_id)
-                : null;
+            formData.centre_id === "" || formData.centre_id === undefined || formData.centre_id === null
+            ? null
+            : Number(formData.centre_id);
 
         const prices = formData.vehicles_types_prices ?? [];
 
-        if (centreId !== null) {
-            const specific = prices.find(
-                p =>
-                    p.vehicle_type_id === typeId &&
-                    Number(p.centre_id) === centreId
-            );
-            if (specific) return specific.price;
-        }
-
-        const general = prices.find(
-            p =>
-                p.vehicle_type_id === typeId &&
-                (p.centre_id === null || p.centre_id === undefined)
+        const row = prices.find(p =>
+            p.vehicle_type_id === typeId &&
+            (centreId === null
+            ? (p.centre_id === null || p.centre_id === undefined)
+            : Number(p.centre_id) === centreId)
         );
 
-        return general?.price ?? "";
+        return row?.price ?? "";
     };
 
 
@@ -113,11 +111,8 @@ export default function Servicio() {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            // setFormData({
-            //     id: '',
-            //     name: '',
-            //     vehicles_types_prices: []
-            // });
+
+
             fetchServicio();
             toast.success("Servicio actualizado correctamente");
             setErrors([]);
@@ -289,29 +284,40 @@ export default function Servicio() {
 
                                     placeholder="Precio"
                                     onChange={(e) => {
-                                        const newValue = e.target.value;
-                                        setFormData((prev) => {
-                                            const existingPrice = prev.vehicles_types_prices.find(
-                                                (price) => price.vehicle_type_id === type.id
-                                            );
+                                    const newValue = e.target.value; // string
+                                    setFormData((prev) => {
+                                        const centreId =
+                                        prev.centre_id === "" || prev.centre_id === undefined || prev.centre_id === null
+                                            ? null
+                                            : Number(prev.centre_id);
 
-                                            let updatedPrices;
-                                            if (existingPrice) {
-                                                updatedPrices = prev.vehicles_types_prices.map((price) =>
-                                                    price.vehicle_type_id === type.id
-                                                        ? { ...price, price: newValue || null }
-                                                        : price
-                                                );
-                                            } else {
-                                                updatedPrices = [
-                                                    ...prev.vehicles_types_prices,
-                                                    { vehicle_type_id: type.id, price: newValue || null },
-                                                ];
-                                            }
+                                        const prices = prev.vehicles_types_prices ?? [];
 
-                                            return { ...prev, vehicles_types_prices: updatedPrices };
-                                        });
+                                        const match = (p) =>
+                                        p.vehicle_type_id === type.id &&
+                                        (centreId === null
+                                            ? (p.centre_id === null || p.centre_id === undefined)
+                                            : Number(p.centre_id) === centreId);
+
+                                        const exists = prices.some(match);
+
+                                        const updatedPrices = exists
+                                        ? prices.map((p) =>
+                                            match(p) ? { ...p, price: newValue === "" ? null : newValue } : p
+                                            )
+                                        : [
+                                            ...prices,
+                                            {
+                                                vehicle_type_id: type.id,
+                                                centre_id: centreId,            // 👈 CLAVE: guardar el centre actual (o null)
+                                                price: newValue === "" ? null : newValue,
+                                            },
+                                            ];
+
+                                        return { ...prev, vehicles_types_prices: updatedPrices };
+                                    });
                                     }}
+
                                 />
                             </div>
                         ))}
