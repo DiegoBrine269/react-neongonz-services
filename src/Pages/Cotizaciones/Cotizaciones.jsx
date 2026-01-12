@@ -139,38 +139,11 @@ export default function Cotizaciones() {
         }
     }
 
-    const handleFacturar = async () => {
-        try {
-            setLoading(true);
-            const res = await clienteAxios.post(`/api/invoices/${cotizacion?.id}/sat`, 
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-
+    // useEffect(() => {
+    //     if (selectedRows.length > 0) {
             
-            
-
-            toast.success("Factura emitida correctamente");
-            setModal(false);
-            setCotizacion({});
-            recargarTabla();
-
-        }   
-        catch (error) { 
-            console.error("Error fetching data:", error);
-            toast.error("Error al emitir la factura");
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    const handleClickTab = (e) => {
-        
-    }
+    //     }
+    // }, [selectedRows]);
     
     useEffect(() => {
         //Cotizaciones pendientes de terminar
@@ -228,7 +201,7 @@ export default function Cotizaciones() {
                                     <span className="counter">{pendientes?.length}</span>
                                 </Link>
 
-                                {/* <Link
+                                <Link
                                     className="btn btn-secondary m-0 relative"
                                     to="/cotizaciones/enviar"
                                     state={{ pendientesEnvio: pendientesEnvio }}
@@ -236,22 +209,13 @@ export default function Cotizaciones() {
                                     <Mail />
                                     Enviar
                                     <span className="counter">{pendientesEnvio?.length}</span>
-                                </Link> */}
+                                </Link>
                             </motion.div>
                     }
                 </AnimatePresence>
             </div>
 
             <div>
-
-                <div className="tabs">
-                    <button onClick={handleClickTab}>Para envío</button>
-                    <button onClick={handleClickTab}>Para OC</button>
-                    <button onClick={handleClickTab}>Para factura</button>
-                    <button onClick={handleClickTab}>Para F</button>
-                    <button onClick={handleClickTab}>Para complemento</button>
-                </div>
-
                 <Tabla
                     key={reloadKey}
                     className="custom-table"
@@ -430,16 +394,6 @@ export default function Cotizaciones() {
                         >
                             <CircleCheck />
                             Aceptar
-                        </button>
-
-                        <button
-                            className="btn"
-                            onClick={() => {
-                                handleFacturar();
-                            }}
-                        >
-                            <CircleCheck />
-                            Emitir factura
                         </button>
                     </div>
                 </div>
