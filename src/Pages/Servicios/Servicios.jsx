@@ -25,19 +25,15 @@ export default function Servicios() {
         e.preventDefault();
 
         try {
-            const { data } = await clienteAxios.post("/api/services", formData, {
+            await clienteAxios.post("/api/services", formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-
-            console.log(data);
             fetchServicios();
             setModalOpen(false);
             toast.success("Servicio creado correctamente");
-            setFormData({
-                name: "",
-            });
+            setFormData({name: ""});
             setErrors({});
         } catch (error) {
             console.error("Error during login:", error);

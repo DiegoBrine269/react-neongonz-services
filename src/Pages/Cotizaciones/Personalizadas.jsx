@@ -17,7 +17,7 @@ import { swalConfig } from "@/config/variables";
 
 export default function Personalizadas() {
 
-    const { token, setLoading, centros, fetchCentros, pendientes, fetchPendientes, responsables, fetchResponsables} = useContext(AppContext);
+    const { token, setLoading, centros, fetchCentros, pendientes, fetchPendientes, responsables, fetchResponsables, fetchUnits, units} = useContext(AppContext);
 
     const navigate = useNavigate();
 
@@ -47,6 +47,7 @@ export default function Personalizadas() {
         fetchResponsables();
         fetchPendientes();
         fetchCentros();
+        fetchUnits();
     }, []);
 
     useEffect(() => {
@@ -154,6 +155,7 @@ export default function Personalizadas() {
             }
             else{
                 setErrors(error.response.data.errors);
+                // console.log(error.response.data);
             }
 
         } finally {
@@ -335,24 +337,65 @@ export default function Personalizadas() {
                                 </button>
                             </div>
                             
-                            <div className="grid grid-cols-[1fr_4fr_2fr] gap-1 items-start">
-                                <input
-                                    {...register(`items.${index}.quantity`)}
-                                    placeholder="Cantidad"
-                                    className="input"
-                                    type="number"
-                                />
-                                <textarea
-                                    {...register(`items.${index}.concept`)}
-                                    placeholder="Concepto"
-                                    className="min-h-9 field-sizing-content"
-                                />
-                                <input
-                                    {...register(`items.${index}.price`)}
-                                    placeholder="Precio"
-                                    className="input"
-                                    type="number"
-                                />
+                            <div className="grid md:grid-cols-[1fr_4fr_2fr_1fr_2fr] gap-1 items-start">
+                                
+                                <div>
+                                    <input
+                                        {...register(`items.${index}.quantity`)}
+                                        placeholder="Cantidad"
+                                        className="input"
+                                        type="number"
+                                    />
+                                    {/* <ErrorLabel>{errors?.['rows.0.quantity']}</ErrorLabel> */}
+                                </div>
+
+                                <div>
+                                    <textarea
+                                        {...register(`items.${index}.concept`)}
+                                        placeholder="Concepto"
+                                        className="min-h-9 field-sizing-content"
+                                    />
+                                    {/* <ErrorLabel>{errors?.['rows.0.concept']}</ErrorLabel> */}
+                                </div>
+
+                                <div>
+                                    <input
+                                        {...register(`items.${index}.price`)}
+                                        placeholder="Precio"
+                                        className="input"
+                                        type="number"
+                                    />
+                                    {/* <ErrorLabel>{errors?.['rows.0.price']}</ErrorLabel> */}
+                                </div>
+
+                                <div>
+                                    <select 
+                                        id="sat_unit_key"
+                                        defaultValue=""
+                                        {...register(`items.${index}.sat_unit_key`)}
+                                    >
+                                        {/* <option value="" disabled>Unidad de medida</option> */}
+                                            {units.map((unit) => (
+                                                <option
+                                                    key={unit.key}
+                                                    value={unit.key}
+                                                >
+                                                    {unit.name} ({unit.key})
+                                                </option>
+                                            ))}
+                                    </select>
+                                    {/* <ErrorLabel>{errors?.['rows.0.sat_unit_key']}</ErrorLabel> */}
+                                </div>
+                                
+                                <div>
+                                    <input
+                                        {...register(`items.${index}.sat_key_prod_serv`)}
+                                        placeholder="Clave de producto o servicio"
+                                        className="input"
+                                        type="number"
+                                    />
+                                    {/* <ErrorLabel>{errors?.['rows.0.sat_key_prod']}</ErrorLabel> */}
+                                </div>
                             </div>
                         </div>
                     ))}

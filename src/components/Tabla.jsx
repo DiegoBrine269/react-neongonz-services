@@ -48,11 +48,6 @@ export default function Tabla({
                 <p className="text">
                     Total: <span className="font-bold">{totalFilas}</span>
                 </p>
-
-                {/* <button className="btn bg-green-800 max-w-35">
-                    <Download/>
-                    Descargar
-                </button> */}
             </div>
             <div className={className}>
                 <Suspense fallback={<p>Fetching workloads...</p>}>
@@ -60,8 +55,7 @@ export default function Tabla({
                         onRef={(r) => (tableRef.current = r.current)}
                         data={data}
                         columns={columns}
-                        // onRef={(r) => (tableRef = r)}
-                        // layout={"fitColumns"}
+                        persistance={true}
                         options={{
                             ...options,
                             ...tabulatorConfig,
@@ -74,9 +68,6 @@ export default function Tabla({
                         }}
                         events={{
                             ...events,
-                            // tableBuilt: (tabulator) => {
-                            //     tableRef.current = tabulator;
-                            // },
                             dataLoaded: (data) => {
                                 if (options?.paginationMode !== "remote")
                                     setTotalFilas(data.length);
@@ -88,7 +79,7 @@ export default function Tabla({
                         }}
                     />
                 </Suspense>
-                <div className="flex justify-end gap-2 mt-2">
+                <div className="contenedor-botones">
                     <button
                         className="btn bg-orange-900 w-fit"
                         onClick={() => downloadPdf()}

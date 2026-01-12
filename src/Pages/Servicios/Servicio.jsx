@@ -11,11 +11,10 @@ export default function Servicio() {
 
     const [servicio, setServicio] = useState({});
     const [types, setTypes] = useState([]);
-    const [units, setUnits] = useState([]);
     const [errors, setErrors] = useState({});
     // const [vehicles_types_prices, setVehiclesTypesPrices] = useState([]);
 
-    const { token, setLoading, fetchCentros, centros } = useContext(AppContext);
+    const { token, setLoading, fetchCentros, centros, fetchUnits, units } = useContext(AppContext);
 
     const [formData, setFormData] = useState({
         id: '',
@@ -87,23 +86,6 @@ export default function Servicio() {
                 },
             });
             setTypes(res.data);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            toast.error("Error al cargar el servicio");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchUnits = async () => {
-        setLoading(true);
-        try {
-            const res = await clienteAxios.get(`/api/invoices/units`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            setUnits(res.data);
         } catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Error al cargar el servicio");
@@ -223,7 +205,7 @@ export default function Servicio() {
                 />
                 {errors.name && <p className="error">{errors.name}</p>}
 
-                <label htmlFor="name" className="label">
+                <label htmlFor="sat_unit_key" className="label">
                     Unidad de medida del SAT
                 </label>
                 <select 
@@ -248,6 +230,18 @@ export default function Servicio() {
                     ))}
                 </select>
                 {errors.sat_unit_key && <p className="error">{errors.sat_unit_key}</p>}
+
+                <label htmlFor="sat_key_prod_serv" className="label">
+                    Clave de producto o servicio
+                </label>
+                <input
+                    type="text"
+                    id="sat_key_prod_serv"
+                    placeholder='Clave de producto o servicio del SAT'
+                    value={formData.sat_key_prod_serv || servicio.sat_key_prod_serv}
+                    onChange={(e) => setFormData({...formData, sat_key_prod_serv: e.target.value})}
+                />
+                {errors.sat_key_prod_serv && <p className="error">{errors.sat_key_prod_serv}</p>}
 
 
                 <label htmlFor="name" className="label">

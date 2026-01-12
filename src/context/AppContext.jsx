@@ -39,6 +39,7 @@ export default function AppProvider({ children }) {
 
     const [pendientesEnvio, setPendientesEnvio] = useState([]);
 
+    const [units, setUnits] = useState([]);
 
 
     let tableRef = useRef(null);
@@ -223,6 +224,24 @@ export default function AppProvider({ children }) {
         }
     };
 
+    // Catálogo de unidadesd de medida del SAT
+    const fetchUnits = async () => {
+        setLoading(true);
+        try {
+            const res = await clienteAxios.get(`/api/invoices/units`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setUnits(res.data);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            toast.error("Error al cargar el servicio");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     //Menú de navegación
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -276,6 +295,10 @@ export default function AppProvider({ children }) {
 
                 customers,
                 fetchCustomers,
+
+                //SAT
+                fetchUnits, 
+                units,
             }}
         >
             {children}

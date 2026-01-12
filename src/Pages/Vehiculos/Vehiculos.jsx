@@ -113,19 +113,19 @@ export default function Vehiculos() {
                 <h2 className="title-3">Vehículo</h2>
                 <div className="flex flex-col gap-3 pl-2">
                     <div className="text">
-                        <span className="font-bold border-b-1 block border-neutral-400">
+                        <span className="label-modal">
                             Económico
                         </span>{" "}
                         <p>{vehiculo?.eco}</p>
                     </div>
                     <div className="text">
-                        <span className="font-bold border-b-1 block border-neutral-400">
+                        <span className="label-modal">
                             Tipo
                         </span>{" "}
                         <p>{vehiculo?.type}</p>
                     </div>
                     <div className="text">
-                        <span className="font-bold border-b-1 block border-neutral-400">
+                        <span className="label-modal">
                             Centro de ventas
                         </span>{" "}
                         <p>{vehiculo?.centre?.name}</p>
@@ -133,7 +133,7 @@ export default function Vehiculos() {
 
                     {vehiculo.projects?.length > 0 && (
                         <div className="text">
-                            <span className="font-bold border-b-1 block border-neutral-400">
+                            <span className="label-modal">
                                 Proyectos recientes
                             </span>{" "}
                             <ul className="text-sm list-disc pl-5 mt-1">

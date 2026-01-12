@@ -44,6 +44,9 @@ body {
         @apply font-bold text-sm text-slate-900 dark:text-slate-200;
     }
 
+    .label-modal{
+        @apply font-bold border-b-1 block border-neutral-400;
+    }
 
     .checkbox-btn {
         @apply hidden;
@@ -94,12 +97,8 @@ body {
         @apply bg-white dark:bg-neutral-800 rounded-lg shadow-md p-2 mb-2;
     }
 
-    .btn {
-        @apply cursor-pointer flex gap-2 w-full md:w-auto items-center justify-center rounded-md border border-transparent bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 ;
-    }
-
     .contenedor-botones {
-        @apply flex gap-2 items-center my-2 flex-wrap;
+        @apply flex gap-2 items-center my-2 flex-wrap md:justify-end;
     }
 
     /* permitir que los botones ocupen solo lo que necesiten pero se encojan/ocupar espacio disponible */
@@ -140,12 +139,16 @@ body {
         cursor: pointer;
     }
 
+    .btn {
+        @apply cursor-pointer flex gap-2 w-full md:w-auto items-center justify-center rounded-md border border-transparent bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 ;
+    }
+
     .btn-danger {
-        @apply bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600;
+        @apply bg-red-600 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600;
     }
 
     .btn-secondary {
-        @apply bg-slate-200 px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-slate-300 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600;
+        @apply bg-slate-200 text-sm font-semibold text-slate-900 shadow-sm hover:bg-slate-300 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600;
     }
 
 
@@ -178,6 +181,18 @@ body {
     .counter {
         @apply text-white text-xs absolute -top-3 -right-3 bg-red-900  w-6 aspect-square flex justify-center items-center rounded-full z-2;
     }
+
+    .tabs {
+        @apply flex w-full justify-between flex-wrap [&::-webkit-scrollbar]:hidden;
+    }
+
+    .tabs button {
+        @apply border flex-1 bg-slate-200 dark:bg-neutral-700 text-slate-900 dark:text-slate-200 px-3 py-1 rounded-t-md font-semibold hover:bg-slate-300 dark:hover:bg-neutral-600 transition-colors cursor-pointer;
+    }
+
+    .tabs button.active {
+        @apply bg-neutral-800 dark:bg-slate-200 text-white dark:text-slate-900;
+    }
 }
 
 video {
@@ -199,14 +214,3 @@ video {
   pointer-events: auto !important;
 } */
 
-.tabs {
-  @apply flex gap-2 w-full justify-between;
-}
-
-.tabs button {
-  @apply flex-1 bg-slate-200 dark:bg-neutral-700 text-slate-900 dark:text-slate-200 px-3 py-1 rounded-md font-semibold hover:bg-slate-300 dark:hover:bg-neutral-600 transition-colors cursor-pointer;
-}
-
-.tabs button.selected {
-  @apply bg-neutral-800 dark:bg-slate-200 text-white dark:text-slate-900;
-}
