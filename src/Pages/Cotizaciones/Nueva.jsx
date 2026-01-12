@@ -135,7 +135,7 @@ export default function Nueva() {
         e.preventDefault();
         console.log(formData);
         setLoading(true);
-
+        // debugger
         try {
             const response = await clienteAxios.post(
                 `/api/invoices`,
@@ -148,12 +148,15 @@ export default function Nueva() {
                 }
             );
 
+            // console.log(response)
+
             downloadBlobResponse(response, "Cotización.pdf");
 
             setErrors({});
             navigate('/cotizaciones');
 
         } catch (error) {
+            console.log(error)
             // console.error("Error during request:", error);
             if (error.response) {
                 const reader = new FileReader();
