@@ -499,11 +499,11 @@ export default function Proyecto() {
             // fetchProyectosAbiertos();
 
             if (proyecto?.related_projects){
-                setFormDataEdit({...formDataEdit, extra_projects: JSON.parse(proyecto?.related_projects),});
-                setFormData({...formData, extra_projects: JSON.parse(proyecto?.related_projects),});
+                setFormDataEdit((prev) => ({...prev, extra_projects: JSON.parse(proyecto?.related_projects)}));
+                setFormData((prev) => ({...prev, extra_projects: JSON.parse(proyecto?.related_projects)}));
             }
 
-            // if (proyecto.centre && proyecto.centre.id) {
+            // if (proyecto.centre && projeto.centre.id) {
             //     fetchProyectosAbiertos();
             // }
         }
