@@ -14,6 +14,7 @@ import 'animate.css';
 import { useForm, useFieldArray } from 'react-hook-form';
 import Swal from "sweetalert2";
 import { swalConfig } from "@/config/variables";
+import get from 'lodash.get';
 
 export default function Personalizadas() {
 
@@ -365,7 +366,7 @@ export default function Personalizadas() {
                                         className="input"
                                         type="number"
                                     />
-                                    {/* <ErrorLabel>{errors?.['rows.0.price']}</ErrorLabel> */}
+                                    <ErrorLabel>{get(errors, `rows.${index}.price`)}</ErrorLabel>
                                 </div>
 
                                 <div>
@@ -384,7 +385,7 @@ export default function Personalizadas() {
                                                 </option>
                                             ))}
                                     </select>
-                                    {/* <ErrorLabel>{errors?.['rows.0.sat_unit_key']}</ErrorLabel> */}
+                                    <ErrorLabel>{get(errors, `rows.${index}.sat_unit_key`)}</ErrorLabel>
                                 </div>
                                 
                                 <div>
@@ -394,7 +395,7 @@ export default function Personalizadas() {
                                         className="input"
                                         type="number"
                                     />
-                                    {/* <ErrorLabel>{errors?.['rows.0.sat_key_prod']}</ErrorLabel> */}
+                                    <ErrorLabel>{get(errors, `rows.${index}.sat_key_prod_serv`)}</ErrorLabel>
                                 </div>
                             </div>
                         </div>

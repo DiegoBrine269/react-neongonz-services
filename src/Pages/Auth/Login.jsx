@@ -5,7 +5,7 @@ import clienteAxios from "../../config/axios";
 import { Link } from "react-router-dom";
 
 export default function Login() {
-    const { setToken, setLoading } = useContext(AppContext);
+    const { setToken, setLoading, setRequestHeader } = useContext(AppContext);
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -23,6 +23,7 @@ export default function Login() {
             const { data } = await clienteAxios.post("/api/login", formData);
             localStorage.setItem("NEON_GONZ_TOKEN", data.token);
             setToken(data.token);
+            setRequestHeader({headers: {Authorization: `Bearer ${data.token}`,},});
 
             navigate("/");
         } catch (error) {

@@ -214,7 +214,7 @@ export default function Servicio() {
 
                     }}
                 >
-                    <option value="" disabled>Selecciona una opción</option>
+                    <option value="" >Selecciona una opción</option>
                     {units.map((unit) => (
                         <option
                             key={unit.key}

@@ -11,7 +11,7 @@ import useNetworkStatus from "../hooks/useNetworkStatus";
 import Snowfall from "react-snowfall";
 
 export default function Layout() {
-    const {isMenuOpen, setIsMenuOpen, loading} = useContext(AppContext);
+    const {isMenuOpen, setIsMenuOpen, loading, loadingMessage} = useContext(AppContext);
     const { isOnline } = useNetworkStatus();
 
 
@@ -23,8 +23,9 @@ export default function Layout() {
                 snowflakeCount={120}
             />   */}
             {loading && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
+                <div className="fixed inset-0 z-50 flex flex-col gap-3 items-center justify-center bg-black/75">
                     <PacmanLoader color="#ffffff" />
+                    {loadingMessage && <p className="text-white">{loadingMessage}</p>}
                 </div>
             )}
 

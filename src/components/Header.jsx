@@ -49,7 +49,7 @@ export default function Header() {
                         {user && <Item to="/proyectos" text="Proyectos" children={<BriefcaseBusiness />} />}
                         {user && user.role === 'admin' && <Item to="/cotizaciones" text="Cotizaciones" children={<Receipt />} />}
                         {user && <Item to="/mi-cuenta" text="Mi cuenta" children={<User />} />}
-                        {user && user.role === 'admin' && <Item to="/reportes-desempeno" text="Desempeño" children={<Users />} />}
+                        {user && user.role === 'admin' && <Item to="/usuarios" text="Usuarios" children={<Users />} />}
                         {user && (<Item to="/logout" text="Cerrar sesión" children={<LogOut />} onClick={handleLogout} />)}
                         {!user && <Item to="/login" text="Iniciar Sesión" children={<LogIn />}/>}
                         {!user && <Item to="/registro" text="Crear una cuenta" children={<UserRoundPlus />}/>}

@@ -12,6 +12,7 @@ import EditarCentros from "@/Pages/Centros/Editar";
 
 import Servicios from "@/Pages/Servicios/Servicios";
 import Servicio from "@/Pages/Servicios/Servicio";
+import Usuarios from "@/Pages/Usuarios/Usuarios";
 import Proyectos from "@/Pages/Proyectos/Proyectos";
 import Proyecto from "@/Pages/Proyectos/Proyecto/Proyecto";
 import "tabulator-tables/dist/css/tabulator_materialize.min.css";
@@ -70,7 +71,8 @@ export default function App() {
                                         <Route path="/cotizaciones/enviar" element={<Enviar />} />
                                         <Route path="/cotizaciones/editar/:id" element={<Editar />} />
                                         <Route path="/servicios/:id" element={<Servicio />} />
-                                        <Route path="/reportes-desempeno" element={<Desempeno />} />
+                                        <Route path="/usuarios" element={<Usuarios />} />
+                                        <Route path="/usuarios/desempeno" element={<Desempeno />} />
                                     </>
                                 )}
                                 <Route path="/vehiculos" element={<Vehiculos />} />

@@ -41,6 +41,8 @@ export default function AppProvider({ children }) {
 
     const [units, setUnits] = useState([]);
 
+    const [loadingMessage, setLoadingMessage] = useState();
+
 
     let tableRef = useRef(null);
 
@@ -256,6 +258,7 @@ export default function AppProvider({ children }) {
             value={{
                 token,
                 requestHeader,
+                setRequestHeader,
                 setToken,
                 user,
                 setUser,
@@ -299,6 +302,10 @@ export default function AppProvider({ children }) {
                 //SAT
                 fetchUnits, 
                 units,
+
+                //
+                loadingMessage,
+                setLoadingMessage,
             }}
         >
             {children}

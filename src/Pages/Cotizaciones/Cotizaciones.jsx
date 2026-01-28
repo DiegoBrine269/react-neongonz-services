@@ -74,12 +74,7 @@ export default function Cotizaciones() {
     async function fetchPDF() {
         try {
             setLoading(true);
-            const res = await clienteAxios.get(`/api/invoices/${cotizacion?.id}/pdf`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                // responseType: "blob",
-            });
+            const res = await clienteAxios.get(`/api/invoices/${cotizacion?.id}/pdf`, requestHeader);
 
             const pdfUrl = res.data.url;
             console.log(pdfUrl);
@@ -237,7 +232,9 @@ export default function Cotizaciones() {
 
 
         try {
+            setErrors({});
             setLoading(true);
+
             await clienteAxios.post(`/api/invoices/create-sat-invoice`, 
                 {
                     invoice_ids: selectedRows.map(r => r.id),
@@ -252,11 +249,21 @@ export default function Cotizaciones() {
             recargarTabla();
         }   
         catch (error) { 
-            console.error("Error fetching data:", error);
-            toast.error("Error al emitir la(s) factura(s)");
+
+  
+
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors);
+                return;
             }
+            
+            Swal.fire({
+                title: "Error al emitir la(s) factura(s)",
+                text: "Asegúrate de haber llenado los campos de Clave de producto y Clave unidad SAT.",
+                icon: "error",
+                ...swalConfig(),
+            });
+
         } finally {
             setLoading(false);
         }
@@ -265,7 +272,7 @@ export default function Cotizaciones() {
     const handleComplemento = async () => {
         try {
             setLoading(true);
-            const res = await clienteAxios.post(`/api/invoices/create-sat-complement`, 
+            await clienteAxios.post(`/api/invoices/create-sat-complement`, 
                 {
                     invoice_ids: selectedRows.map(r => r.id),
                     ...formData,
@@ -350,7 +357,21 @@ export default function Cotizaciones() {
                                     activeTab == 'factura' &&
                                     <motion.button
                                         className="btn"
-                                        onClick={() => setModal2(true)}
+                                        onClick={() => {
+                                            //Verificar que todas las filas sean de cotizaciones del mismo CV
+                                            const multipleCentres = new Set(selectedRows.map(r => r.centre_id)).size > 1;
+                                            if(multipleCentres){
+                                                Swal.fire({
+                                                    title: "Selecciona cotizaciones del mismo Centro de Ventas",
+                                                    text: "Solo puedes facturar de manera múltiple a un mismo Centro de Ventas a la vez.",
+                                                    icon: "error",
+                                                    ...swalConfig(),
+                                                });
+                                                setLoading(false);
+                                                return;
+                                            }
+                                            setModal2(true)
+                                        }}
                                         {...motionProps}
                                     > 
                                             <>
@@ -366,9 +387,9 @@ export default function Cotizaciones() {
                                         className="btn"
                                         onClick={() => {
                                             // Abrir modal de complemento solo si el payment_form es 99, es decir, por definir
-                                            if(selectedRows[0].payment_form === '99'){
-                                                setModal3(true)
-                                            }
+                                            // if(selectedRows[0].payment_form === '99'){
+                                            // }
+                                            setModal3(true)
                                         }}
                                         
                                         {...motionProps}
@@ -737,7 +758,7 @@ export default function Cotizaciones() {
 
                     <div className="text">
                         <span className="label-modal">
-                            Archivo
+                            Archivo de cotización
                         </span>{" "}
                         <button
                             className="underline cursor-pointer py-1"
@@ -746,6 +767,31 @@ export default function Cotizaciones() {
                             Ver pdf 📄
                         </button>
                     </div>
+
+
+                    {/* <div className="text">
+                        <span className="label-modal">
+                            Archivos de factura
+                        </span>{" "}
+                        <button
+                            className="underline cursor-pointer py-1"
+                            onClick={fetchPDF}
+                        >
+                            Ver pdf 📄
+                        </button>
+                    </div>
+
+                    <div className="text">
+                        <span className="label-modal">
+                            Archivos de complemento
+                        </span>{" "}
+                        <button
+                            className="underline cursor-pointer py-1"
+                            onClick={fetchPDF}
+                        >
+                            Ver pdf 📄
+                        </button>
+                    </div> */}
 
                     {cotizacion?.internal_commentary && (
                         <div className="text">
@@ -802,8 +848,6 @@ export default function Cotizaciones() {
                         </select>
                         <ErrorLabel>{errors.payment_form}</ErrorLabel>
 
-
-
                         <label className="label" htmlFor="payment_method">Método de pago:</label>
                         <select 
                             id="payment_method"
@@ -816,6 +860,33 @@ export default function Cotizaciones() {
                             <option value="PPD">(PPD) Pago en parcialidades o diferido</option>
                         </select>
                         <ErrorLabel>{errors.payment_method}</ErrorLabel>
+
+                        <label className="label">Forma de facturar</label>
+                        <div className="pl-2">
+                            <label 
+                                htmlFor="joined" 
+                                className="text text-sm flex gap-1 mt-0"
+                                onClick={() => setFormData({...formData, joined: 1})}
+                            >
+                                <input type="radio" name="joined" id="joined" value={1} />
+                                <span className="bre">Facturar de manera conjunta (una factura por todas las cotizaciones)</span>
+                            </label>
+ 
+                            <label 
+                                htmlFor="not-joined" 
+                                className="text text-sm flex gap-1 mt-0"
+                                onClick={() => setFormData({...formData, joined: 0})}
+                            >
+                                <input type="radio" name="joined" id="not-joined" value={0} />
+                                <span className="bre">Facturar de manera individual (una factura por cada cotización)</span>
+                            </label>
+                        </div>
+                        <ErrorLabel>{errors.joined}</ErrorLabel>
+
+                        <ErrorLabel>{errors.product_key}</ErrorLabel>
+                        <ErrorLabel>{errors.sat_unit_key}</ErrorLabel>
+
+
 
                         <div className="contenedor-botones">
                             <button 
@@ -832,34 +903,52 @@ export default function Cotizaciones() {
             <Modal isOpen={modal3} onClose={() => setModal3(false)}>
                 <h2 className="title-3">Ingresa los siguientes datos</h2>
                 <div className="">
+                    <label className="label" htmlFor="payment_form">Forma de pago:</label>
+                    <select  
+                        id="payment_form"
+                        defaultValue=""
+                        value={formData.payment_form || ''}
+                        onChange={e => setFormData({...formData, payment_form: e.target.value})}
+                        autoFocus
+                    >
+                        <option value="">Selecciona una opción</option>
+                        <option value="01">Efectivo</option>
+                        <option value="02">Cheque nominativo</option>
+                        <option value="03">Transferencia electrónica de fondos</option>
+                        <option value="04">Tarjeta de crédito</option>
+                        <option value="28">Tarjeta de débito</option>
+                        <option value="29">Tarjeta de servicios</option>
+                        <option value="30">Aplicación de anticipos</option>
+                        <option value="31">Intermediario de pagos</option>
+                    </select>
+                    <ErrorLabel>{errors.payment_form}</ErrorLabel>
 
-                        <label className="label" htmlFor="payment_form">Forma de pago:</label>
-                        <select  
-                            id="payment_form"
-                            defaultValue=""
-                            value={formData.payment_form || ''}
-                            onChange={e => setFormData({...formData, payment_form: e.target.value})}
-                            autoFocus
+
+                    <label className="label" htmlFor="payment_date">Fecha de pago</label>
+                    <input type="date" className="input" />
+
+                    <label className="label" htmlFor="payment_date">Cliente fiscal</label>
+                    <select  
+                        id="payment_form"
+                        defaultValue=""
+                        // value={formData.payment_form || ''}
+                        // onChange={e => setFormData({...formData, payment_form: e.target.value})}
+                        autoFocus
+                    >
+                        <option value="">Selecciona una opción</option>
+                    </select>
+
+                    <label className="label" htmlFor="payment_amount">Importe de pago</label>
+                    <input type="number" className="input" placeholder="Importe de pago"/>
+
+                    <div className="contenedor-botones">
+                        <button 
+                            className="btn"
+                            onClick={handleComplemento}
                         >
-                            <option value="">Selecciona una opción</option>
-                            <option value="01">Efectivo</option>
-                            <option value="02">Cheque nominativo</option>
-                            <option value="03">Transferencia electrónica de fondos</option>
-                            <option value="04">Tarjeta de crédito</option>
-                            <option value="28">Tarjeta de débito</option>
-                            <option value="29">Tarjeta de servicios</option>
-                            <option value="30">Aplicación de anticipos</option>
-                            <option value="31">Intermediario de pagos</option>
-                        </select>
-                        <ErrorLabel>{errors.payment_form}</ErrorLabel>
-                        <div className="contenedor-botones">
-                            <button 
-                                className="btn"
-                                onClick={handleComplemento}
-                            >
-                                Aceptar
-                            </button>
-                        </div>
+                            Aceptar
+                        </button>
+                    </div>
                 </div>
             </Modal>
         </>

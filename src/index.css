@@ -112,6 +112,18 @@ body {
         @apply flex-[1_1_100%] min-w-[100%] w-full md:flex-none;
     } */
 
+    .contenedor-botones-2 {
+        @apply flex flex-wrap gap-2 justify-start md:justify-end;
+    }
+
+    .contenedor-botones-2 .btn {
+        @apply mt-0 flex items-center gap-1.5;
+    }
+
+    .contenedor-botones-2.riesgo {
+        @apply mt-2 justify-start md:justify-end;
+    }
+
     .tabulator-tableholder {
         @apply max-h-[50vh] md:max-h-96;
     }
@@ -183,16 +195,30 @@ body {
     }
 
     .tabs {
-        @apply flex w-full justify-between flex-wrap [&::-webkit-scrollbar]:hidden;
+        @apply flex w-full border-b border-slate-200 dark:border-neutral-700 overflow-x-auto gap-1;
     }
 
     .tabs button {
-        @apply border flex-1 bg-slate-200 dark:bg-neutral-700 text-slate-900 dark:text-slate-200 px-3 py-1 rounded-t-md font-semibold hover:bg-slate-300 dark:hover:bg-neutral-600 transition-colors cursor-pointer;
+        @apply
+            relative
+            px-4 py-2
+            text-sm font-medium
+            text-slate-600 dark:text-slate-300
+            bg-transparent
+            border-b-2 border-transparent
+            transition-all
+            whitespace-nowrap
+            hover:text-slate-900 dark:hover:text-slate-100
+            hover:border-slate-300
+            cursor-pointer;
     }
 
     .tabs button.active {
-        @apply bg-neutral-800 dark:bg-slate-200 text-white dark:text-slate-900;
+        @apply
+            text-slate-900 dark:text-slate-100
+            border-blue-500;
     }
+
 }
 
 video {

@@ -20,7 +20,7 @@ export default function Nueva() {
     const navigate = useNavigate();
    
 
-    const { token, setLoading, centros, fetchCentros, fetchResponsables, responsables} = useContext(AppContext);
+    const { token, setLoading, centros, fetchCentros, fetchResponsables, responsables, setLoadingMessage} = useContext(AppContext);
 
     const [centro, setCentro] = useState("");
     const [errors, setErrors] = useState({});
@@ -135,6 +135,7 @@ export default function Nueva() {
         e.preventDefault();
         console.log(formData);
         setLoading(true);
+        setLoadingMessage("Generando cotización, espera.");
         // debugger
         try {
             const response = await clienteAxios.post(
@@ -183,6 +184,7 @@ export default function Nueva() {
             }
         } finally {
             setLoading(false);
+            setLoadingMessage(null);
         }
     };
     
