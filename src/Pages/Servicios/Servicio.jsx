@@ -102,9 +102,18 @@ export default function Servicio() {
                 price => Object.keys(price).length !== 0
             );
 
+            // Eliminar los objetos de cleanedPrices que sean diferentes a formData.centre_id (considerando null y undefined)
+            const finalPrices = cleanedPrices.filter(price => {
+                const priceCentreId = price.centre_id === "" || price.centre_id === undefined || price.centre_id === null
+                    ? null
+                    : Number(price.centre_id);
+
+                return priceCentreId === currentCentreId;
+            });
+
             const payload = {
                 ...formData,
-                vehicles_types_prices: cleanedPrices,
+                vehicles_types_prices: finalPrices,
             };
 
             await clienteAxios.put(`/api/services/${id}`, payload, {
