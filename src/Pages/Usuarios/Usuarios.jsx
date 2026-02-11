@@ -82,13 +82,16 @@ export default function Usuarios() {
     }, []);
 
     return (
-        <>
+        <div
+            className='lg:w-2/3 mx-auto'
+        >
             <h2 className='title-2'>Usuarios</h2>
                 <div className="contenedor-botones">
                     <Link className="btn">Reportes de desempeño</Link>
                 </div>
                 {
-                    users?.map(u => u.id !== user.id && u.role == 'user' && (
+                    users?.map(u => u.id !== user.id && u.role == 'user' && 
+                        (
                             <div className="mt-4 rounded-xl border border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-4 shadow-sm">
                     
                                 <div className="flex items-start gap-4">
@@ -98,44 +101,47 @@ export default function Usuarios() {
                                         className="w-20 h-20 rounded-full object-cover ring-2 ring-slate-200 dark:ring-neutral-600"
                                     />
 
-                                    <div className="flex-1">
-                                        
-                                        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                                            {u.name} {u.last_name}
-                                        </h3>
+                                    <div className='w-full'>
 
-                                        <div className="mt-1 space-y-1 text-sm text-slate-600 dark:text-slate-300">
-                                            <p>
-                                                <span className="font-medium">Estatus:</span>{" "}
-                                                {
-                                                    u.is_active ?
-                                                        <span className="inline-flex items-center gap-1 text-green-600">
-                                                            ● Activo
-                                                        </span>
-                                                    :
-                                                        <span className="inline-flex items-center gap-1 text-red-600">
-                                                            ● Inactivo
-                                                        </span>
-                                                }
-                                            </p>
+                                        <div className="flex-1">
+                                            
+                                            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                                                {u.name} {u.last_name}
+                                            </h3>
 
-                                            <p>
-                                                <span className="font-medium">Miembro desde:</span>{" "}
-                                                {format(u.created_at, "DD/MM/YYYY")}
-                                            </p>
+                                            <div className="mt-1 space-y-1 text-sm text-slate-600 dark:text-slate-300">
+                                                <p>
+                                                    <span className="font-medium">Estatus:</span>{" "}
+                                                    {
+                                                        u.is_active ?
+                                                            <span className="inline-flex items-center gap-1 text-green-600">
+                                                                ● Activo
+                                                            </span>
+                                                        :
+                                                            <span className="inline-flex items-center gap-1 text-red-600">
+                                                                ● Inactivo
+                                                            </span>
+                                                    }
+                                                </p>
+
+                                                <p>
+                                                    <span className="font-medium">Miembro desde:</span>{" "}
+                                                    {format(u.created_at, "DD/MM/YYYY")}
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div className="flex flex-col gap-2">
-                                        <button 
-                                            className="btn btn-outline !px-3 !py-1 text-sm"
-                                            onClick={()=>{
-                                                setModal(true)
-                                                setSelectedUser(u)
-                                            }}
-                                        >
-                                            Cambiar contraseña
-                                        </button>
+                                        <div className="flex justify-end gap-2">
+                                            <button 
+                                                className="btn btn-outline !px-3 !py-1 text-sm"
+                                                onClick={()=>{
+                                                    setModal(true)
+                                                    setSelectedUser(u)
+                                                }}
+                                            >
+                                                Cambiar contraseña
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -165,7 +171,6 @@ export default function Usuarios() {
 
                                 </div>
                             </div>
-                        
                         )
                     )
 
@@ -211,6 +216,6 @@ export default function Usuarios() {
                     </div>
                 </Modal>
 
-        </>
+        </div>
     )
 }

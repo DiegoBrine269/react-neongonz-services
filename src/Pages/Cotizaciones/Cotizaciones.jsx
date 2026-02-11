@@ -71,7 +71,7 @@ export default function Cotizaciones() {
         }
     }, [reloadKey]);
 
-    async function fetchPDF() {
+    async function fetchInvoiceFile() {
         try {
             setLoading(true);
             const res = await clienteAxios.get(`/api/invoices/${cotizacion?.id}/pdf`, requestHeader);
@@ -92,6 +92,38 @@ export default function Cotizaciones() {
         }
     }
 
+    async function fetchZipFile(id) {
+        try {
+            setLoading(true);
+            const response = await clienteAxios.get(`/api/billings/${id}/download`, {
+                responseType: "blob",
+                ...requestHeader
+            });
+
+            const disposition = response.headers["content-disposition"] || "";
+            const match = disposition.match(/filename\*=UTF-8''([^;]+)|filename="([^"]+)"/i);
+            const fileName = decodeURIComponent(match?.[1] || match?.[2] || `SAT COT_${id} .zip`);
+
+            const blob = new Blob([response.data], {
+                type: "application/zip",
+            });
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            toast.error("Error al descargar los archivos");
+        }
+        finally {
+            setLoading(false);
+        }
+    }
 
 
     async function handleEliminarCotizaciones() {
@@ -287,6 +319,9 @@ export default function Cotizaciones() {
             setModal3(false);
         }   
         catch (error) { 
+            if (error.response && error.response.data.errors) 
+                setErrors(error.response.data.errors);
+            
             console.error("Error fetching data:", error);
             toast.error("Error al emitir el/los complemento(s)");
         } finally {
@@ -762,36 +797,45 @@ export default function Cotizaciones() {
                         </span>{" "}
                         <button
                             className="underline cursor-pointer py-1"
-                            onClick={fetchPDF}
+                            onClick={fetchInvoiceFile}
                         >
                             Ver pdf 📄
                         </button>
                     </div>
 
+                    {
+                        cotizacion?.billing?.pdf_path &&
+                        <div className="text">
+                            <span className="label-modal">
+                                Factura
+                            </span>{" "}
+                            <button
+                                className="underline cursor-pointer py-1"
+                                onClick={()=>fetchZipFile(cotizacion.billing.id)}
+                            >
+                                Descargar archivos 📄
+                            </button>
+                        </div>
+                    }
 
-                    {/* <div className="text">
-                        <span className="label-modal">
-                            Archivos de factura
-                        </span>{" "}
-                        <button
-                            className="underline cursor-pointer py-1"
-                            onClick={fetchPDF}
-                        >
-                            Ver pdf 📄
-                        </button>
-                    </div>
+                    {
+                        cotizacion?.complements?.map(
+                            (complement, index) =>
+                                <div className="text" key={index}>
+                                    <span className="label-modal">
+                                        Complemento {index + 1}
+                                    </span>{" "}
+                                    <button
+                                        className="underline cursor-pointer py-1"
+                                        onClick={()=>fetchZipFile(complement.id)}
 
-                    <div className="text">
-                        <span className="label-modal">
-                            Archivos de complemento
-                        </span>{" "}
-                        <button
-                            className="underline cursor-pointer py-1"
-                            onClick={fetchPDF}
-                        >
-                            Ver pdf 📄
-                        </button>
-                    </div> */}
+                                    >
+                                        Descargar archivos 📄
+                                    </button>
+                                </div>
+                        )
+                    }
+
 
                     {cotizacion?.internal_commentary && (
                         <div className="text">
@@ -835,15 +879,15 @@ export default function Cotizaciones() {
                             disabled={formData.payment_method === 'PPD'}
                             autoFocus
                         >
-                            <option value="">Selecciona una opción</option>
+                            <option value="" disabled>Selecciona una opción</option>
                             <option value="01">Efectivo</option>
-                            <option value="02">Cheque nominativo</option>
+                            {/* <option value="02">Cheque nominativo</option> */}
                             <option value="03">Transferencia electrónica de fondos</option>
-                            <option value="04">Tarjeta de crédito</option>
+                            {/* <option value="04">Tarjeta de crédito</option>
                             <option value="28">Tarjeta de débito</option>
                             <option value="29">Tarjeta de servicios</option>
                             <option value="30">Aplicación de anticipos</option>
-                            <option value="31">Intermediario de pagos</option>
+                            <option value="31">Intermediario de pagos</option> */}
                             <option value="99">Por definir</option>
                         </select>
                         <ErrorLabel>{errors.payment_form}</ErrorLabel>
@@ -913,19 +957,26 @@ export default function Cotizaciones() {
                     >
                         <option value="">Selecciona una opción</option>
                         <option value="01">Efectivo</option>
-                        <option value="02">Cheque nominativo</option>
+                        {/* <option value="02">Cheque nominativo</option> */}
                         <option value="03">Transferencia electrónica de fondos</option>
-                        <option value="04">Tarjeta de crédito</option>
+                        {/* <option value="04">Tarjeta de crédito</option>
                         <option value="28">Tarjeta de débito</option>
                         <option value="29">Tarjeta de servicios</option>
                         <option value="30">Aplicación de anticipos</option>
-                        <option value="31">Intermediario de pagos</option>
+                        <option value="31">Intermediario de pagos</option> */}
                     </select>
                     <ErrorLabel>{errors.payment_form}</ErrorLabel>
 
 
                     <label className="label" htmlFor="payment_date">Fecha de pago</label>
-                    <input type="date" className="input" />
+                    <input 
+                        type="date" 
+                        className="input"
+                        id="payment_date"
+                        onChange={e => setFormData({...formData, payment_date: e.target.value})}
+                     />
+                    <ErrorLabel>{errors.payment_date}</ErrorLabel>
+
 
                     <label className="label" htmlFor="payment_date">Cliente fiscal</label>
                     <select  
@@ -939,7 +990,15 @@ export default function Cotizaciones() {
                     </select>
 
                     <label className="label" htmlFor="payment_amount">Importe de pago</label>
-                    <input type="number" className="input" placeholder="Importe de pago"/>
+                    <input
+                        id="payment_amount"
+                        onChange={e => setFormData({...formData, payment_amount: e.target.value})} 
+                        type="number" 
+                        className="input" 
+                        placeholder="Importe de pago"
+                    />
+                    <ErrorLabel>{errors.payment_amount}</ErrorLabel>
+
 
                     <div className="contenedor-botones">
                         <button 
