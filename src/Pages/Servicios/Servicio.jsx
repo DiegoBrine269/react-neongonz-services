@@ -41,6 +41,7 @@ export default function Servicio() {
             });
             setServicio(res.data);
             setFormData({
+                ...formData,
                 ...res.data,
                 vehicles_types_prices: res.data.vehicle_types.map(
                     (item) => item.pivot

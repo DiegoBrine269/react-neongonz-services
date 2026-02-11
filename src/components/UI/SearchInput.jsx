@@ -80,7 +80,7 @@ export default function SearchInput({htmlId, initialValue, lista, placeholder, o
             {<div className={`${!mostrarSugerencias && 'hidden'} max-w-full rounded-md cursor-pointer p-3 bg-white dark:bg-neutral-800 w-full top-full border shadow-2xl`}>
                 
 
-                <input ref={inputBuscarServicioRef} type="text" className="input sticky top-0" placeholder="Buscar servicio" onChange={handleFiltrarLista}/>
+                <input ref={inputBuscarServicioRef} type="text" className="input sticky top-0" placeholder="Buscar" onChange={handleFiltrarLista}/>
 
                 <div className="overflow-scroll max-h-40 h-auto">
                     {listaFiltrada.map((item) => (
