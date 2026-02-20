@@ -11,7 +11,7 @@ import  ErrorLabel  from '@/components/UI/ErrorLabel.jsx';
 export default function Centros() {
     // const [centros, setCentros] = useState([]);
     const [centro, setCentro] = useState({});
-    const { token, setLoading, centros, fetchCentros, fetchResponsables, responsables } = useContext(AppContext);
+    const { token, setLoading, centros, fetchCentros, fetchResponsables, responsables, fetchCustomers, customers } = useContext(AppContext);
 
     const [isModalCreateOpen, setModalCreateOpen] = useState(false);
     const [isModalViewOpen, setModalViewOpen] = useState(false);
@@ -66,6 +66,7 @@ export default function Centros() {
             await fetchCentros();
             // setLoading(false);
             await fetchResponsables();
+            await fetchCustomers();
         };
 
         fetchData();
@@ -176,7 +177,29 @@ export default function Centros() {
                         }
                     </select>
 
-                    <ErrorLabel>{errors.responsible_id}</ErrorLabel>
+                    <label className="label" htmlFor="customer_id">
+                        Cliente fiscal
+                    </label>
+                    <select  
+                        id="customer_id"
+                        className="input"
+                        value={formData.customer_id}
+                        onChange={e => setFormData({...formData, customer_id: e.target.value})}    
+                    >
+                        <option value="">Selecciona un cliente fiscal</option>
+                        {
+                            customers?.map(customer => (
+                                <option
+                                    key={customer.id}
+                                    value={customer.id}
+                                >
+                                    {customer.legal_name}
+                                </option>
+                            ))
+                        }
+                    </select>
+
+                    <ErrorLabel>{errors.customer_id}</ErrorLabel>
 
                     <label className="label" htmlFor="location">
                         Ubicación
