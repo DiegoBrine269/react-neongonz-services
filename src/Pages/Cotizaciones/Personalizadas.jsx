@@ -113,7 +113,7 @@ export default function Personalizadas() {
 
         try {
             const response = await clienteAxios.post(
-                `/api/invoices/create-custom`,
+                `/api/invoices/custom`,
                 payload,
                 {
                     headers: {
@@ -255,11 +255,15 @@ export default function Personalizadas() {
 
                                     removeAll();
 
+                                    
                                     selectedCot.rows.forEach((row) =>{
+                                        // console.log(row.sat_key_prod_serv);
                                         append({
                                             concept: row.concept,
                                             quantity: row.quantity,
                                             price: row.price,
+                                            sat_unit_key: row.sat_unit_key,
+                                            sat_key_prod_serv: row.sat_key_prod_serv.trim(),
                                         });
                                     });
                                 }
@@ -271,7 +275,7 @@ export default function Personalizadas() {
                             </option>
                             {pendientes.map((cot) => (
                                 <option key={cot.id} value={cot.id}>
-                                    {cot.concept} - {cot.centre.name}
+                                    {cot.centre.name} ({format(new Date(cot.date), "DD/MM/YYYY")})
                                 </option>
                             ))}
                         </select>
@@ -325,7 +329,7 @@ export default function Personalizadas() {
                         }
                     />
                     <ErrorLabel>{errors?.date}</ErrorLabel>
-
+                    
                     {fields.map((field, index) => (
                         <div key={field.id} className="my-3 relative border p-2 rounded-lg border-neutral-400">
                             
