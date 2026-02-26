@@ -346,6 +346,7 @@ export default function Nueva() {
                                 >
                                     <div className="flex justify-between items-center mb-2">
                                         <TitleCheckBox
+                                            id={p.service_id}
                                             name= {p.id}
                                             label= {`${p.service} (${format(p.date,"full","es")})`}
                                             checked={checkedMap[p.id] || false}

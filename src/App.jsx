@@ -7,6 +7,8 @@ import { AppContext } from "./context/AppContext";
 import { useContext } from "react";
 import NotFound from "@/Pages/NotFound";
 import Responsables from "@/Pages/Responsables/Responsables";
+import Clientes from "@/Pages/Clientes/Clientes";
+
 import Centros from "@/Pages/Centros/Centros";
 import EditarCentros from "@/Pages/Centros/Editar";
 
@@ -64,6 +66,7 @@ export default function App() {
                                         <Route path="/centros-de-venta/editar/:id" element={<EditarCentros />} />
 
                                         <Route path="/responsables" element={<Responsables />} />
+                                        <Route path="/clientes" element={<Clientes />} />
                                         <Route path="/servicios" element={<Servicios />} />
                                         <Route path="/cotizaciones" element={<Cotizaciones />} />
                                         <Route path="/cotizaciones/nueva" element={<Nueva />} />

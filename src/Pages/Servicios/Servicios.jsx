@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import Tabla from "../../components/Tabla";
 import clienteAxios from "../../config/axios";
 import { AppContext } from "../../context/AppContext";
@@ -58,10 +58,10 @@ export default function Servicios() {
         }
     }
 
-    const handleRowClick = (e, row) => {
+    const handleRowClick = useCallback((e, row) => {
         const id = row.getData().id;
         navigate(`/servicios/${id}`);
-    };
+    }, []);
 
     // Consultar todas las agencias  al cargar el componente
     useEffect(() => {
@@ -100,9 +100,7 @@ export default function Servicios() {
                     pagination: "local",
                     paginationSize: 20,
                 }}
-                events={{
-                    rowClick: handleRowClick,
-                }}
+                onRowClick={handleRowClick}
                 columns={columns}
                 data={servicios}
                 title="Catálogo de servicios"
