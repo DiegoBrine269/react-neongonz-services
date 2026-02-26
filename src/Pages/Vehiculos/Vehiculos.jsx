@@ -1,6 +1,6 @@
 import clienteAxios from "../../config/axios";
 import { AppContext } from "../../context/AppContext";
-import { useContext, useEffect, useState, useRef } from "react";
+import { useContext, useEffect, useState, useRef, useCallback } from "react";
 import Modal from "@/components/Modal";
 import Tabla from "../../components/Tabla";
 import {Link} from "react-router-dom";
@@ -32,31 +32,37 @@ export default function Vehiculos() {
     }, []);
 
 
-        const handleSubmit = async (e) => {
-            e.preventDefault();
-            setLoading(true);
+    const handleRowClick = useCallback((e, row) => {
+        const data = row.getData();
+        setVehiculo(data);
+        setModalOpen(true);
+    }, []);
 
-            try {
-                const { data } = await clienteAxios.put(`/api/vehicles/${vehiculo.id}`,
-                    formData,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
 
-                setErrors({});
-                toast.success('Vehículo actualizado');
-                setModal2Open(false);
-                console.log(tableRef);
-                tableRef.current.setData();
-            } catch (error) {
-                console.error("Error :", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+        try {
+            const { data } = await clienteAxios.put(`/api/vehicles/${vehiculo.id}`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            setErrors({});
+            toast.success('Vehículo actualizado');
+            setModal2Open(false);
+            console.log(tableRef);
+            tableRef.current.setData();
+        } catch (error) {
+            console.error("Error :", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
     return (
@@ -99,13 +105,9 @@ export default function Vehiculos() {
                         },
                         filterMode: "remote",
                     }}
-                    events={{
-                        rowClick: (e, row) => {
-                            const data = row.getData();
-                            setVehiculo(data);
-                            setModalOpen(true);
-                        },
-                    }}
+
+                    onRowClick={handleRowClick}
+      
                 />
             </div>
 

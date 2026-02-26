@@ -15,8 +15,13 @@ export default function Tabla({
     columns,
     options,
     events,
+    onRowClick,
+    onSelectionChange,
 }) {
     const [totalFilas, setTotalFilas] = useState(0);
+
+    const [cantidadSeleccionadas, setCantidadSeleccionadas] = useState(0);
+
 
     // let tableRef = useRef(null);
     const { tableRef } = useContext(AppContext);
@@ -42,11 +47,27 @@ export default function Tabla({
         });
     };
 
+    const internalRowSelectionChanged = (data, rows, selected, deselected) => {
+        // lógica interna de la tabla
+        setCantidadSeleccionadas(data.length);
+
+        // evento hacia el padre
+        onSelectionChange?.(data, rows, selected, deselected);
+    };
+
+    const internalRowClick = (e, row) => {
+
+        onRowClick?.(e, row);
+    };
+
+
     return (
         <>
             <div className="flex justify-between items-center">
                 <p className="text">
-                    Total: <span className="font-bold">{totalFilas}</span>
+                
+                    {cantidadSeleccionadas > 0  && <> Seleccionando: <span className="font-bold">{cantidadSeleccionadas}</span> de <span className="font-bold">{totalFilas}</span></>}
+                    {cantidadSeleccionadas == 0 && <>Total: <span className="font-bold">{totalFilas}</span></>}
                 </p>
             </div>
             <div className={className}>
@@ -76,6 +97,10 @@ export default function Tabla({
                                 if (options?.paginationMode !== "remote")
                                     setTotalFilas(rows.length);
                             },
+
+                            
+                            rowSelectionChanged: internalRowSelectionChanged,
+                            rowClick: internalRowClick,
                         }}
                     />
                 </Suspense>

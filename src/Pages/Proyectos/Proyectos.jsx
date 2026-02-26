@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, useRef, useMemo } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 // import "../../node_modules/react-tabulator/css/materialize/tabulator_materialize.min.css";
 
 import clienteAxios from "../../config/axios";
@@ -96,10 +96,10 @@ export default function Proyectos() {
     // Hook SWR
     // const { data: proyectos, error, isLoading } = useSWR(url, fetcher);
 
-    const handleRowClick = (e, row) => {
+    const handleRowClick = useCallback((e, row) => {
         const id = row.getData().id;
         navigate(`/proyectos/${id}`);
-    };
+    },[]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -237,9 +237,8 @@ export default function Proyectos() {
                         },
                         filterMode: "remote",
                     }}
-                events={{
-                    rowClick: handleRowClick,
-                }}
+                
+                onRowClick={handleRowClick}
                 columns={columns}
                 title="Listado de proyectos"
             />

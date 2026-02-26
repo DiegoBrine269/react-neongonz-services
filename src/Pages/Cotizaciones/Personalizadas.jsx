@@ -275,7 +275,7 @@ export default function Personalizadas() {
                             </option>
                             {pendientes.map((cot) => (
                                 <option key={cot.id} value={cot.id}>
-                                    {cot.centre.name} ({format(cot.date, "DD/MM/YYYY")})
+                                    {cot.centre.name} ({format(new Date(cot.date), "DD/MM/YYYY")})
                                 </option>
                             ))}
                         </select>

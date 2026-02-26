@@ -2,7 +2,7 @@
 import { CirclePlus, UserRoundPen, Trash2, CircleCheck, Receipt, Pencil, MailIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import Tabla from "../../components/Tabla";
-import { useContext, useState, useRef, useEffect } from "react";
+import { useContext, useState, useRef, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import { AppContext } from "../../context/AppContext";
 import Modal from "../../components/Modal";
@@ -12,6 +12,8 @@ import Swal from "sweetalert2";
 import { format } from "@formkit/tempo";
 import { motion, AnimatePresence } from "framer-motion";
 import ErrorLabel from '@/components/UI/ErrorLabel';
+import { useForm, useFieldArray } from 'react-hook-form';
+import get from 'lodash.get';
 
 
 export default function Cotizaciones() {
@@ -20,15 +22,26 @@ export default function Cotizaciones() {
     const [cotizacion, setCotizacion] = useState({});
 
     const [selectedRows, setSelectedRows] = useState([]);
+    const [listaComplementos, setListaComplementos] = useState([]);
+
     
     const [modal, setModal] = useState(false);
     const [modal2, setModal2] = useState(false);
     const [modal3, setModal3] = useState(false);
 
 
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState({
+        validation_date: format(new Date(), "YYYY-MM-DD"),
+    });
+    
     const [errors, setErrors] = useState({});
 
+    // React Hook Form setup
+    const {register, handleSubmit, setValue } = useForm({
+            defaultValues: {
+            items: [] 
+        }
+    });
 
     const [activeTab, setActiveTab] = useState('todas');
     const tabs = [
@@ -43,7 +56,7 @@ export default function Cotizaciones() {
     ];
 
 
-    const { tableRef, token, setLoading, pendientes, fetchPendientes,  pendientesEnvio, fetchPendientesEnvio, requestHeader } = useContext(AppContext);
+    const { tableRef, token, setLoading, pendientes, fetchPendientes,  pendientesEnvio, fetchPendientesEnvio, requestHeader, fetchCustomers, customers } = useContext(AppContext);
 
     const [reloadKey, setReloadKey] = useState(0);
     const savedFiltersRef = useRef([]);
@@ -58,11 +71,88 @@ export default function Cotizaciones() {
 
     const recargarTabla = () => {
         tableRef.current.replaceData();
-        // if (tableRef.current) {
-        //     savedFiltersRef.current = tableRef.current.getFilters();
-        // }
-        // setReloadKey(prev => prev + 1);
     };
+
+    const handleClickComplemento = () => {
+        // const grouped = Object.values(
+        //     selectedRows.reduce((acc, item) => {
+        //         const id = item.billing.id;
+        //         const uuid = item.billing.uuid;
+
+        //         if (!acc[id]) {
+        //             acc[id] = {
+        //                 id: id,
+        //                 uuid: uuid,
+        //                 total: 0,
+        //             };
+        //         }
+                
+        //         acc[id].total += parseInt(item.total)*1.16;
+
+        //         return acc;
+        //     }, {})
+        // );
+
+        // console.log(grouped)
+        // setListaComplementos(grouped);
+
+        const ocs = new Set(selectedRows.map(r => r.oc));
+
+        const params = new URLSearchParams();
+
+        Array.from(ocs).forEach((oc, i) => {
+            params.append(`filter[${i}][field]`, 'oc');
+            params.append(`filter[${i}][type]`, '=');
+            params.append(`filter[${i}][value]`, oc);
+        });
+
+        clienteAxios.get(`/api/invoices?${params.toString()}`, requestHeader)
+            .then(res => {
+                const grouped = Object.values(
+                    res.data.data.reduce((acc, item) => {
+                        const id = item.billing?.id || `no-billing-${item.id}`;
+                        const uuid = item.billing?.uuid || null;
+
+                        if (!acc[id]) {
+                            acc[id] = {
+                                id: id,
+                                uuid: uuid,
+                                total: 0,
+                            };
+                        }
+                        
+                        acc[id].total += parseInt(item.total)*1.16;
+
+                        return acc;
+                    }, {})
+                );
+
+                setListaComplementos(grouped);  
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+                toast.error("Error al cargar los datos para los complementos");
+            }); 
+            
+
+        
+        setModal3(true)
+    }
+
+    const handleRowClick = useCallback((e, row) => {
+        const data = row?.getData?.();
+        setCotizacion(data);
+        setFormData(prev => ({
+            ...prev,
+            validation_date: format(new Date(), "YYYY-MM-DD")
+        }));
+        setModal(true);
+    }, []);
+
+
+    const handleRowSelectionChanged = useCallback((selectedData) => {
+        setSelectedRows(selectedData);
+    }, []);
 
     useEffect(() => {
         // cuando la tabla se “reconstruye”, vuelves a aplicar
@@ -70,6 +160,17 @@ export default function Cotizaciones() {
             tableRef.current.setFilter(savedFiltersRef.current);
         }
     }, [reloadKey]);
+
+    //Esto es para enviar los ids de las facturas seleccionadas al formulario de complemento dinámicamente
+    useEffect(() => {
+        setValue(
+            "items",
+            listaComplementos.map(row => ({
+            id: row.id,
+            amount: ""
+            }))
+        );
+    }, [listaComplementos]);
 
     async function fetchInvoiceFile() {
         try {
@@ -95,14 +196,14 @@ export default function Cotizaciones() {
     async function fetchZipFile(id) {
         try {
             setLoading(true);
-            const response = await clienteAxios.get(`/api/billings/${id}/download`, {
+            const response = await clienteAxios.get(`/api/billings/${id}`, {
                 responseType: "blob",
                 ...requestHeader
             });
 
             const disposition = response.headers["content-disposition"] || "";
             const match = disposition.match(/filename\*=UTF-8''([^;]+)|filename="([^"]+)"/i);
-            const fileName = decodeURIComponent(match?.[1] || match?.[2] || `SAT COT_${id} .zip`);
+            const fileName = decodeURIComponent(match?.[1] || match?.[2] || `SAT.zip`);
 
             const blob = new Blob([response.data], {
                 type: "application/zip",
@@ -267,7 +368,7 @@ export default function Cotizaciones() {
             setErrors({});
             setLoading(true);
 
-            await clienteAxios.post(`/api/invoices/create-sat-invoice`, 
+            await clienteAxios.post(`/api/billings/sat-billing`, 
                 {
                     invoice_ids: selectedRows.map(r => r.id),
                     ...formData
@@ -282,7 +383,7 @@ export default function Cotizaciones() {
         }   
         catch (error) { 
 
-  
+            // console.log();
 
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors);
@@ -291,7 +392,7 @@ export default function Cotizaciones() {
             
             Swal.fire({
                 title: "Error al emitir la(s) factura(s)",
-                text: "Asegúrate de haber llenado los campos de Clave de producto y Clave unidad SAT.",
+                text: error.response.data.error ?? "Asegúrate de haber llenado los campos de Clave de producto y Clave unidad SAT.",
                 icon: "error",
                 ...swalConfig(),
             });
@@ -301,12 +402,14 @@ export default function Cotizaciones() {
         }
     }
 
-    const handleComplemento = async () => {
+    const handleComplemento = async (data) => {
         try {
             setLoading(true);
-            await clienteAxios.post(`/api/invoices/create-sat-complement`, 
+            console.log(data.items);
+            await clienteAxios.post(`/api/billings/sat-complement`, 
                 {
-                    invoice_ids: selectedRows.map(r => r.id),
+                    // invoice_ids: selectedRows.map(r => r.id),
+                    data: data.items,
                     ...formData,
                 },
                 requestHeader
@@ -335,6 +438,8 @@ export default function Cotizaciones() {
 
         //Pendientes de enviar
         fetchPendientesEnvio();
+
+        fetchCustomers();
     }, []);
 
     useEffect(()=>{
@@ -420,12 +525,7 @@ export default function Cotizaciones() {
                                     activeTab == 'complemento' &&
                                     <motion.button
                                         className="btn"
-                                        onClick={() => {
-                                            // Abrir modal de complemento solo si el payment_form es 99, es decir, por definir
-                                            // if(selectedRows[0].payment_form === '99'){
-                                            // }
-                                            setModal3(true)
-                                        }}
+                                        onClick={handleClickComplemento}
                                         
                                         {...motionProps}
                                     > 
@@ -457,16 +557,6 @@ export default function Cotizaciones() {
                                     Personalizadas{" "}
                                     <span className="counter">{pendientes?.length}</span>
                                 </Link>
-
-                                {/* <Link
-                                    className="btn btn-secondary m-0 relative"
-                                    to="/cotizaciones/enviar"
-                                    state={{ pendientesEnvio: pendientesEnvio }}
-                                >
-                                    <Mail />
-                                    Enviar
-                                    <span className="counter">{pendientesEnvio?.length}</span>
-                                </Link> */}
                             </motion.div>
                     }
                 </AnimatePresence>
@@ -615,6 +705,13 @@ export default function Cotizaciones() {
                             headerFilter: true,
                             resizable: false,
                         },
+                        {
+                            title: "UUID",
+                            field: "billing.uuid",
+                            headerFilter: true,
+                            resizable: false,
+                            // visible: false,
+                        },
                     ]}
                     ref={tableRef}
                     layout="fitColumns"
@@ -631,17 +728,8 @@ export default function Cotizaciones() {
                         },
                         filterMode: "remote",
                     }}
-                    events={{
-                        rowClick: (e, row) => {
-                            const data = row.getData();
-                            // console.log(data);
-                            setCotizacion(data);
-                            setModal(true);
-                        },
-                        rowSelectionChanged: (selectedData) => {
-                            setSelectedRows(selectedData); // Guardamos en estado
-                        },
-                    }}
+                    onRowClick={handleRowClick}
+                    onSelectionChange={handleRowSelectionChanged}
                 />
             </div>
 
@@ -823,7 +911,7 @@ export default function Cotizaciones() {
                             (complement, index) =>
                                 <div className="text" key={index}>
                                     <span className="label-modal">
-                                        Complemento {index + 1}
+                                        Complemento {index + 1} 
                                     </span>{" "}
                                     <button
                                         className="underline cursor-pointer py-1"
@@ -905,27 +993,30 @@ export default function Cotizaciones() {
                         </select>
                         <ErrorLabel>{errors.payment_method}</ErrorLabel>
 
-                        <label className="label">Forma de facturar</label>
-                        <div className="pl-2">
-                            <label 
-                                htmlFor="joined" 
-                                className="text text-sm flex gap-1 mt-0"
-                                onClick={() => setFormData({...formData, joined: 1})}
-                            >
-                                <input type="radio" name="joined" id="joined" value={1} />
-                                <span className="bre">Facturar de manera conjunta (una factura por todas las cotizaciones)</span>
-                            </label>
- 
-                            <label 
-                                htmlFor="not-joined" 
-                                className="text text-sm flex gap-1 mt-0"
-                                onClick={() => setFormData({...formData, joined: 0})}
-                            >
-                                <input type="radio" name="joined" id="not-joined" value={0} />
-                                <span className="bre">Facturar de manera individual (una factura por cada cotización)</span>
-                            </label>
-                        </div>
-                        <ErrorLabel>{errors.joined}</ErrorLabel>
+                       {selectedRows.length > 1 && (
+                        <>
+                            <label className="label">Forma de facturar</label>
+                            <div className="pl-2">
+                                <label 
+                                    htmlFor="joined" 
+                                    className="text text-sm flex gap-1 mt-0"
+                                    onClick={() => setFormData({...formData, joined: 1})}
+                                >
+                                    <input type="radio" name="joined" id="joined" value={1} />
+                                    <span className="bre">Facturar de manera conjunta (una factura por todas las cotizaciones)</span>
+                                </label>
+    
+                                <label 
+                                    htmlFor="not-joined" 
+                                    className="text text-sm flex gap-1 mt-0"
+                                    onClick={() => setFormData({...formData, joined: 0})}
+                                >
+                                    <input type="radio" name="joined" id="not-joined" value={0} />
+                                    <span className="bre">Facturar de manera individual (una factura por cada cotización)</span>
+                                </label>
+                            </div>
+                            <ErrorLabel>{errors.joined}</ErrorLabel>
+                       </>) }
 
                         <ErrorLabel>{errors.product_key}</ErrorLabel>
                         <ErrorLabel>{errors.sat_unit_key}</ErrorLabel>
@@ -946,7 +1037,7 @@ export default function Cotizaciones() {
             {/* Modal para pedir datos de complemento */}
             <Modal isOpen={modal3} onClose={() => setModal3(false)}>
                 <h2 className="title-3">Ingresa los siguientes datos</h2>
-                <div className="">
+                <form className="" onSubmit={handleSubmit(handleComplemento)}>
                     <label className="label" htmlFor="payment_form">Forma de pago:</label>
                     <select  
                         id="payment_form"
@@ -983,32 +1074,49 @@ export default function Cotizaciones() {
                         id="payment_form"
                         defaultValue=""
                         // value={formData.payment_form || ''}
-                        // onChange={e => setFormData({...formData, payment_form: e.target.value})}
+                        onChange={e => setFormData({...formData, customer_id: e.target.value})}
                         autoFocus
                     >
-                        <option value="">Selecciona una opción</option>
+                        <option value="" disabled>Selecciona una opción</option>
+                        {
+                            customers.map(customer => (
+                                <option key={customer.id} value={customer.id}>{customer.legal_name}</option>
+                            ))
+                        }
                     </select>
+                    <ErrorLabel>{errors.customer_id}</ErrorLabel>
 
-                    <label className="label" htmlFor="payment_amount">Importe de pago</label>
-                    <input
-                        id="payment_amount"
-                        onChange={e => setFormData({...formData, payment_amount: e.target.value})} 
-                        type="number" 
-                        className="input" 
-                        placeholder="Importe de pago"
-                    />
-                    <ErrorLabel>{errors.payment_amount}</ErrorLabel>
+
+                    {
+                        listaComplementos.map((row, index) =>(
+                            <>
+                                <label className="label" htmlFor={row.id}>Importe de pago de {row.uuid} ({formatoMoneda.format(row.total)})</label>
+                                {/* <input type="hidden" name="" {...register(`items.${index}.id`)} defaultValue={row.id} /> */}
+                                <input
+                                    {...register(`items.${index}.amount`)}
+                                    id={row.id}
+                                    type="number" 
+                                    className="input" 
+                                    placeholder="Importe de pago"
+                                    min="1"
+                                />
+                                <ErrorLabel>{get(errors, `data.${index}.amount`)}</ErrorLabel>
+                                
+                            </>
+                        ))
+                    }
+
 
 
                     <div className="contenedor-botones">
                         <button 
                             className="btn"
-                            onClick={handleComplemento}
+                            type="submit"
                         >
                             Aceptar
                         </button>
                     </div>
-                </div>
+                </form>
             </Modal>
         </>
     );

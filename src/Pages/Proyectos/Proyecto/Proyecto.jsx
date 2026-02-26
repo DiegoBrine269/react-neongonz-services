@@ -118,7 +118,10 @@ export default function Proyecto() {
     }).then(res => res.data);
 
 
-
+    const handleRowClick = useCallback((e, row) => {
+        setVehiculo(row.getData());
+        setModalConsultarOpen(true);
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -787,12 +790,7 @@ export default function Proyecto() {
                 title={`${proyecto?.service?.name} - ${proyecto?.centre?.name}`}
                 tableRef={tableRef}
                 className="custom-table"
-                events={{
-                    rowClick: (e, row) => {
-                        setVehiculo(row.getData());
-                        setModalConsultarOpen(true);
-                    },
-                }}
+                onRowClick={handleRowClick}
                 columns={columns}
                 data={vehiculos}
             />

@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import Tabla from "@/components/Tabla";
 import clienteAxios from "@/config/axios";
 import { AppContext } from "@/context/AppContext";
 import Modal from "@/components/Modal";
 import { toast } from "react-toastify";
-import { CirclePlus, UsersRound } from "lucide-react";
+import { Building2, CirclePlus, UsersRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import  ErrorLabel  from '@/components/UI/ErrorLabel.jsx';
 
@@ -58,6 +58,11 @@ export default function Centros() {
         }
     }
 
+    const handleRowClick = useCallback((e, row) => {
+        setModalViewOpen(true);
+        const data = row.getData();
+        setCentro(data);
+    }, []);
 
     // Consultar todas las agencias  al cargar el componente
     useEffect(() => {
@@ -114,19 +119,18 @@ export default function Centros() {
                     <UsersRound/>
                     Responsables
                 </Link>
+
+                <Link to={'/clientes'} className="btn btn-secondary">
+                    <Building2/>
+                    Clientes fiscales
+                </Link>
             </div>
 
             
 
 
             <Tabla
-                events={{
-                    rowClick: (e, row) => {
-                        setModalViewOpen(true);
-                        const data = row.getData();
-                        setCentro(data);
-                    },
-                }}
+                onRowClick={handleRowClick}
                 columns={columns}
                 data={centros}
                 title={"Listado de centros de venta"}
