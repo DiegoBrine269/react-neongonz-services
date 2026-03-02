@@ -5,11 +5,12 @@ import Modal from "@/components/Modal";
 import Tabla from "../../components/Tabla";
 import {Link} from "react-router-dom";
 import { toast } from "react-toastify";
+import {Truck} from "lucide-react"
 
 
 export default function Vehiculos() {
     const [vehiculos, setVehiculos] = useState([]);
-    const { token, setLoading, centros, fetchCentros, tableRef } = useContext(AppContext);
+    const { token, setLoading, centros, fetchCentros, tableRef, user } = useContext(AppContext);
     const [isModalOpen, setModalOpen] = useState(false);
     const [isModal2Open, setModal2Open] = useState(false);
     const [formData, setFormData] = useState({});
@@ -70,6 +71,14 @@ export default function Vehiculos() {
             <h2 className="title-2">Listado de vehículos</h2>
 
             <div>
+
+                {user.role === 'admin' && <div className="contenedor-botones">
+                    <Link to="/vehiculos/tipos" className="btn btn-secondary">
+                        <Truck className="w-4 h-4 mr-2" />
+                        Ver tipos de vehículos
+                    </Link>
+                </div>}
+
                 <Tabla
                     columns={[
                         {

@@ -79,7 +79,7 @@ export default function Servicio() {
     const fetchTypes = async () => {
         setLoading(true);
         try {
-            const res = await clienteAxios.get(`/api/vehicles-types`, {
+            const res = await clienteAxios.get(`/api/vehicles/types`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
