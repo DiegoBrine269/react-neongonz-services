@@ -443,14 +443,14 @@ export default function Cotizaciones() {
     }, []);
 
     useEffect(()=>{
-        if(formData.payment_method === 'PPD'){
+        if(formData.payment_method === 'PPD' && activeTab === 'factura'){
             setFormData(prevFormData => ({...prevFormData, payment_form: '99'}));
         }
 
-        if(formData.payment_form === '99' && formData.payment_method === 'PUE'){
+        if(formData.payment_form === '99' && formData.payment_method === 'PUE' && activeTab === 'factura'){
             setFormData(prevFormData => ({...prevFormData, payment_form: ''}));
         }
-    }, [formData.payment_method, formData.payment_form]);
+    }, [formData.payment_method, formData.payment_form, activeTab]);
 
     return (
         <>
@@ -1020,6 +1020,8 @@ export default function Cotizaciones() {
 
                         <ErrorLabel>{errors.product_key}</ErrorLabel>
                         <ErrorLabel>{errors.sat_unit_key}</ErrorLabel>
+                        <ErrorLabel>{errors.customer}</ErrorLabel>
+                        <ErrorLabel>{errors.error}</ErrorLabel>
 
 
 
@@ -1042,7 +1044,7 @@ export default function Cotizaciones() {
                     <select  
                         id="payment_form"
                         defaultValue=""
-                        value={formData.payment_form || ''}
+                        value={formData.payment_form}
                         onChange={e => setFormData({...formData, payment_form: e.target.value})}
                         autoFocus
                     >
@@ -1069,13 +1071,12 @@ export default function Cotizaciones() {
                     <ErrorLabel>{errors.payment_date}</ErrorLabel>
 
 
-                    <label className="label" htmlFor="payment_date">Cliente fiscal</label>
+                    <label className="label" htmlFor="customer">Cliente fiscal</label>
                     <select  
-                        id="payment_form"
+                        id="customer"
                         defaultValue=""
                         // value={formData.payment_form || ''}
                         onChange={e => setFormData({...formData, customer_id: e.target.value})}
-                        autoFocus
                     >
                         <option value="" disabled>Selecciona una opción</option>
                         {
