@@ -30,6 +30,7 @@ import Tesseract from "tesseract.js";
 
 import Camera from 'react-html5-camera-photo';
 import 'react-html5-camera-photo/build/css/index.css';
+import ButtonSubmit from "@/components/UI/Buttons/ButtonSubmit.jsx";
 
 
 export default function Proyecto() {
@@ -1069,14 +1070,23 @@ export default function Proyecto() {
                             </div>
                         )}
 
-                        <div className="flex gap-2 mt-2">
-                            <input
+                        <div className="contenedor-botones">
+                            {/* <input
                                 className="btn disabled:opacity-50 disabled:cursor-not-allowed flex-1"
                                 type="submit"
                                 value="Registrar"
                                 onClick={handleSubmit}
                                 disabled={fetching}
-                            />
+                            /> */}
+                            <ButtonSubmit
+                                // className="flex-1"
+                                type="submit"
+                                onClick={handleSubmit}
+                                icon={<CircleCheck />}
+                                disabled={fetching}
+                            >
+                                Registrar
+                            </ButtonSubmit>
                         </div>
                     </form>
                 </Modal>

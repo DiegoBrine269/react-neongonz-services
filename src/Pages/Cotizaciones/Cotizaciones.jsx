@@ -14,7 +14,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import ErrorLabel from '@/components/UI/ErrorLabel';
 import { useForm, useFieldArray } from 'react-hook-form';
 import get from 'lodash.get';
+import ButtonSubmit from "@/components/UI/Buttons/ButtonSubmit";
 
+const MotionButton = motion.create(ButtonSubmit);
 
 export default function Cotizaciones() {
 
@@ -287,7 +289,7 @@ export default function Cotizaciones() {
                                 requestHeader
                             );
                 
-                toast.success("Cotizaciones enviadas correctamente");
+                toast.success(res.data.message || "Cotizaciones enviadas correctamente");
                 recargarTabla();
 
             } catch (error) {
@@ -362,13 +364,11 @@ export default function Cotizaciones() {
     }
 
     const handleFacturar = async () => {
-
-
         try {
             setErrors({});
             setLoading(true);
 
-            await clienteAxios.post(`/api/billings/sat-billing`, 
+            const res = await clienteAxios.post(`/api/billings/sat-billing`, 
                 {
                     invoice_ids: selectedRows.map(r => r.id),
                     ...formData
@@ -376,7 +376,7 @@ export default function Cotizaciones() {
                 requestHeader
             );
 
-            toast.success("Factura(s) emitida(s) correctamente");
+            toast.success(res.data.message || "Factura(s) emitida(s) correctamente");
             setModal2(false);
             setCotizacion({});
             recargarTabla();
@@ -405,8 +405,8 @@ export default function Cotizaciones() {
     const handleComplemento = async (data) => {
         try {
             setLoading(true);
-            console.log(data.items);
-            await clienteAxios.post(`/api/billings/sat-complement`, 
+            
+            const res = await clienteAxios.post(`/api/billings/sat-complement`, 
                 {
                     // invoice_ids: selectedRows.map(r => r.id),
                     data: data.items,
@@ -415,7 +415,7 @@ export default function Cotizaciones() {
                 requestHeader
             );
 
-            toast.success("Complemento(s) emitido(s) correctamente");
+            toast.success(res.data.message || "Complemento(s) emitido(s) correctamente");
             setModal(false);
             setCotizacion({});
             recargarTabla();
@@ -479,18 +479,14 @@ export default function Cotizaciones() {
                                 </motion.button>
 
                                 {
-                                    activeTab == 'envio' &&
-                                    <motion.button
-                                        className="btn"
+                                    (activeTab == 'envio' || activeTab == 'oc') &&
+                                    <MotionButton
                                         onClick={handleEnviarCotizaciones}
+                                        icon={<MailIcon />}
                                         {...motionProps}
-                                    > 
-                                            <>
-                                                <MailIcon />
-                                                Enviar
-                                            </>
-                                        
-                                    </motion.button>
+                                    >
+                                        Enviar
+                                    </MotionButton>
                                 }
 
                                 {
@@ -1026,12 +1022,12 @@ export default function Cotizaciones() {
 
 
                         <div className="contenedor-botones">
-                            <button 
-                                className="btn"
+                            <ButtonSubmit
                                 onClick={handleFacturar}
+                                icon={<CircleCheck />}
                             >
                                 Aceptar
-                            </button>
+                            </ButtonSubmit>
                         </div>
                 </div>
             </Modal>
@@ -1110,12 +1106,13 @@ export default function Cotizaciones() {
 
 
                     <div className="contenedor-botones">
-                        <button 
-                            className="btn"
+                        <ButtonSubmit
                             type="submit"
+                            onClick={handleSubmit(handleComplemento)}
+                            icon={<CircleCheck />}
                         >
                             Aceptar
-                        </button>
+                        </ButtonSubmit>
                     </div>
                 </form>
             </Modal>

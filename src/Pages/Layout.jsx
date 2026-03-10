@@ -22,12 +22,12 @@ export default function Layout() {
                 className="pointer-events-none fixed inset-0 w-full"
                 snowflakeCount={120}
             />   */}
-            {loading && (
+            {/* {loading && (
                 <div className="fixed inset-0 z-50 flex flex-col gap-3 items-center justify-center bg-black/75">
                     <PacmanLoader color="#ffffff" />
                     {loadingMessage && <p className="text-white">{loadingMessage}</p>}
                 </div>
-            )}
+            )} */}
 
             {!isOnline && (
                 <div className="fixed inset-0 z-50 flex gap-2 flex-col items-center justify-center bg-black/75">

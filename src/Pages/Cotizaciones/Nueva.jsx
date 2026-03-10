@@ -14,7 +14,7 @@ import {formatearDinero} from "@/utils/utils.js";
 import AnimatedAmount from "@/components/UI/AnimatedAmount";
 import ErrorLabel from "@/components/UI/ErrorLabel.jsx";
 import {useSelection} from "@/hooks/useSelection";
-
+import ButtonSubmit from "@/components/UI/Buttons/ButtonSubmit.jsx";
 
 export default function Nueva() {
     const navigate = useNavigate();
@@ -411,13 +411,15 @@ export default function Nueva() {
                                     }
                                 ></textarea>
 
-                                <button
-                                    className="btn mt-4"
-                                    onClick={handleSubmit}
-                                >
-                                    <Printer />
-                                    Generar
-                                </button>
+                                <div className="contenedor-botones">
+                                    <ButtonSubmit
+                                        type="submit"
+                                        onClick={handleSubmit}
+                                        icon={<Printer />}
+                                    >
+                                        Generar
+                                    </ButtonSubmit>
+                                </div>
                             </>
                         )}
 

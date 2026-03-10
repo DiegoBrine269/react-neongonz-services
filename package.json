@@ -21,6 +21,7 @@
     "lodash.get": "^4.4.2",
     "lucide-react": "^0.487.0",
     "motion": "^12.23.12",
+    "nprogress": "^0.2.0",
     "react": "^19.0.0",
     "react-day-picker": "^9.8.0",
     "react-dom": "^19.0.0",

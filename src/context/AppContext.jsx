@@ -1,6 +1,8 @@
 import { createContext, useEffect, useState, useRef } from "react";
 import clienteAxios from "../config/axios";
 import { toast } from "react-toastify";
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 
 export const AppContext = createContext();
 
@@ -249,7 +251,14 @@ export default function AppProvider({ children }) {
 
     // Loading
     const [loading, setLoading] = useState(false);
-
+    const handleLoading = (value) => {
+        if (value) {
+            NProgress.start();
+        } else {
+            NProgress.done();
+        }
+        setLoading(value); // Si aún necesitas el estado para algo más
+    };
     //Total de filas
 
 
@@ -268,7 +277,7 @@ export default function AppProvider({ children }) {
                 isMenuOpen,
                 setIsMenuOpen,
                 loading,
-                setLoading,
+                setLoading: handleLoading,
                 fetchCentros,
                 centros,
                 setCentros,
