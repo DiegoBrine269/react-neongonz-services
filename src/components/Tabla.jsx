@@ -1,4 +1,4 @@
-import { useState, useRef, Suspense, useContext, useEffect } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import { tabulatorConfig } from "../config/variables.js";
 import { ReactTabulator } from "react-tabulator";
 import { Sheet, FileText } from "lucide-react";
@@ -71,39 +71,39 @@ export default function Tabla({
                 </p>
             </div>
             <div className={className}>
-                <Suspense fallback={<p>Fetching workloads...</p>}>
-                    <ReactTabulator
-                        onRef={(r) => (tableRef.current = r.current)}
-                        data={data}
-                        columns={columns}
-                        persistance={true}
-                        options={{
-                            ...options,
-                            ...tabulatorConfig,
+                <ReactTabulator
+                    onRef={(r) => (tableRef.current = r.current)}
+                    data={data}
+                    columns={columns}
+                    persistance={true}
+                    options={{
+                        ...options,
+                        ...tabulatorConfig,
 
-                            ajaxResponse: (url, params, response) => {
-                                // console.log(response.total);
-                                setTotalFilas(response.total);
-                                return response;
-                            },
-                        }}
-                        events={{
-                            ...events,
-                            dataLoaded: (data) => {
-                                if (options?.paginationMode !== "remote")
-                                    setTotalFilas(data.length);
-                            },
-                            dataFiltered: (filters, rows) => {
-                                if (options?.paginationMode !== "remote")
-                                    setTotalFilas(rows.length);
-                            },
 
-                            
-                            rowSelectionChanged: internalRowSelectionChanged,
-                            rowClick: internalRowClick,
-                        }}
-                    />
-                </Suspense>
+                        ajaxResponse: (url, params, response) => {
+                            console.log(response.total);
+                            setTotalFilas(response.total);
+                            return response;
+                        },
+                    }}
+                    events={{
+                        ...events,
+                        dataLoaded: (data) => {
+                            if (options?.paginationMode !== "remote")
+                                setTotalFilas(data.length);
+                        },
+                        dataFiltered: (filters, rows) => {
+                            if (options?.paginationMode !== "remote")
+                                setTotalFilas(rows.length);
+                        },
+
+                        
+                        rowSelectionChanged: internalRowSelectionChanged,
+                        rowClick: internalRowClick,
+                    }}
+                />
+
                 <div className="contenedor-botones">
                     <button
                         className="btn bg-orange-900 w-fit"

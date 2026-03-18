@@ -1,9 +1,9 @@
 
 import { useState } from "react";
 import { useContext, useEffect } from "react";
-import { AppContext } from "../../context/AppContext";
+import { AppContext } from "@/context/AppContext";
 import { toast } from "react-toastify";
-import clienteAxios from "../../config/axios";
+import clienteAxios from "@/config/axios";
 import { Printer } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format } from "@formkit/tempo";
@@ -15,35 +15,17 @@ import AnimatedAmount from "@/components/UI/AnimatedAmount";
 import ErrorLabel from "@/components/UI/ErrorLabel.jsx";
 import {useSelection} from "@/hooks/useSelection";
 import ButtonSubmit from "@/components/UI/Buttons/ButtonSubmit.jsx";
+import { CotizacionesContext } from "@/context/CotizacionesContext";
 
 export default function Nueva() {
     const navigate = useNavigate();
    
 
-    const { token, setLoading, centros, fetchCentros, fetchResponsables, responsables, setLoadingMessage} = useContext(AppContext);
+    const { token, setLoading, loading, centros, fetchCentros, fetchResponsables, responsables, setLoadingMessage} = useContext(AppContext);
+    const {vehiculosPendientes, setVehiculosPendientes, centro, setCentro, formData, setFormData, selected, toggle, clear, isSelected, setSelected, selectAll, handleCheckboxChange, checkedMap, setCheckedMap, centrosPendientes, setCentrosPendientes, proyectosPendientes, setProyectosPendientes, seleccionarTodo, setSeleccionarTodo, proyectosSeleccionados, setProyectosSeleccionados, subTotal, setSubTotal} = useContext(CotizacionesContext);
 
-    const [centro, setCentro] = useState("");
     const [errors, setErrors] = useState({});
     const [lanzarError, setLanzarError] = useState(false);
-
-    const [vehiculosPendientes, setVehiculosPendientes] = useState([]);
-    const [centrosPendientes, setCentrosPendientes] = useState([]);
-    const [proyectosPendientes, setProyectosPendientes] = useState([]);
-
-
-    const [seleccionarTodo, setSeleccionarTodo] = useState(false);
-    const [proyectosSeleccionados, setProyectosSeleccionados] = useState([]);
-
-    const [subTotal, setSubTotal] = useState(0);
-
-    const [formData, setFormData] = useState({
-        vehicles: [],
-        responsible_id: null,
-        comments: null
-    });
-
-    const { selected, toggle, clear, isSelected, setSelected, selectAll, handleCheckboxChange, checkedMap, setCheckedMap } = useSelection();
-
 
 
     useEffect(() => {
@@ -115,9 +97,6 @@ export default function Nueva() {
                         .values() // Obtén los valores únicos
                 )
             );
-
-            // console.log(res.data);  
-
 
             setVehiculosPendientes(res.data);
             
@@ -316,7 +295,8 @@ export default function Nueva() {
                         className="flex gap-1 justify-end items-center mt-0"
                     >
                         <input
-                            className="h-4 w-4"
+                            className={`h-4 w-4 ${loading ? "cursor-not-allowed" : ""}`}
+                            disabled={loading}
                             type="checkbox"
                             id="seleccionar-todo"
                             checked={seleccionarTodo}
@@ -324,7 +304,6 @@ export default function Nueva() {
 
                                 const nuevoValor = !seleccionarTodo;
                                 setSeleccionarTodo(nuevoValor);
-                                console.log(vehiculosPendientes)
                                 if(nuevoValor)
                                     selectAll(vehiculosPendientes.filter(v => v.centre_id === centro.id))
                                 else
@@ -351,6 +330,8 @@ export default function Nueva() {
                                             label= {`${p.service} (${format(p.date,"full","es")})`}
                                             checked={checkedMap[p.id] || false}
                                             onChange={handleCheckboxChange(p.id, vehiculosPendientes, (item) => item.project.id )}
+                                            className={loading ? "cursor-not-allowed" : ""}
+                                            disabled={loading}
                                         />
                                     </div>
                                     <div className="flex flex-col gap-2">
@@ -382,7 +363,8 @@ export default function Nueva() {
                                                                 label={v.eco}
                                                                 checked={isSelected(v)}
                                                                 onChange={() => toggle(v)}
-
+                                                                className={loading ? "cursor-not-allowed" : ""}
+                                                                disabled={loading}
                                                             />
                                                         ))}
                                                     </div>

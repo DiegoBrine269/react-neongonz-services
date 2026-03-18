@@ -4,6 +4,9 @@ const tabulatorConfig = {
     placeholder: "Sin resultados",
     layout: "fitDataFill",
     resizableColumns: false,
+    paginationSize: 50,
+    paginationSizeSelector: [10, 25, 50, 100],
+    
     langs: {
         default: {
             pagination: {
@@ -15,6 +18,7 @@ const tabulatorConfig = {
                 prev_title: "Página anterior",
                 next: "Siguiente",
                 next_title: "Página siguiente",
+                page_size: "Cantidad de registros por página",
             },
             ajax: {
                 loading: "Cargando datos...", // Cambia "Loading..."

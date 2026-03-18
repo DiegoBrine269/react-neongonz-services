@@ -1,8 +1,8 @@
 import React from 'react'
 
-export default function PeerLabel({checked, value, onChange, label, tooltip=false}) {
+export default function PeerLabel({checked, value, onChange, label, tooltip=false, className="", disabled=false}) {
     return (
-        <label className="cursor-pointer relative inline-flex items-center text-xs mt-0 group select-none">
+        <label className={`cursor-pointer relative inline-flex items-center text-xs mt-0 group select-none ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}>
             <input
                 type="checkbox"
                 className="checkbox-btn peer"
