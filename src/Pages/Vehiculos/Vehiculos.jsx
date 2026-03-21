@@ -90,7 +90,7 @@ export default function Vehiculos() {
                         },
                         {
                             title: "Tipo",
-                            field: "type",
+                            field: "type.type",
                             headerFilter: true,
                             resizable: false,
                         },
@@ -133,7 +133,7 @@ export default function Vehiculos() {
                         <span className="label-modal">
                             Tipo
                         </span>{" "}
-                        <p>{vehiculo?.type}</p>
+                        <p>{vehiculo?.type?.type}</p>
                     </div>
                     <div className="text">
                         <span className="label-modal">

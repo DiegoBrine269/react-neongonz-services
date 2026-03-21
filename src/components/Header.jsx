@@ -22,11 +22,11 @@ export default function Header() {
         return (
             <NavLink
                 to={to}
-                className={({ isActive }) =>
-                    `flex items-center gap-2 p-2 rounded-md transition-colors duration-300 dark:text-neutral-200 hover:bg-gray-200 hover:text-neutral-900 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 ${
-                        isActive
+                className={({ isActive, isPending }) =>
+                    `flex items-center gap-2 p-2 rounded-md transition-all duration-150 ${
+                        isActive || isPending
                             ? "bg-neutral-900 text-neutral-200 font-bold dark:bg-neutral-200 dark:text-neutral-900"
-                            : ""
+                            : "text-neutral-700 dark:text-neutral-200 hover:bg-gray-200 hover:text-neutral-900 dark:hover:bg-neutral-700"
                     }`
                 }
                 onClick={(e) => {

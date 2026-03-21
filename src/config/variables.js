@@ -5,7 +5,8 @@ const tabulatorConfig = {
     layout: "fitDataFill",
     resizableColumns: false,
     paginationSize: 50,
-    paginationSizeSelector: [10, 25, 50, 100],
+    // paginationSizeSelector: [10, 25, 50, 100],
+
     
     langs: {
         default: {
@@ -21,8 +22,8 @@ const tabulatorConfig = {
                 page_size: "Cantidad de registros por página",
             },
             ajax: {
-                loading: "Cargando datos...", // Cambia "Loading..."
-                error: "Error al cargar", // También puedes cambiar "Error loading data"
+                loading: "Cargando datos...", 
+                error: "Error al cargar", 
             },
         },
     },
