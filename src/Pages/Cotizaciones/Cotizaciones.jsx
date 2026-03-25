@@ -15,6 +15,11 @@ import ErrorLabel from '@/components/UI/ErrorLabel';
 import { useForm, useFieldArray } from 'react-hook-form';
 import get from 'lodash.get';
 import ButtonSubmit from "@/components/UI/Buttons/ButtonSubmit";
+import FacturacionPreview from "@/Pages/Cotizaciones/FacturacionPreview";
+import ComplementoPreview from "@/Pages/Cotizaciones/ComplementoPreview";
+
+import ReactDOMServer from "react-dom/server";
+import { columnasCotizaciones } from "./configCotizaciones";
 
 const MotionButton = motion.create(ButtonSubmit);
 
@@ -365,13 +370,49 @@ export default function Cotizaciones() {
 
     const handleFacturar = async () => {
         try {
+            // 1. Primero valida sin ejecutar
+            setLoading(true);
+            try {
+                await clienteAxios.post(
+                    `/api/billings/sat-billing`,
+                    {
+                        invoice_ids: selectedRows.map(r => r.id),
+                        ...formData,
+                        dry_run: true, 
+                    },
+                    requestHeader
+                );
+            } catch (error) {
+                console.log(error.response.data.error)
+                setErrors(error.response?.data?.errors || error.response?.data?.error || {});
+                setLoading(false);
+                return; 
+            }
+            setLoading(false);
+
+            // 2. Sin errores → confirmar
+            const result = await Swal.fire({
+                title: "¿Estás segur@ de querer emitir la(s) factura(s)?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, emitir",
+                cancelButtonText: "Cancelar",
+                ...swalConfig(true),
+                html: ReactDOMServer.renderToString(
+                    <FacturacionPreview data={{ cotizaciones: selectedRows, formData }} />
+                ),
+            });
+
+            if (!result.isConfirmed) return;
+
+            // 3. POST real
             setErrors({});
             setLoading(true);
-
-            const res = await clienteAxios.post(`/api/billings/sat-billing`, 
+            const res = await clienteAxios.post(
+                `/api/billings/sat-billing`,
                 {
                     invoice_ids: selectedRows.map(r => r.id),
-                    ...formData
+                    ...formData,
                 },
                 requestHeader
             );
@@ -382,8 +423,6 @@ export default function Cotizaciones() {
             recargarTabla();
         }   
         catch (error) { 
-
-            // console.log();
 
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors);
@@ -405,10 +444,42 @@ export default function Cotizaciones() {
     const handleComplemento = async (data) => {
         try {
             setLoading(true);
-            
-            const res = await clienteAxios.post(`/api/billings/sat-complement`, 
+
+            try {
+                await clienteAxios.post(`/api/billings/sat-complement`,
+                    {
+                        data: data.items,
+                        ...formData,
+                        dry_run: true,
+                    },
+                    requestHeader
+                );
+            } catch (error) {
+                setErrors(error.response?.data?.errors || {});
+                return;
+            } finally {
+                setLoading(false);
+            }
+
+            const result = await Swal.fire({
+                title: "¿Estás segur@ de querer emitir el/los complemento(s)?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, emitir",
+                cancelButtonText: "Cancelar",
+                ...swalConfig(true),
+                html: ReactDOMServer.renderToString(
+                    <ComplementoPreview data={{ cotizaciones: selectedRows, formData }} />
+                ),
+            });
+
+            if (!result.isConfirmed) return;
+
+            setErrors({});
+            setLoading(true);
+
+            const res = await clienteAxios.post(`/api/billings/sat-complement`,
                 {
-                    // invoice_ids: selectedRows.map(r => r.id),
                     data: data.items,
                     ...formData,
                 },
@@ -420,11 +491,10 @@ export default function Cotizaciones() {
             setCotizacion({});
             recargarTabla();
             setModal3(false);
-        }   
-        catch (error) { 
-            if (error.response && error.response.data.errors) 
+        } catch (error) {
+            if (error.response?.data?.errors)
                 setErrors(error.response.data.errors);
-            
+
             console.error("Error fetching data:", error);
             toast.error("Error al emitir el/los complemento(s)");
         } finally {
@@ -450,6 +520,9 @@ export default function Cotizaciones() {
         if(formData.payment_form === '99' && formData.payment_method === 'PUE' && activeTab === 'factura'){
             setFormData(prevFormData => ({...prevFormData, payment_form: ''}));
         }
+
+        // if(activeTab === 'factura')
+        //     setFormData({...formData, joined: 1});
     }, [formData.payment_method, formData.payment_form, activeTab]);
 
     return (
@@ -468,7 +541,7 @@ export default function Cotizaciones() {
                                 className="contenedor-botones"
                                 {...motionProps}
                             >
-                                <motion.button
+                                { activeTab !== 'factura' && activeTab !== 'f' && activeTab != 'complemento' && <motion.button
 
                                     className="btn btn-danger"
                                     onClick={handleEliminarCotizaciones}
@@ -476,7 +549,7 @@ export default function Cotizaciones() {
                                 >
                                     <Trash2 />
                                     Eliminar
-                                </motion.button>
+                                </motion.button>}
 
                                 {
                                     (activeTab == 'envio' || activeTab == 'oc') &&
@@ -507,6 +580,8 @@ export default function Cotizaciones() {
                                                 return;
                                             }
                                             setModal2(true)
+                                            setErrors({})
+                                            setFormData({...formData, joined:1});
                                         }}
                                         {...motionProps}
                                     > 
@@ -580,135 +655,7 @@ export default function Cotizaciones() {
                 <Tabla
                     key={reloadKey}
                     className="custom-table"
-                    columns={[
-                        {
-                            title: "",
-                            formatter: "rowSelection",
-                            titleFormatter: "rowSelection", // opcional: checkbox en el header para seleccionar todos
-                            hozAlign: "center",
-                            headerSort: false,
-                            width: 50,
-                            resizable: false,
-                        },
-                        {
-                            title: "Centro",
-                            field: "centre",
-                            headerFilter: true,
-                            resizable: false,
-                        },
-                        {
-                            title: "Monto total",
-                            field: "total",
-                            headerFilter: "number",
-                            headerFilterFunc: "=",
-                            formatter: (cell) => {
-                                return cell.getValue() ? formatoMoneda.format(parseInt(cell.getValue())): null;
-                            },
-                            hozAlign: "right",
-                            resizable: false,
-                        },
-                        {
-                            title: "Fecha de cotización",
-                            field: "date",
-                            headerFilter: true,
-                            headerFilterParams: {
-                                elementAttributes: {
-                                    type: "date",
-                                },
-                            },
-                            resizable: false,
-                            formatter: (cell) => {
-                                const date = new Date(
-                                    cell.getValue() + "T12:00:00"
-                                );
-
-                                return format(date, "DD/MM/YYYY");
-                            },
-                        },
-                        {
-                            title: "Fecha de validación",
-                            field: "validation_date",
-                            headerFilter: true,
-                            headerFilterParams: {
-                                elementAttributes: {
-                                    type: "date",
-                                },
-                            },
-                            resizable: false,
-                            formatter: (cell) => {
-                                if (!cell.getValue()) return "";
-                                const date = new Date(
-                                    cell.getValue() + "T12:00:00"
-                                );
-
-                                return format(date, "DD/MM/YYYY");
-                            },
-                        },
-                        {
-                            title: "Servicios",
-                            field: "services",
-                            headerFilter: true,
-                            resizable: false,
-                            width: 220,
-                        },
-                        {
-                            title: "Número",
-                            field: "invoice_number",
-                            headerFilter: true,
-                            resizable: false,
-                        },
-
-                        {
-                            title: "OC",
-                            field: "oc",
-                            headerFilter: true,
-                            resizable: false,
-                        },
-
-                        {
-                            title: "Folio fiscal",
-                            field: "uuid",
-                            headerFilter: true,
-                            resizable: false,
-                        },
-                        {
-                            title: "Forma de pago",
-                            field: "payment_form",
-                            headerFilter: true,
-                            resizable: false,
-                        },
-                        {
-                            title: "Método de pago",
-                            field: "payment_method",
-                            headerFilter: true,
-                            resizable: false,
-                        },
-                        {
-                            title: "F",
-                            field: "f_receipt",
-                            headerFilter: true,
-                            resizable: false,
-                        },
-                        {
-                            title: "Comentarios internos",
-                            field: "internal_commentary",
-                            headerFilter: true,
-                            resizable: false,
-                        },
-                        {
-                            title: "Status",
-                            field: "status",
-                            headerFilter: true,
-                            resizable: false,
-                        },
-                        {
-                            title: "UUID",
-                            field: "billing.uuid",
-                            headerFilter: true,
-                            resizable: false,
-                            // visible: false,
-                        },
-                    ]}
+                    columns={columnasCotizaciones}
                     ref={tableRef}
                     layout="fitColumns"
                     options={{
@@ -965,13 +912,7 @@ export default function Cotizaciones() {
                         >
                             <option value="" disabled>Selecciona una opción</option>
                             <option value="01">Efectivo</option>
-                            {/* <option value="02">Cheque nominativo</option> */}
                             <option value="03">Transferencia electrónica de fondos</option>
-                            {/* <option value="04">Tarjeta de crédito</option>
-                            <option value="28">Tarjeta de débito</option>
-                            <option value="29">Tarjeta de servicios</option>
-                            <option value="30">Aplicación de anticipos</option>
-                            <option value="31">Intermediario de pagos</option> */}
                             <option value="99">Por definir</option>
                         </select>
                         <ErrorLabel>{errors.payment_form}</ErrorLabel>
@@ -998,7 +939,7 @@ export default function Cotizaciones() {
                                     className="text text-sm flex gap-1 mt-0"
                                     onClick={() => setFormData({...formData, joined: 1})}
                                 >
-                                    <input type="radio" name="joined" id="joined" value={1} />
+                                    <input type="radio" name="joined" id="joined" value={1} defaultChecked />
                                     <span className="bre">Facturar de manera conjunta (una factura por todas las cotizaciones)</span>
                                 </label>
     
@@ -1018,6 +959,7 @@ export default function Cotizaciones() {
                         <ErrorLabel>{errors.sat_unit_key}</ErrorLabel>
                         <ErrorLabel>{errors.customer}</ErrorLabel>
                         <ErrorLabel>{errors.error}</ErrorLabel>
+                        
 
 
 
@@ -1046,13 +988,7 @@ export default function Cotizaciones() {
                     >
                         <option value="">Selecciona una opción</option>
                         <option value="01">Efectivo</option>
-                        {/* <option value="02">Cheque nominativo</option> */}
                         <option value="03">Transferencia electrónica de fondos</option>
-                        {/* <option value="04">Tarjeta de crédito</option>
-                        <option value="28">Tarjeta de débito</option>
-                        <option value="29">Tarjeta de servicios</option>
-                        <option value="30">Aplicación de anticipos</option>
-                        <option value="31">Intermediario de pagos</option> */}
                     </select>
                     <ErrorLabel>{errors.payment_form}</ErrorLabel>
 
@@ -1065,7 +1001,6 @@ export default function Cotizaciones() {
                         onChange={e => setFormData({...formData, payment_date: e.target.value})}
                      />
                     <ErrorLabel>{errors.payment_date}</ErrorLabel>
-
 
                     <label className="label" htmlFor="customer">Cliente fiscal</label>
                     <select  
@@ -1082,13 +1017,10 @@ export default function Cotizaciones() {
                         }
                     </select>
                     <ErrorLabel>{errors.customer_id}</ErrorLabel>
-
-
                     {
                         listaComplementos.map((row, index) =>(
                             <>
-                                <label className="label" htmlFor={row.id}>Importe de pago de {row.uuid} ({formatoMoneda.format(row.total)})</label>
-                                {/* <input type="hidden" name="" {...register(`items.${index}.id`)} defaultValue={row.id} /> */}
+                                <label className="label" htmlFor={row.id}>Importe de pago de {row.uuid.substring(0,8) + '...'} ({formatoMoneda.format(row.total)})</label>
                                 <input
                                     {...register(`items.${index}.amount`)}
                                     id={row.id}
@@ -1098,12 +1030,9 @@ export default function Cotizaciones() {
                                     min="1"
                                 />
                                 <ErrorLabel>{get(errors, `data.${index}.amount`)}</ErrorLabel>
-                                
                             </>
                         ))
                     }
-
-
 
                     <div className="contenedor-botones">
                         <ButtonSubmit
