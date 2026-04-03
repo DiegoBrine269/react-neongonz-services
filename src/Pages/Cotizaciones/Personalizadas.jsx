@@ -427,6 +427,21 @@ export default function Personalizadas() {
                         }
                     ></textarea>
 
+                    <label htmlFor="comments" className="label">
+                        Comentarios o instrucciones especiales
+                    </label>
+                    <textarea
+                        value={formData.comments ?? ""}
+                        id="comments"
+                        placeholder="Comentarios o instrucciones especiales"
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                comments: e.target.value,
+                            })
+                        }
+                    ></textarea>
+
                     <div className="contenedor-botones">
                         <button 
                             className="btn" 
