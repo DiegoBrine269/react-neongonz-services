@@ -1,11 +1,18 @@
 // CotizacionesContext.jsx
-import { createContext, useState } from "react";
+import { createContext, useState, useContext } from "react";
 import { useSelection } from "@/hooks/useSelection";
+import clienteAxios from "@/config/axios";
+import { AppContext } from "@/context/AppContext";
+
 
 export const CotizacionesContext = createContext();
 
 export default function CotizacionesProvider({ children }) {
 
+    const { token, setLoading } = useContext(AppContext);
+
+
+    const [cotizacion, setCotizacion] = useState(null);
     const [vehiculosPendientes, setVehiculosPendientes] = useState([]);
     const [centro, setCentro] = useState("");
     const [formData, setFormData] = useState({
@@ -22,6 +29,24 @@ export default function CotizacionesProvider({ children }) {
     const [subTotal, setSubTotal] = useState(0);
     const selection = useSelection(); // { selected, toggle, clear, ... }
 
+    const fetchCotizacion = async (id) => {
+        try {
+            setLoading(true);
+            const res = await clienteAxios.get(`/api/invoices/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,   
+                },  
+            });
+
+            setCotizacion(res.data);
+
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     return (
         <CotizacionesContext.Provider value={{
             vehiculosPendientes, setVehiculosPendientes,
@@ -32,7 +57,9 @@ export default function CotizacionesProvider({ children }) {
             seleccionarTodo, setSeleccionarTodo,
             proyectosSeleccionados, setProyectosSeleccionados,
             subTotal, setSubTotal,
-            ...selection  // expande todas las propiedades del hook
+            ...selection,  // expande todas las propiedades del hook
+
+            cotizacion, fetchCotizacion, setCotizacion
         }}>
             {children}
         </CotizacionesContext.Provider>

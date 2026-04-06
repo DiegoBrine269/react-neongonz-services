@@ -15,9 +15,14 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import Swal from "sweetalert2";
 import { swalConfig } from "@/config/variables";
 import get from 'lodash.get';
+import { useParams } from "react-router-dom";
+import { CotizacionesContext } from "@/context/CotizacionesContext";
 
 export default function Personalizadas() {
 
+    const { id } = useParams();
+
+    const { cotizacion, fetchCotizacion, setCotizacion } = useContext(CotizacionesContext);
     const { token, setLoading, centros, fetchCentros, pendientes, fetchPendientes, responsables, fetchResponsables, fetchUnits, units} = useContext(AppContext);
 
     const navigate = useNavigate();
@@ -49,7 +54,20 @@ export default function Personalizadas() {
         fetchPendientes();
         fetchCentros();
         fetchUnits();
-    }, []);
+        setCotizacion(null);
+
+        if(id){
+            setAccion("edit");
+            setMostrarBotones(false);
+            fetchCotizacion(id); 
+        }
+    }, [id]);
+
+    useEffect(()=>{
+        // console.log(cotizacion);
+        if(cotizacion)
+            handleSelectCotizacion(null, cotizacion);
+    },[cotizacion]);
 
     useEffect(() => {
         setFormData({
@@ -99,6 +117,52 @@ export default function Personalizadas() {
             }
         }
     
+    }
+
+    const handleSelectCotizacion = (e = null, cotizacion = null) => {
+    
+        let selectedCot;
+
+        console.log("Seleccionando cotización", { e, cotizacion });
+
+        if(!cotizacion){
+            const selectedId = parseInt(e.target.value);
+            selectedCot = pendientes.find(
+                (cot) => cot.id === selectedId
+            );
+        }
+        else{
+            selectedCot = cotizacion;
+        }
+
+        if (selectedCot) {
+            setFormData({
+                ...formData,
+                invoice_id: selectedCot.id,
+                centre_id: selectedCot.centre.id,
+                concept: selectedCot.concept,
+                quantity: selectedCot.quantity,
+                price: selectedCot.price,
+                internal_commentary:
+                    selectedCot.internal_commentary,
+                date: selectedCot.date,
+                responsible_id: selectedCot.responsible_id,
+            });
+
+            removeAll();
+
+            
+            selectedCot.rows.forEach((row) =>{
+                // console.log(row.sat_key_prod_serv);
+                append({
+                    concept: row.concept,
+                    quantity: row.quantity,
+                    price: row.price,
+                    sat_unit_key: row.sat_unit_key,
+                    sat_key_prod_serv: row.sat_key_prod_serv.trim(),
+                });
+            });
+        }
     }
 
     const onSubmit = async (data) => {
@@ -233,42 +297,9 @@ export default function Personalizadas() {
                         <select
                             id="invoice_id"
                             className="input"
-                            onChange={(e) => {
-                                const selectedId = parseInt(e.target.value);
-                                const selectedCot = pendientes.find(
-                                    (cot) => cot.id === selectedId
-                                );
-
-                                if (selectedCot) {
-                                    setFormData({
-                                        ...formData,
-                                        invoice_id: selectedCot.id,
-                                        centre_id: selectedCot.centre.id,
-                                        concept: selectedCot.concept,
-                                        quantity: selectedCot.quantity,
-                                        price: selectedCot.price,
-                                        internal_commentary:
-                                            selectedCot.internal_commentary,
-                                        date: selectedCot.date,
-                                        responsible_id: selectedCot.responsible_id,
-                                    });
-
-                                    removeAll();
-
-                                    
-                                    selectedCot.rows.forEach((row) =>{
-                                        // console.log(row.sat_key_prod_serv);
-                                        append({
-                                            concept: row.concept,
-                                            quantity: row.quantity,
-                                            price: row.price,
-                                            sat_unit_key: row.sat_unit_key,
-                                            sat_key_prod_serv: row.sat_key_prod_serv.trim(),
-                                        });
-                                    });
-                                }
-                            }}
-                            value={formData.invoice_id || ""}
+                            onChange={handleSelectCotizacion}
+                            value={cotizacion?.centre?.id || formData.invoice_id || ""}
+                            disabled ={cotizacion ? true : false}
                         >
                             <option value="" disabled>
                                 Selecciona una cotización
@@ -278,6 +309,12 @@ export default function Personalizadas() {
                                     {cot.centre.name} ({format(new Date(cot.date), "DD/MM/YYYY")})
                                 </option>
                             ))}
+                            {
+                                cotizacion && 
+                                <option key={cotizacion.centre.id} value={cotizacion.centre.id}>
+                                    {cotizacion.centre.name} ({format(new Date(cotizacion.date), "DD/MM/YYYY")})
+                                </option>
+                            }
                         </select>
                         <ErrorLabel>{errors?.invoice_id}</ErrorLabel>
                     </div>
@@ -452,35 +489,41 @@ export default function Personalizadas() {
                             Generar
                         </button>
 
-                        <button
-                            className="btn bg-green-700"
-                            type="submit"
-                            onClick={()=> setCompleted(false)}
-                        >
-                            <CalendarClock />
-                            Borrador
-                        </button>
+                        {
+                                
+                            // Si hay cotización, es porque se está editando
+                            !cotizacion && <>
+                                <button
+                                    className="btn bg-green-700"
+                                    type="submit"
+                                    onClick={()=> setCompleted(false)}
+                                >
+                                    <CalendarClock />
+                                    Borrador
+                                </button>
 
-                        <button 
-                            className="btn btn-secondary" 
-                            type="submit"
-                            onClick={() => {
-                                setIsBudget(true);
-                                setCompleted(true);
-                            }}
-                        >
-                            <Printer />
-                            Presupuesto
-                        </button>
+                                <button 
+                                    className="btn btn-secondary" 
+                                    type="submit"
+                                    onClick={() => {
+                                        setIsBudget(true);
+                                        setCompleted(true);
+                                    }}
+                                >
+                                    <Printer />
+                                    Presupuesto
+                                </button>
 
-                        {formData.invoice_id && <button 
-                            className="btn btn-danger" 
-                            type="button"
-                            onClick={handleClickEliminar}
-                        >
-                            <Trash2 />
-                            Eliminar
-                        </button>}
+                                {formData.invoice_id && <button 
+                                    className="btn btn-danger" 
+                                    type="button"
+                                    onClick={handleClickEliminar}
+                                >
+                                    <Trash2 />
+                                    Eliminar
+                                </button>}
+                            </>
+                        }
                     </div>
                 </form>
             )}

@@ -886,13 +886,25 @@ export default function Cotizaciones() {
                             <Trash2 />
                             Eliminar
                         </button>
-                        {!cotizacion.concept && activeTab === 'envio' && <Link
-                            className="btn btn-secondary"
-                            to={`/cotizaciones/editar/${cotizacion?.id}`}
-                        >
-                            <Pencil />
-                            Editar
-                        </Link>}
+                        {
+                            (cotizacion.status === 'envio' || cotizacion.status === 'oc') && !cotizacion.is_custom ? 
+                                <Link
+                                    className="btn btn-secondary"
+                                    to={`/cotizaciones/editar/${cotizacion?.id}`}
+                                >
+                                    <Pencil />
+                                    Editar
+                                </Link>
+                            :
+                                <Link
+                                    className="btn btn-secondary"
+                                    to={`/cotizaciones/personalizadas/${cotizacion?.id}`}
+                                >
+                                    <Pencil />
+                                    Editar
+                                </Link>
+                        }
+
                     </div>
                 </div>
             </Modal>
