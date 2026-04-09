@@ -61,7 +61,7 @@ export default function Personalizadas() {
             setMostrarBotones(false);
             fetchCotizacion(id); 
         }
-    }, [id]);
+    }, []);
 
     useEffect(()=>{
         // console.log(cotizacion);

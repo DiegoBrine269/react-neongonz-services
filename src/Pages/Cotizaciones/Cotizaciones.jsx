@@ -767,6 +767,14 @@ export default function Cotizaciones() {
                         <p>{format(cotizacion?.date, "DD/MM/YYYY")}</p>
                     </div>
 
+                    { cotizacion?.billing && 
+                    <div className="text">
+                        <span className="label-modal">
+                            Fecha de facturación
+                        </span>{" "}
+                        <p>{format(cotizacion?.billing.date, "DD/MM/YYYY")}</p>
+                    </div>}
+
                     {cotizacion?.validation_date && (
                         <div className="text">
                             <span className="label-modal">
@@ -887,22 +895,26 @@ export default function Cotizaciones() {
                             Eliminar
                         </button>
                         {
-                            (cotizacion.status === 'envio' || cotizacion.status === 'oc') && !cotizacion.is_custom ? 
-                                <Link
-                                    className="btn btn-secondary"
-                                    to={`/cotizaciones/editar/${cotizacion?.id}`}
-                                >
-                                    <Pencil />
-                                    Editar
-                                </Link>
-                            :
-                                <Link
-                                    className="btn btn-secondary"
-                                    to={`/cotizaciones/personalizadas/${cotizacion?.id}`}
-                                >
-                                    <Pencil />
-                                    Editar
-                                </Link>
+                            (cotizacion.status === 'envio' || cotizacion.status === 'oc') && 
+                            
+                            <>
+                                {!cotizacion.is_custom ? 
+                                    <Link
+                                        className="btn btn-secondary"
+                                        to={`/cotizaciones/editar/${cotizacion?.id}`}
+                                    >
+                                        <Pencil />
+                                        Editar
+                                    </Link>
+                                :
+                                    <Link
+                                        className="btn btn-secondary"
+                                        to={`/cotizaciones/personalizadas/${cotizacion?.id}`}
+                                    >
+                                        <Pencil />
+                                        Editar
+                                    </Link>}
+                            </>
                         }
 
                     </div>

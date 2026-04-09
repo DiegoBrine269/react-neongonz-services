@@ -67,9 +67,9 @@ body {
     header {
         @apply bg-slate-800 shadow-md;
     }
-    nav {
+    /* nav {
         @apply p-5 max-w-screen-lg mx-auto flex items-center justify-between;
-    }
+    } */
     main {
         @apply max-w-screen-lg mx-auto;
     }
