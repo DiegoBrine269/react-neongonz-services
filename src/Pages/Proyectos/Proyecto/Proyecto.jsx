@@ -27,9 +27,14 @@ import SearchInput from "@/components/UI/SearchInput";
 
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
 
 import 'react-html5-camera-photo/build/css/index.css';
 import ButtonSubmit from "@/components/UI/Buttons/ButtonSubmit.jsx";
+
+import imageCompression from 'browser-image-compression';
+
+import FileInput from "@/components/UI/Buttons/FileInput";
 
 
 export default function Proyecto() {
@@ -84,7 +89,7 @@ export default function Proyecto() {
         token ? [`/api/projects/${id}`, token] : null, // null evita llamadas si no hay token
         ([url, token]) => fetcher(url, token),
         {
-            refreshInterval: 30000,
+            refreshInterval: 5000,
             revalidateOnFocus: true, 
             revalidateOnReconnect: false, // no recarga al reconectarse
             shouldRetryOnError: false, // evita reintentos infinitos
@@ -387,35 +392,52 @@ export default function Proyecto() {
         duplicarProyecto();
     };
 
-    const handleSeleccionarFotos = (e) =>{
+    const handleSeleccionarFotos = async (e) => {
         const files = Array.from(e.target.files);
+        const validFiles = [];
+        const urls = [];
 
-        files.forEach((file, index) => {
-            // Checar tamaño máximo de 2 MB
-            if (file.size > 2 * 1024 * 1024) {
+        for (const [index, file] of files.entries()) {
+            if (file.size > 10 * 1024 * 1024) {
                 Swal.fire({
                     icon: "error",
                     title: "Archivo demasiado grande",
-                    text: `El archivo ${file.name} excede el tamaño máximo de 2 MB y no será agregado.`,
+                    text: `El archivo ${file.name} excede el tamaño máximo de 10 MB y no será agregado.`,
+                    ...swalConfig(),
+                });
+                continue;
+            }
+
+            const compressed = await imageCompression(file, {
+                maxSizeMB: 0.5,
+                maxWidthOrHeight: 1280,
+                useWebWorker: true,
+                initialQuality: 0.7,
+            });
+
+            const namedFile = new File([compressed], file.name, { type: compressed.type });
+
+            setErrors((prev) => ({ ...prev, [`images.${index}`]: null }));
+
+            if((formData.images?.length ?? 0) + validFiles.length >= 5){
+                Swal.fire({
+                    icon: "error",
+                    title: "Límite de archivos",
+                    text: `Solo puedes agregar un máximo de 5 imágenes por vehículo. Ya has seleccionado ${formData.images.length + validFiles.length} imágenes.`,
                     ...swalConfig(),
                 });
 
-                files.splice(index, 1); // Eliminar el archivo que excede el tamaño
-            } else {
-                setErrors((prev) => ({
-                    ...prev,
-                    [`images.${index}`]: null, // Limpiar error si el archivo es válido
-                }));
-                
+                break;
             }
-            
-        });
 
+            validFiles.push(namedFile);
+            urls.push(URL.createObjectURL(namedFile));
+        }
 
-        const urls = files.map((file) => URL.createObjectURL(file));
-        setPreviews(urls);
-        setFormData((prev) => ({ ...prev, images: files }));
-    }
+        // Acumular en lugar de reemplazar
+        setPreviews((prev) => [...prev, ...urls]);
+        setFormData((prev) => ({ ...prev, images: [...(prev.images || []), ...validFiles] }));
+    };
 
     const handleEliminarProyecto = async (e) => {
         e.preventDefault();
@@ -1085,9 +1107,17 @@ export default function Proyecto() {
                     ></textarea>
                     <ErrorLabel>{errors?.commentary}</ErrorLabel>
 
-                    <label className="label" htmlFor="photos">Fotografía(s)</label>
+                    <label className="label" htmlFor="photos">Añadir fotografía(s)</label>
 
-                    <div className="flex p-2 gap-2">
+                    {/* Tomar foto */}
+                    <div>
+                        
+                        <FileInput
+                            handleSeleccionarFotos={handleSeleccionarFotos}
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-1 p-2">
                         {previews.map((url, i) => (
                             <div key={i} className="flex flex-col items-center gap-1">
                                 <img  src={url} className="w-20 h-20 object-cover rounded-lg" />
@@ -1095,20 +1125,6 @@ export default function Proyecto() {
                             </div>
                         ))}
                     </div>
-                    {/* Tomar foto */}
-                    <div>
-                        <input 
-                            className="btn btn-secondary w-[100%]"
-                            type="file" 
-                            id="file" 
-                            // class="file"                             
-                            accept="image/*" 
-                            multiple 
-                            onChange={handleSeleccionarFotos}
-                        />
-                        {/* <label for="file">Select file</label> */}
-                    </div>
-
    
                     <ErrorLabel>{errors?.photos}</ErrorLabel>
 
@@ -1207,15 +1223,15 @@ export default function Proyecto() {
                     { vehiculo?.photos && 
                         <div className="text">
                             <span className="font-bold border-b-1 block border-neutral-400">
-                                Fotografías
+                                Fotografía(s)
                             </span>
-                            <div className="flex flex-wrap p-2">
+                            <div className="overflow-x-scroll flex gap-2 p-2">
                                 {vehiculo?.photos
                                     ? vehiculo.photos.map((photo, i) => (
                                         <img
                                             key={photo.id}
                                             src={photo.url}
-                                            className="w-40 h-40 object-cover rounded-lg mr-2 mb-2 cursor-pointer"
+                                            className="w-40 h-40 object-cover rounded-lg cursor-pointer"
                                             onClick={() => {
                                                 setLightboxIndex(i);
                                                 setLightboxOpen(true);
@@ -1265,6 +1281,8 @@ export default function Proyecto() {
                 close={() => setLightboxOpen(false)}
                 index={lightboxIndex}
                 slides={vehiculo?.photos?.map(photo => ({ src: photo.url }))}
+                plugins={[Zoom]}
+                controller={{ closeOnBackdropClick: true }}
             />
 
             {user?.role === "admin" && vehiculos.length > 0 && (
