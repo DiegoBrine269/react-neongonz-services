@@ -59,7 +59,6 @@ export default function Cotizaciones() {
         { id: 'f', label: 'Para F' },
         { id: 'complemento', label: 'Para complemento' },
         { id: 'finalizada', label: 'Finalizadas' },
-
     ];
 
 
@@ -767,7 +766,7 @@ export default function Cotizaciones() {
                         <p>{format(cotizacion?.date, "DD/MM/YYYY")}</p>
                     </div>
 
-                    { cotizacion?.billing && 
+                    { cotizacion?.billing?.date && 
                     <div className="text">
                         <span className="label-modal">
                             Fecha de facturación
@@ -895,7 +894,7 @@ export default function Cotizaciones() {
                             Eliminar
                         </button>
                         {
-                            (cotizacion.status === 'envio' || cotizacion.status === 'oc') && 
+                            // (cotizacion.status === 'envio' || cotizacion.status === 'oc') && 
                             
                             <>
                                 {!cotizacion.is_custom ? 

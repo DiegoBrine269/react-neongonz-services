@@ -12,6 +12,7 @@ import {formatearDinero} from "@/utils/utils.js";
 import AnimatedAmount from "@/components/UI/AnimatedAmount";
 import { Printer } from "lucide-react";
 import { downloadBlobResponse } from "@/utils/downloadFile"; // ajusta ruta según tu estructura
+import OtrosDatos from "./EditarComponents/OtrosDatos.jsx";
 
 
 export default function Editar() {
@@ -43,6 +44,8 @@ export default function Editar() {
     });
 
     const [errors, setErrors] = useState({});
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -92,8 +95,8 @@ export default function Editar() {
             }
         } finally {
             setLoading(false);
-            navigate('/cotizaciones');
         }
+                    navigate('/cotizaciones');
     };
 
     const handleCheckboxChange = (name, items, toggleSelected) => (e) => {
@@ -184,6 +187,7 @@ export default function Editar() {
 
     useEffect(() => {   
         if(!cotizacion) return; 
+        
         const fetchData  = async ()=>  {
             setLoading(true);
             fetchVehiculosPendientes();
@@ -195,6 +199,10 @@ export default function Editar() {
             ...formData,
             date: format(cotizacion?.date, "YYYY-MM-DD"),
             responsible_id: cotizacion?.responsible_id,
+            oc: cotizacion?.oc,
+            f_receipt: cotizacion?.f_receipt,
+            validation_date: cotizacion?.validation_date,
+            status: cotizacion?.status
         });
     }, [cotizacion]);
 
@@ -238,146 +246,164 @@ export default function Editar() {
     return (
         <>
             <h2 className="title-2">Editar {cotizacion?.invoice_number}</h2>
-
             <form action="">
-                <label htmlFor="centre_id" className="label">
-                    Centro
-                </label>
-                <select id="centre_id" defaultValue="" disabled>
-                    <option value="">{cotizacion?.centre.name}</option>
-                </select>
-                <ErrorLabel>{errors?.centre_id}</ErrorLabel>
+                {/* Este div no es visible para aquellas cotizaciones que estén en la etapa de factura en adelante */}
+                {
+                    (cotizacion?.status === 'envio' || cotizacion?.status === 'oc') &&
+                    <div className="border-1 border-neutral-400 p-2 rounded my-4">
+                    <h3 className="title-3">Información del documento</h3>
+                    
+                        <label htmlFor="centre_id" className="label">
+                            Centro
+                        </label>
+                        <select id="centre_id" defaultValue="" disabled>
+                            <option value="">{cotizacion?.centre.name}</option>
+                        </select>
+                        <ErrorLabel>{errors?.centre_id}</ErrorLabel>
 
-                <label htmlFor="date" className="label">
-                    Fecha
-                </label>
-                <input
-                    type="date"
-                    id="date"
-                    value={formData.date}
-                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                />
-                <ErrorLabel>{errors?.date}</ErrorLabel>
+                        <label htmlFor="date" className="label">
+                            Fecha
+                        </label>
+                        <input
+                            type="date"
+                            id="date"
+                            value={formData.date}
+                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                        />
+                        <ErrorLabel>{errors?.date}</ErrorLabel>
 
-                <label className="label" htmlFor="correo">
-                    Destinatario
-                </label>
-                <select
-                    id="centre_id"
-                    className="input"
-                    value={formData.responsible_id ?? cotizacion?.responsible_id ?? ""}
-                    onChange={(e) => setFormData({...formData, responsible_id: e.target.value})}
+                        <label className="label" htmlFor="correo">
+                            Destinatario
+                        </label>
+                        <select
+                            id="centre_id"
+                            className="input"
+                            value={formData.responsible_id ?? cotizacion?.responsible_id ?? ""}
+                            onChange={(e) => setFormData({...formData, responsible_id: e.target.value})}
 
-                >
-                    <option value="" disabled>
-                        Seleccione un destinatario
-                    </option>
-                    {responsables
-                        .filter((responsable) =>
-                            centro?.responsibles?.some(r => r.id === responsable.id)
-                        )
-                        .map((responsable) => (
-                            <option key={responsable.id} value={responsable.id}>
-                                {responsable.name}
+                        >
+                            <option value="" disabled>
+                                Seleccione un destinatario
                             </option>
-                        ))}
-                </select>
-                <ErrorLabel>{errors?.responsible_id}</ErrorLabel>
+                            {responsables
+                                .filter((responsable) =>
+                                    centro?.responsibles?.some(r => r.id === responsable.id)
+                                )
+                                .map((responsable) => (
+                                    <option key={responsable.id} value={responsable.id}>
+                                        {responsable.name}
+                                    </option>
+                                ))}
+                        </select>
+                        <ErrorLabel>{errors?.responsible_id}</ErrorLabel>
 
-                {/* Subtotal */}
-                <div className="sticky top-0 text-right my-3">
-                    <AnimatedAmount
-                        keyProp={subTotal}
-                        label={`Subtotal: ${formatearDinero(subTotal)}`}
+                        {/* Subtotal */}
+                        <div className="sticky top-0 text-right my-3">
+                            <AnimatedAmount
+                                keyProp={subTotal}
+                                label={`Subtotal: ${formatearDinero(subTotal)}`}
+                            />
+                        </div>
+
+                        <label
+                            htmlFor="seleccionar-todo"
+                            className="flex gap-1 justify-end items-center mt-0"
+                        >
+                            <input
+                                className="h-4 w-4"
+                                type="checkbox"
+                                id="seleccionar-todo"
+                                checked={seleccionarTodo}
+                                onChange={() => {
+
+                                    const nuevoValor = !seleccionarTodo;
+                                    setSeleccionarTodo(nuevoValor);
+                                    if(nuevoValor)
+                                        selectAll(vehiculosPendientes);
+                                    else
+                                        clear();
+                                    
+                                    
+                                }}
+                            />
+                            <span className="text">Seleccionar todo</span>
+                        </label>
+
+
+                        {proyectosPendientes?.map((p) => (
+                            <div
+                                key={p.id}
+                                className="border-1 border-neutral-400 p-2 rounded my-4"
+                            >
+                                <TitleCheckBox
+                                    name= {p.id}
+                                    label= {`${p.service} (${format(p.date,"full","es")})`}
+                                    checked={checkedMap[p.id] || false}
+                                    onChange={handleCheckboxChange(p.id, vehiculosPendientes, toggle)}
+                                />
+
+                                <div className="flex flex-col gap-2">
+                                    {(() => {
+                                        
+                                        const agrupados ={};
+
+                                        vehiculosPendientes?.forEach(
+                                            (v) => {
+                                                // debugger;
+                                                if (v.project.id === p.id) {
+                                                    if (!agrupados[v.type]) {
+                                                        agrupados[v.type] = [];
+                                                    }
+                                                    agrupados[v.type].push(v);
+                                                }                                        
+                                            }
+                                        );
+
+                                                    
+                                        // 2. Renderizar los grupos
+                                        return Object.entries(agrupados).map(([tipo, vehiculos]) => (
+                                            <div key={tipo}>
+                                                <p className="text font-bold mt-1">
+                                                    {tipo}
+                                                </p>
+                                                <div className="flex gap-1 flex-wrap pl-2">
+                                                    {vehiculos.map((v) => {
+                                                        // debugger;
+                                                        // if(idsPreviamenteSeleccionados.includes(v.id))
+                                                        //     toggle(v);
+
+                                                        return <PeerLabel
+                                                            key={v.id}
+                                                            value={v.id}
+                                                            label={v.eco}
+                                                            checked={isSelected(v)}
+                                                            onChange={() => toggle(v)}
+                                                        />
+                                                    })}
+                                                </div>
+                                            </div>
+                                    ));
+                                    })()}
+                                </div>
+
+                            </div>
+                        ))}
+
+
+                    </div>
+                }
+
+                <div className="border-1 border-neutral-400 p-2 rounded my-4">
+                    <OtrosDatos
+                        formData={formData}
+                        setFormData={setFormData}
+                        errors={errors}
+                        cotizacion={cotizacion}
                     />
                 </div>
 
-                <label
-                    htmlFor="seleccionar-todo"
-                    className="flex gap-1 justify-end items-center mt-0"
-                >
-                    <input
-                        className="h-4 w-4"
-                        type="checkbox"
-                        id="seleccionar-todo"
-                        checked={seleccionarTodo}
-                        onChange={() => {
-
-                            const nuevoValor = !seleccionarTodo;
-                            setSeleccionarTodo(nuevoValor);
-                            if(nuevoValor)
-                                selectAll(vehiculosPendientes);
-                            else
-                                clear();
-                            
-                            
-                        }}
-                    />
-                    <span className="text">Seleccionar todo</span>
-                </label>
-
-
-                {proyectosPendientes?.map((p) => (
-                    <div
-                        key={p.id}
-                        className="border-1 border-neutral-400 p-2 rounded my-4"
-                    >
-                        <TitleCheckBox
-                            name= {p.id}
-                            label= {`${p.service} (${format(p.date,"full","es")})`}
-                            checked={checkedMap[p.id] || false}
-                            onChange={handleCheckboxChange(p.id, vehiculosPendientes, toggle)}
-                        />
-
-                        <div className="flex flex-col gap-2">
-                            {(() => {
-                                
-                                const agrupados ={};
-
-                                vehiculosPendientes?.forEach(
-                                    (v) => {
-                                        // debugger;
-                                        if (v.project.id === p.id) {
-                                            if (!agrupados[v.type]) {
-                                                agrupados[v.type] = [];
-                                            }
-                                            agrupados[v.type].push(v);
-                                        }                                        
-                                    }
-                                );
-
-                                            
-                                // 2. Renderizar los grupos
-                                return Object.entries(agrupados).map(([tipo, vehiculos]) => (
-                                    <div key={tipo}>
-                                        <p className="text font-bold mt-1">
-                                            {tipo}
-                                        </p>
-                                        <div className="flex gap-1 flex-wrap pl-2">
-                                            {vehiculos.map((v) => {
-                                                // debugger;
-                                                // if(idsPreviamenteSeleccionados.includes(v.id))
-                                                //     toggle(v);
-
-                                                return <PeerLabel
-                                                    key={v.id}
-                                                    value={v.id}
-                                                    label={v.eco}
-                                                    checked={isSelected(v)}
-                                                    onChange={() => toggle(v)}
-                                                />
-                                            })}
-                                        </div>
-                                    </div>
-                            ));
-                            })()}
-                        </div>
-
-                    </div>
-                ))}
-
                 {selected.length > 0 && (
-                    <>
+                    <div className="contenedor-botones">
                         
 
                         <button
@@ -387,10 +413,10 @@ export default function Editar() {
                             <Printer />
                             Actualizar
                         </button>
-                    </>
+                    </div>
                 )}
-
             </form>
+
         </>
     );
 }

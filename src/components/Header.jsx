@@ -61,7 +61,7 @@ export default function Header() {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={handleToggle}
-                        className="xl:hidden p-1 text-neutral-700 dark:text-neutral-200"
+                        className="cursor-pointer xl:hidden p-1 text-neutral-700 dark:text-neutral-200"
                     >
                         {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
                     </button>

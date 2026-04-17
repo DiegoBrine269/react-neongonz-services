@@ -25,19 +25,15 @@ import CopyField from "./CopyField";
 import useSWR, {mutate} from "swr";
 import SearchInput from "@/components/UI/SearchInput";
 
-import Webcam from "react-webcam";
-import Tesseract from "tesseract.js";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 
-import Camera from 'react-html5-camera-photo';
 import 'react-html5-camera-photo/build/css/index.css';
 import ButtonSubmit from "@/components/UI/Buttons/ButtonSubmit.jsx";
 
 
 export default function Proyecto() {
     const navigate = useNavigate();
-
-
-
     const { id } = useParams();
     const [editando, setEditando] = useState(false);
     const [proyectosAbiertos, setProyectosAbiertos] = useState([]);
@@ -60,9 +56,10 @@ export default function Proyecto() {
     const [selectingDate, setSelectingDate] = useState(false);
     const [selectedDate, setSelectedDate] = useState();
         
-    const [tesseractError, setTesseractError] = useState(null);
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
 
-    const webcamRef = useRef(null);
+    const [previews, setPreviews] = useState([]);
 
     // Sets para los filtros
     const [usuarios, setUsuarios] = useState([]);
@@ -152,21 +149,39 @@ export default function Proyecto() {
         setLoading(true);
 
         try {
-            const { data } = await clienteAxios.post(
+            const fd = new FormData();
+            Object.entries(formData).forEach(([key, value]) => {
+                if (Array.isArray(value)) {
+                    value.forEach((file) => fd.append(`${key}[]`, file));
+                } else {
+                    fd.append(key, value);
+                }
+            });
+
+            await clienteAxios.post(
                 `/api/projects/${id}/add-vehicle`,
-                formData,
-                requestHeader
+                fd, 
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data", 
+                    },
+                }
             );
-            // fetchProyecto();
             mutate([`/api/projects/${id}`, token]);
             setModalAgregarOpen(false);
             toast.success("Vehículo agregado correctamente");
             setFormData({
+                eco: "",
+                type: "",
                 centre_id: "",
                 service_id: "",
                 date: "",
+                images: [],  // <-- reset
+                commentary: "",
             });
             setErrors({});
+            setPreviews([]);
             setUsarPlaca(false);
             setFiltrosColapsados(false);
         } catch (error) {
@@ -176,8 +191,16 @@ export default function Proyecto() {
             }
         } finally {
             setLoading(false)
-            formFiltrosRef.reset();
             tableRef.current.clearFilter();
+            setFiltros([])
+            // setFormData({
+            //     centre_id: "",
+            //     service_id: "",
+            //     date: "",
+            //     images: [],  // <-- reset
+            // });
+            // setPreviews([])
+            formFiltrosRef.reset();
         }
     };
 
@@ -244,7 +267,9 @@ export default function Proyecto() {
             confirmButtonText: "Sí, eliminar vehículo.",
             showCancelButton: true,
             cancelButtonText: "Cancelar",
-            ...swalConfig(),
+            ...swalConfig({ danger: true }),
+
+
         });
 
         if (!result.isConfirmed) {
@@ -361,6 +386,36 @@ export default function Proyecto() {
         e.preventDefault();
         duplicarProyecto();
     };
+
+    const handleSeleccionarFotos = (e) =>{
+        const files = Array.from(e.target.files);
+
+        files.forEach((file, index) => {
+            // Checar tamaño máximo de 2 MB
+            if (file.size > 2 * 1024 * 1024) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Archivo demasiado grande",
+                    text: `El archivo ${file.name} excede el tamaño máximo de 2 MB y no será agregado.`,
+                    ...swalConfig(),
+                });
+
+                files.splice(index, 1); // Eliminar el archivo que excede el tamaño
+            } else {
+                setErrors((prev) => ({
+                    ...prev,
+                    [`images.${index}`]: null, // Limpiar error si el archivo es válido
+                }));
+                
+            }
+            
+        });
+
+
+        const urls = files.map((file) => URL.createObjectURL(file));
+        setPreviews(urls);
+        setFormData((prev) => ({ ...prev, images: files }));
+    }
 
     const handleEliminarProyecto = async (e) => {
         e.preventDefault();
@@ -524,7 +579,7 @@ export default function Proyecto() {
     const fetchTypesOnEcoChange = async () => {
         try {
 
-            if(formData.eco === "" || formData?.eco?.length < 5)
+            if(formData.eco === "" || formData?.eco?.length < 5 || !formData.eco )
                 return;
             
             setFetching(true);
@@ -614,12 +669,6 @@ export default function Proyecto() {
                 return format(date, { date: "short", time: "short" }, "es");
             },
             accessorDownload: (value) => format(value, "YYYY-MM-DD HH:mm:ss"),
-            // mutator: (value, data, type, params, component) => {
-            //     // value viene en crudo (ISO) — devolvemos la versión formateada usada en la celda
-            //     const fecha = new Date(value);
-
-            //     return fecha.toLocaleString()
-            // },
             resizable: false,
             width: 180,
         },
@@ -909,188 +958,216 @@ export default function Proyecto() {
                 </form>
             </Modal>
 
-            <ErrorBoundary>
-                <Modal
-                    isOpen={isModalAgregarOpen}
-                    onClose={() => {
-                        setModalAgregarOpen(false)
-                        setFormData({
-                            eco: "",
-                            type: "",
-                            project_id: id,
-                            user_id: user.id,
-                            commentary: "",
-                            extra_projects: [],
-                            usar_placa: false,
-                        });
-                        setErrors({});
-                    }}
-                >
-                    <h2 className="title-3">Agregar vehículo al proyecto</h2>
-                    <form action="">
-                        <label
-                            htmlFor="usar-placa"
-                            className="label flex justify-end items-center gap-2"
-                        >
+            
+            <Modal
+                isOpen={isModalAgregarOpen}
+                onClose={() => {
+                    setModalAgregarOpen(false)
+                    setFormData({
+                        eco: "",
+                        type: "",
+                        project_id: id,
+                        user_id: user.id,
+                        commentary: "",
+                        extra_projects: [],
+                        usar_placa: false,
+                    });
+                    setPreviews([]);
+                    setErrors({});
+                }}
+            >
+                <h2 className="title-3">Agregar vehículo al proyecto</h2>
+                <form action="">
+                    <label
+                        htmlFor="usar-placa"
+                        className="label flex justify-end items-center gap-2"
+                    >
+                        <input
+                            type="checkbox"
+                            name=""
+                            id="usar-placa"
+                            checked={usarPlaca}
+                            onChange={() => {
+                                setFormData({
+                                    ...formData,
+                                    usar_placa: !usarPlaca,
+                                    eco: "",
+                                });
+                                setUsarPlaca((prev) => !prev);
+                                inputEcoRef.current.focus();
+                            }}
+                        />
+                        Usar no. de placa
+                    </label>
+                    <label className="label" htmlFor="eco">
+                        {usarPlaca ? "No. de placa" : "Económico"}
+                    </label>
+
+                    <div>
+                        <div className="flex gap-2">
                             <input
-                                type="checkbox"
-                                name=""
-                                id="usar-placa"
-                                checked={usarPlaca}
-                                onChange={() => {
+                                ref={inputEcoRef}
+                                className="input"
+                                type={usarPlaca ? "text" : "number"}
+                                id="eco"
+                                placeholder={
+                                    usarPlaca ? "No. de placa" : "Económico"
+                                }
+                                value={formData.eco}
+                                min={1}
+                                onChange={(e) => {
+                                    setErrors({...errors, eco: null});
                                     setFormData({
                                         ...formData,
-                                        usar_placa: !usarPlaca,
-                                        eco: "",
+                                        eco: e.target.value,
                                     });
-                                    setUsarPlaca((prev) => !prev);
-                                    inputEcoRef.current.focus();
                                 }}
+                                autoComplete="off"
+                                autoFocus
                             />
-                            Usar no. de placa
-                        </label>
-                        <label className="label" htmlFor="eco">
-                            {usarPlaca ? "No. de placa" : "Económico"}
-                        </label>
-
-                        <div>
-                            <div className="flex gap-2">
-                                <input
-                                    ref={inputEcoRef}
-                                    className="input"
-                                    type={usarPlaca ? "text" : "number"}
-                                    id="eco"
-                                    placeholder={
-                                        usarPlaca ? "No. de placa" : "Económico"
-                                    }
-                                    value={formData.eco}
-                                    min={1}
-                                    onChange={(e) => {
-                                        setErrors({...errors, eco: null});
-                                        setFormData({
-                                            ...formData,
-                                            eco: e.target.value,
-                                        });
-                                    }}
-                                    autoComplete="off"
-                                    autoFocus
-                                />
-                                {/* <button className="btn bg-green-600" onClick={handleAbrirCamara} type="button">
-                                    <CameraIcon/>
-                                </button> */}
-                            </div>
-                            <ErrorLabel>{errors?.eco}</ErrorLabel>
+                            {/* <button className="btn bg-green-600" onClick={handleAbrirCamara} type="button">
+                                <CameraIcon/>
+                            </button> */}
                         </div>
+                        <ErrorLabel>{errors?.eco}</ErrorLabel>
+                    </div>
 
-                        <div className="flex items-center gap-2">
-                            <label className="label" htmlFor="type">
-                                Tipo de vehículo
-                            </label>
-
-                            {fetching && (
-                                <ClipLoader
-                                    className="mt-2"
-                                    color="#10B981"
-                                    size={20}
-                                />
-                            )}
-                        </div>
-                        <select
-                            className="input"
-                            id="type"
-                            onChange={(e) =>
-                                setFormData({
-                                    ...formData,
-                                    type: e.target.value,
-                                })
-                            }
-                            value={formData.type || ""}
-                            // defaultValue=""
-                        >
-                            <option value="" disabled>
-                                Seleccione un tipo
-                            </option>
-                            {types.map((type) => (
-                                <option key={type.id} value={type.id}>
-                                    {type.type}
-                                </option>
-                            ))}
-                        </select>
-                        <ErrorLabel>{errors?.type}</ErrorLabel>
-
-                        <label className="label" htmlFor="commentary">
-                            Comentario (opcional)
+                    <div className="flex items-center gap-2">
+                        <label className="label" htmlFor="type">
+                            Tipo de vehículo
                         </label>
-                        <textarea
-                            name=""
-                            id="commentary"
-                            placeholder="Comentario"
-                            onChange={(e) =>
-                                setFormData({
-                                    ...formData,
-                                    commentary: e.target.value,
-                                })
-                            }
-                            value={formData.commentary || ""}
-                        ></textarea>
-                        <ErrorLabel>{errors?.commentary}</ErrorLabel>
 
-                        {proyectosAbiertos?.length > 1 && (
-                            <div>
-                                <label
-                                    className="label flex"
-                                    onClick={() =>
-                                        setIsCollapsed((prev) => !prev)
-                                    }
-                                >
-                                    <ChevronRight className={isCollapsed ? "block" : "hidden"}/>
-                                    <ChevronDown className={!isCollapsed ? "block" : "hidden"}/>
-                                    Agregar a otros proyectos de forma simultánea (opcional)
-                                </label>
-                                <div
-                                    className={`pl-2 pt-2 flex flex-wrap gap-1 overflow-hidden ${
-                                        isCollapsed ? "max-h-0" : null
-                                    }`}
-                                >
-                                    {proyectosAbiertos.map((p) =>
-                                        p.id != id ? (
-                                            <RadioButtonItem
-                                                key={p.id}
-                                                onChange={() =>
-                                                    toggleProyectoExtra(p.id)
-                                                }
-                                                checked={formData?.extra_projects?.includes(
-                                                    p.id
-                                                )}
-                                                label={p.service}
-                                            />
-                                        ) : null
-                                    )}
-                                </div>
-                            </div>
+                        {fetching && (
+                            <ClipLoader
+                                className="mt-2"
+                                color="#10B981"
+                                size={20}
+                            />
                         )}
+                    </div>
+                    <select
+                        className="input"
+                        id="type"
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                type: e.target.value,
+                            })
+                        }
+                        value={formData.type || ""}
+                        // defaultValue=""
+                    >
+                        <option value="" disabled>
+                            Seleccione un tipo
+                        </option>
+                        {types.map((type) => (
+                            <option key={type.id} value={type.id}>
+                                {type.type}
+                            </option>
+                        ))}
+                    </select>
+                    <ErrorLabel>{errors?.type}</ErrorLabel>
 
-                        <div className="contenedor-botones">
-                            {/* <input
-                                className="btn disabled:opacity-50 disabled:cursor-not-allowed flex-1"
-                                type="submit"
-                                value="Registrar"
-                                onClick={handleSubmit}
-                                disabled={fetching}
-                            /> */}
-                            <ButtonSubmit
-                                // className="flex-1"
-                                type="submit"
-                                onClick={handleSubmit}
-                                icon={<CircleCheck />}
-                                disabled={fetching}
+                    <label className="label" htmlFor="commentary">
+                        Comentario (opcional)
+                    </label>
+                    <textarea
+                        name=""
+                        id="commentary"
+                        placeholder="Comentario"
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                commentary: e.target.value,
+                            })
+                        }
+                        value={formData.commentary || ""}
+                    ></textarea>
+                    <ErrorLabel>{errors?.commentary}</ErrorLabel>
+
+                    <label className="label" htmlFor="photos">Fotografía(s)</label>
+
+                    <div className="flex p-2 gap-2">
+                        {previews.map((url, i) => (
+                            <div key={i} className="flex flex-col items-center gap-1">
+                                <img  src={url} className="w-20 h-20 object-cover rounded-lg" />
+                                <ErrorLabel>{errors?.[`images.${i}`]}</ErrorLabel>
+                            </div>
+                        ))}
+                    </div>
+                    {/* Tomar foto */}
+                    <div>
+                        <input 
+                            className="btn btn-secondary w-[100%]"
+                            type="file" 
+                            id="file" 
+                            // class="file"                             
+                            accept="image/*" 
+                            multiple 
+                            onChange={handleSeleccionarFotos}
+                        />
+                        {/* <label for="file">Select file</label> */}
+                    </div>
+
+   
+                    <ErrorLabel>{errors?.photos}</ErrorLabel>
+
+                    {proyectosAbiertos?.length > 1 && (
+                        <div>
+                            <label
+                                className="label flex"
+                                onClick={() =>
+                                    setIsCollapsed((prev) => !prev)
+                                }
                             >
-                                Registrar
-                            </ButtonSubmit>
+                                <ChevronRight className={isCollapsed ? "block" : "hidden"}/>
+                                <ChevronDown className={!isCollapsed ? "block" : "hidden"}/>
+                                Agregar a otros proyectos de forma simultánea (opcional)
+                            </label>
+                            <div
+                                className={`pl-2 pt-2 flex flex-wrap gap-1 overflow-hidden ${
+                                    isCollapsed ? "max-h-0" : null
+                                }`}
+                            >
+                                {proyectosAbiertos.map((p) =>
+                                    p.id != id ? (
+                                        <RadioButtonItem
+                                            key={p.id}
+                                            onChange={() =>
+                                                toggleProyectoExtra(p.id)
+                                            }
+                                            checked={formData?.extra_projects?.includes(
+                                                p.id
+                                            )}
+                                            label={p.service}
+                                        />
+                                    ) : null
+                                )}
+                            </div>
                         </div>
-                    </form>
-                </Modal>
-            </ErrorBoundary>
+                    )}
+
+                    <div className="contenedor-botones">
+                        {/* <input
+                            className="btn disabled:opacity-50 disabled:cursor-not-allowed flex-1"
+                            type="submit"
+                            value="Registrar"
+                            onClick={handleSubmit}
+                            disabled={fetching}
+                        /> */}
+                        <ButtonSubmit
+                            // className="flex-1"
+                            type="submit"
+                            onClick={handleSubmit}
+                            icon={<CircleCheck />}
+                            disabled={fetching}
+                        >
+                            Registrar
+                        </ButtonSubmit>
+                    </div>
+                </form>
+            </Modal>
+            
 
             <Modal
                 isOpen={selectingDate}
@@ -1126,6 +1203,36 @@ export default function Proyecto() {
                         label="Registrado por"
                         value={`${vehiculo?.user?.name}`}
                     />
+
+                    { vehiculo?.photos && 
+                        <div className="text">
+                            <span className="font-bold border-b-1 block border-neutral-400">
+                                Fotografías
+                            </span>
+                            <div className="flex flex-wrap p-2">
+                                {vehiculo?.photos
+                                    ? vehiculo.photos.map((photo, i) => (
+                                        <img
+                                            key={photo.id}
+                                            src={photo.url}
+                                            className="w-40 h-40 object-cover rounded-lg mr-2 mb-2 cursor-pointer"
+                                            onClick={() => {
+                                                setLightboxIndex(i);
+                                                setLightboxOpen(true);
+                                            }}
+                                        />
+                                    ))
+                                    : // Skeleton mientras no hay datos
+                                    Array.from({ length: 4 }).map((_, i) => (
+                                        <div
+                                            key={i}
+                                            className="w-40 h-40 rounded-lg mr-2 mb-2 bg-neutral-200 animate-pulse"
+                                        />
+                                    ))
+                                }
+                            </div>
+                        </div>
+                    }
                 </div>
 
                 <div className="contenedor-botones">
@@ -1152,6 +1259,13 @@ export default function Proyecto() {
                     </button>
                 </div>
             </Modal>
+
+            <Lightbox
+                open={lightboxOpen}
+                close={() => setLightboxOpen(false)}
+                index={lightboxIndex}
+                slides={vehiculo?.photos?.map(photo => ({ src: photo.url }))}
+            />
 
             {user?.role === "admin" && vehiculos.length > 0 && (
                 <CopyField

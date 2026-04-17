@@ -17,6 +17,8 @@ import { swalConfig } from "@/config/variables";
 import get from 'lodash.get';
 import { useParams } from "react-router-dom";
 import { CotizacionesContext } from "@/context/CotizacionesContext";
+import OtrosDatos from "./EditarComponents/OtrosDatos.jsx";
+
 
 export default function Personalizadas() {
 
@@ -260,271 +262,288 @@ export default function Personalizadas() {
 
             {accion && (
                 <form action="" onSubmit={handleSubmit(onSubmit)}>
-                    <div className={accion === "edit" ? "hidden" : ""}>
+                    <div className="border-1 border-neutral-400 p-2 rounded my-4">
+                        <h3 className="title-3">Datos del documento</h3>
+                        <div className={accion === "edit" ? "hidden" : ""}>
+                            <label className="label" htmlFor="centre_id">
+                                Centro de ventas
+                            </label>
+                            <select
+                                id="centre_id"
+                                className="input"
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        centre_id: e.target.value,
+                                    })
+                                }
+                                value={formData.centre_id || ""}
+                            >
+                                <option value="" disabled>
+                                    Seleccione un centro de ventas
+                                </option>
+                                {centros.map((centro) => (
+                                    <option key={centro.id} value={centro.id}>
+                                        {centro.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <ErrorLabel>{errors.centre_id}</ErrorLabel>
+
+                            
+                        </div>
+
+                        <div className={accion === "create" ? "hidden" : ""}>
+                            
+                            <label className="label" htmlFor="invoice_id">
+                                Cotización
+                            </label>
+                            <select
+                                id="invoice_id"
+                                className="input"
+                                onChange={handleSelectCotizacion}
+                                value={cotizacion?.centre?.id || formData.invoice_id || ""}
+                                disabled ={cotizacion ? true : false}
+                            >
+                                <option value="" disabled>
+                                    Selecciona una cotización
+                                </option>
+                                {pendientes.map((cot) => (
+                                    <option key={cot.id} value={cot.id}>
+                                        {cot.centre.name} ({format(new Date(cot.date), "DD/MM/YYYY")})
+                                    </option>
+                                ))}
+                                {
+                                    cotizacion && 
+                                    <option key={cotizacion.centre.id} value={cotizacion.centre.id}>
+                                        {cotizacion.centre.name} ({format(new Date(cotizacion.date), "DD/MM/YYYY")})
+                                    </option>
+                                }
+                            </select>
+                            <ErrorLabel>{errors?.invoice_id}</ErrorLabel>
+                        </div>
+
                         <label className="label" htmlFor="centre_id">
-                            Centro de ventas
+                            Destinatario
                         </label>
                         <select
-                            id="centre_id"
+                            id="responsible_id"
                             className="input"
                             onChange={(e) =>
                                 setFormData({
                                     ...formData,
-                                    centre_id: e.target.value,
+                                    responsible_id: e.target.value,
                                 })
                             }
-                            value={formData.centre_id || ""}
+                            value={formData.responsible_id || ""}
+                            disabled ={!formData.centre_id}
                         >
                             <option value="" disabled>
-                                Seleccione un centro de ventas
+                                Seleccione un destinatario
                             </option>
-                            {centros.map((centro) => (
-                                <option key={centro.id} value={centro.id}>
-                                    {centro.name}
+                            {responsables
+                                .filter((responsable) =>
+                                    centros.find(c=>c.id == formData.centre_id)?.responsibles?.some(r => r.id === responsable.id)
+                                )
+                                .map((responsable) => (
+                                <option key={responsable.id} value={responsable.id}>
+                                    {responsable.name}
                                 </option>
                             ))}
                         </select>
-                        <ErrorLabel>{errors.centre_id}</ErrorLabel>
+                        <ErrorLabel>{errors.responsible_id}</ErrorLabel>
 
-                        
-                    </div>
-
-                    <div className={accion === "create" ? "hidden" : ""}>
-                        
-                        <label className="label" htmlFor="invoice_id">
-                            Cotización
+                        <label className="label" htmlFor="fecha">
+                            fecha
                         </label>
-                        <select
-                            id="invoice_id"
+                        <input
                             className="input"
-                            onChange={handleSelectCotizacion}
-                            value={cotizacion?.centre?.id || formData.invoice_id || ""}
-                            disabled ={cotizacion ? true : false}
-                        >
-                            <option value="" disabled>
-                                Selecciona una cotización
-                            </option>
-                            {pendientes.map((cot) => (
-                                <option key={cot.id} value={cot.id}>
-                                    {cot.centre.name} ({format(new Date(cot.date), "DD/MM/YYYY")})
-                                </option>
-                            ))}
-                            {
-                                cotizacion && 
-                                <option key={cotizacion.centre.id} value={cotizacion.centre.id}>
-                                    {cotizacion.centre.name} ({format(new Date(cotizacion.date), "DD/MM/YYYY")})
-                                </option>
+                            type="date"
+                            id="fecha"
+                            placeholder="fecha"
+                            value={formData?.date}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    date: e.target.value,
+                                })
                             }
-                        </select>
-                        <ErrorLabel>{errors?.invoice_id}</ErrorLabel>
-                    </div>
+                        />
+                        <ErrorLabel>{errors?.date}</ErrorLabel>
+                        
+                        {fields.map((field, index) => (
+                            <div key={field.id} className="my-3 relative border p-2 rounded-lg border-neutral-400">
+                                
+                                <div className="flex justify-between mb-1 center-items">
+                                    <p className="text ">Fila {index+1}</p>
+                                    <button className="btn btn-danger !w-auto !p-1 m-0" type="button" onClick={() => remove(index)}>
+                                        <Trash2
+                                            className="h-4 w-4"
+                                        />
+                                    </button>
+                                </div>
+                                
+                                <div className="grid md:grid-cols-[1fr_4fr_2fr_1fr_2fr] gap-1 items-start">
+                                    
+                                    <div>
+                                        <input
+                                            {...register(`items.${index}.quantity`)}
+                                            placeholder="Cantidad"
+                                            className="input"
+                                            type="number"
+                                        />
+                                        {/* <ErrorLabel>{errors?.['rows.0.quantity']}</ErrorLabel> */}
+                                    </div>
 
-                    <label className="label" htmlFor="centre_id">
-                        Destinatario
-                    </label>
-                    <select
-                        id="responsible_id"
-                        className="input"
-                        onChange={(e) =>
-                            setFormData({
-                                ...formData,
-                                responsible_id: e.target.value,
-                            })
-                        }
-                        value={formData.responsible_id || ""}
-                        disabled ={!formData.centre_id}
-                    >
-                        <option value="" disabled>
-                            Seleccione un destinatario
-                        </option>
-                        {responsables
-                            .filter((responsable) =>
-                                centros.find(c=>c.id == formData.centre_id)?.responsibles?.some(r => r.id === responsable.id)
-                            )
-                            .map((responsable) => (
-                            <option key={responsable.id} value={responsable.id}>
-                                {responsable.name}
-                            </option>
+                                    <div>
+                                        <textarea
+                                            {...register(`items.${index}.concept`)}
+                                            placeholder="Concepto"
+                                            className="min-h-9 field-sizing-content"
+                                        />
+                                        {/* <ErrorLabel>{errors?.['rows.0.concept']}</ErrorLabel> */}
+                                    </div>
+
+                                    <div>
+                                        <input
+                                            {...register(`items.${index}.price`)}
+                                            placeholder="Precio"
+                                            className="input"
+                                            type="number"
+                                        />
+                                        <ErrorLabel>{get(errors, `rows.${index}.price`)}</ErrorLabel>
+                                    </div>
+
+                                    <div>
+                                        <select 
+                                            id="sat_unit_key"
+                                            defaultValue=""
+                                            {...register(`items.${index}.sat_unit_key`)}
+                                        >
+                                            {/* <option value="" disabled>Unidad de medida</option> */}
+                                                {units.map((unit) => (
+                                                    <option
+                                                        key={unit.key}
+                                                        value={unit.key}
+                                                    >
+                                                        {unit.name} ({unit.key})
+                                                    </option>
+                                                ))}
+                                        </select>
+                                        <ErrorLabel>{get(errors, `rows.${index}.sat_unit_key`)}</ErrorLabel>
+                                    </div>
+                                    
+                                    <div>
+                                        <input
+                                            {...register(`items.${index}.sat_key_prod_serv`)}
+                                            placeholder="Clave de producto o servicio"
+                                            className="input"
+                                            type="number"
+                                        />
+                                        <ErrorLabel>{get(errors, `rows.${index}.sat_key_prod_serv`)}</ErrorLabel>
+                                    </div>
+                                </div>
+                            </div>
                         ))}
-                    </select>
-                    <ErrorLabel>{errors.responsible_id}</ErrorLabel>
 
-                    <label className="label" htmlFor="fecha">
-                        fecha
-                    </label>
-                    <input
-                        className="input"
-                        type="date"
-                        id="fecha"
-                        placeholder="fecha"
-                        value={formData?.date}
-                        onChange={(e) =>
-                            setFormData({
-                                ...formData,
-                                date: e.target.value,
-                            })
-                        }
-                    />
-                    <ErrorLabel>{errors?.date}</ErrorLabel>
-                    
-                    {fields.map((field, index) => (
-                        <div key={field.id} className="my-3 relative border p-2 rounded-lg border-neutral-400">
-                            
-                            <div className="flex justify-between mb-1 center-items">
-                                <p className="text ">Fila {index+1}</p>
-                                <button className="btn btn-danger !w-auto !p-1 m-0" type="button" onClick={() => remove(index)}>
-                                    <Trash2
-                                        className="h-4 w-4"
-                                    />
-                                </button>
-                            </div>
-                            
-                            <div className="grid md:grid-cols-[1fr_4fr_2fr_1fr_2fr] gap-1 items-start">
-                                
-                                <div>
-                                    <input
-                                        {...register(`items.${index}.quantity`)}
-                                        placeholder="Cantidad"
-                                        className="input"
-                                        type="number"
-                                    />
-                                    {/* <ErrorLabel>{errors?.['rows.0.quantity']}</ErrorLabel> */}
-                                </div>
-
-                                <div>
-                                    <textarea
-                                        {...register(`items.${index}.concept`)}
-                                        placeholder="Concepto"
-                                        className="min-h-9 field-sizing-content"
-                                    />
-                                    {/* <ErrorLabel>{errors?.['rows.0.concept']}</ErrorLabel> */}
-                                </div>
-
-                                <div>
-                                    <input
-                                        {...register(`items.${index}.price`)}
-                                        placeholder="Precio"
-                                        className="input"
-                                        type="number"
-                                    />
-                                    <ErrorLabel>{get(errors, `rows.${index}.price`)}</ErrorLabel>
-                                </div>
-
-                                <div>
-                                    <select 
-                                        id="sat_unit_key"
-                                        defaultValue=""
-                                        {...register(`items.${index}.sat_unit_key`)}
-                                    >
-                                        {/* <option value="" disabled>Unidad de medida</option> */}
-                                            {units.map((unit) => (
-                                                <option
-                                                    key={unit.key}
-                                                    value={unit.key}
-                                                >
-                                                    {unit.name} ({unit.key})
-                                                </option>
-                                            ))}
-                                    </select>
-                                    <ErrorLabel>{get(errors, `rows.${index}.sat_unit_key`)}</ErrorLabel>
-                                </div>
-                                
-                                <div>
-                                    <input
-                                        {...register(`items.${index}.sat_key_prod_serv`)}
-                                        placeholder="Clave de producto o servicio"
-                                        className="input"
-                                        type="number"
-                                    />
-                                    <ErrorLabel>{get(errors, `rows.${index}.sat_key_prod_serv`)}</ErrorLabel>
-                                </div>
-                            </div>
+                        <div className="flex justify-end mt-2">
+                            <button className="w-auto btn" type="button" onClick={() => append({ concept: '', quantity: '', price: '' })}>
+                                <ListPlus/>
+                                Agregar fila
+                            </button>
                         </div>
-                    ))}
 
-                    <div className="flex justify-end mt-2">
-                        <button className="w-auto btn" type="button" onClick={() => append({ concept: '', quantity: '', price: '' })}>
-                            <ListPlus/>
-                            Agregar fila
-                        </button>
+                        <label htmlFor="internal_commentary" className="label">
+                            Comentarios internos
+                        </label>
+                        <textarea
+                            value={formData.internal_commentary ?? ""}
+                            id="internal_commentary"
+                            placeholder="Comentarios internos"
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    internal_commentary: e.target.value,
+                                })
+                            }
+                        ></textarea>
+
+                        <label htmlFor="comments" className="label">
+                            Comentarios o instrucciones especiales
+                        </label>
+                        <textarea
+                            value={formData.comments ?? ""}
+                            id="comments"
+                            placeholder="Comentarios o instrucciones especiales"
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    comments: e.target.value,
+                                })
+                            }
+                        ></textarea>
                     </div>
 
-                    <label htmlFor="internal_commentary" className="label">
-                        Comentarios internos
-                    </label>
-                    <textarea
-                        value={formData.internal_commentary ?? ""}
-                        id="internal_commentary"
-                        placeholder="Comentarios internos"
-                        onChange={(e) =>
-                            setFormData({
-                                ...formData,
-                                internal_commentary: e.target.value,
-                            })
-                        }
-                    ></textarea>
+                    { 
+                        // Solo en caso de que se esté editando
+                        cotizacion &&
+                        <div className="border-1 border-neutral-400 p-2 rounded my-4">
+                            <OtrosDatos
+                                formData={formData}
+                                setFormData={setFormData}
+                                errors={errors}
+                                cotizacion={cotizacion}
+                            />
+                        </div>
+                    }
 
-                    <label htmlFor="comments" className="label">
-                        Comentarios o instrucciones especiales
-                    </label>
-                    <textarea
-                        value={formData.comments ?? ""}
-                        id="comments"
-                        placeholder="Comentarios o instrucciones especiales"
-                        onChange={(e) =>
-                            setFormData({
-                                ...formData,
-                                comments: e.target.value,
-                            })
-                        }
-                    ></textarea>
 
                     <div className="contenedor-botones">
-                        <button 
-                            className="btn" 
-                            type="submit"
-                            onClick={()=> setCompleted(true)}
-                        >
-                            <Printer />
-                            Generar
-                        </button>
+                            <button 
+                                className="btn" 
+                                type="submit"
+                                onClick={()=> setCompleted(true)}
+                            >
+                                <Printer />
+                                Generar
+                            </button>
 
-                        {
-                                
-                            // Si hay cotización, es porque se está editando
-                            !cotizacion && <>
-                                <button
-                                    className="btn bg-green-700"
-                                    type="submit"
-                                    onClick={()=> setCompleted(false)}
-                                >
-                                    <CalendarClock />
-                                    Borrador
-                                </button>
+                            {
+                                    
+                                // Si hay cotización, es porque se está editando
+                                !cotizacion && <>
+                                    <button
+                                        className="btn bg-green-700"
+                                        type="submit"
+                                        onClick={()=> setCompleted(false)}
+                                    >
+                                        <CalendarClock />
+                                        Borrador
+                                    </button>
 
-                                <button 
-                                    className="btn btn-secondary" 
-                                    type="submit"
-                                    onClick={() => {
-                                        setIsBudget(true);
-                                        setCompleted(true);
-                                    }}
-                                >
-                                    <Printer />
-                                    Presupuesto
-                                </button>
+                                    <button 
+                                        className="btn btn-secondary" 
+                                        type="submit"
+                                        onClick={() => {
+                                            setIsBudget(true);
+                                            setCompleted(true);
+                                        }}
+                                    >
+                                        <Printer />
+                                        Presupuesto
+                                    </button>
 
-                                {formData.invoice_id && <button 
-                                    className="btn btn-danger" 
-                                    type="button"
-                                    onClick={handleClickEliminar}
-                                >
-                                    <Trash2 />
-                                    Eliminar
-                                </button>}
-                            </>
-                        }
-                    </div>
+                                    {formData.invoice_id && <button 
+                                        className="btn btn-danger" 
+                                        type="button"
+                                        onClick={handleClickEliminar}
+                                    >
+                                        <Trash2 />
+                                        Eliminar
+                                    </button>}
+                                </>
+                            }
+                        </div>
                 </form>
             )}
         </div>

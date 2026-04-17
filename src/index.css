@@ -79,11 +79,11 @@ body {
     }
 
     .title-2 {
-        @apply text-2xl font-bold text-red-600 mb-4;
+        @apply text-2xl font-bold text-red-600 mb-3;
     }
 
     .title-3 {
-        @apply text-xl font-bold text-red-600 mb-4;
+        @apply text-xl font-bold text-red-600 mb-2;
     }
 
     .text {
