@@ -86,7 +86,7 @@ export default function Proyecto() {
     };
 
     const { data: proyecto, error, isLoading } = useSWR(
-        token ? [`/api/projects/${id}`, token] : null, // null evita llamadas si no hay token
+        token && filtros.length == 0 ? [`/api/projects/${id}`, token] : null, // null evita llamadas si no hay token
         ([url, token]) => fetcher(url, token),
         {
             refreshInterval: 5000,
@@ -709,7 +709,7 @@ export default function Proyecto() {
                     // onTakePhoto = { (dataUri) => { handleTakePhoto(dataUri); } }
                 /> */}
             <div className="flex items-center gap-2 justify-between">
-                <h2 className="title-2 mb-0 text-center w-full lg:text-left">{proyecto?.service.name} - {proyecto?.centre.name}</h2>
+                <h2 className="title-2 mb-0 text-center w-full lg:text-left">{proyecto?.service?.name} - {proyecto?.centre?.name}</h2>
 
                 <button
                     onClick={() => {
