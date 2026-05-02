@@ -20,6 +20,7 @@ import Proyectos from "@/Pages/Proyectos/Proyectos";
 import Proyecto from "@/Pages/Proyectos/Proyecto/Proyecto";
 import "tabulator-tables/dist/css/tabulator_materialize.min.css";
 import Vehiculos from "@/Pages/Vehiculos/Vehiculos";
+import Vehiculo from "@/Pages/Vehiculos/Vehiculo";
 import Tipos from "@/Pages/Vehiculos/Tipos";
 
 import MiCuenta from "@/Pages/MiCuenta"
@@ -85,6 +86,7 @@ export default function App() {
                                     </>
                                 )}
                                 <Route path="/vehiculos" element={<Vehiculos />} />
+                                <Route path="/vehiculos/:id" element={<Vehiculo />} />
                                 <Route path="/proyectos" element={<Proyectos />} />
                                 <Route path="/proyectos/:id" element={<Proyecto />} />
                                 <Route path="/mi-cuenta" element={<MiCuenta />} />

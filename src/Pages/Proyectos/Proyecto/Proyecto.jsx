@@ -93,6 +93,7 @@ export default function Proyecto() {
             revalidateOnFocus: true, 
             revalidateOnReconnect: false, // no recarga al reconectarse
             shouldRetryOnError: false, // evita reintentos infinitos
+            keepPreviousData: true,
         }
     );
 
@@ -1208,7 +1209,12 @@ export default function Proyecto() {
             >
                 <h2 className="title-3">Vehículo</h2>
                 <div className="flex flex-col gap-3 pl-2">
-                    <InfoRow label="Económico" value={vehiculo?.eco} />
+                    
+                    <InfoRow 
+                        label="Económico" 
+                        value={vehiculo?.eco} 
+                        link={vehiculo?.id ? `/vehiculos/${vehiculo?.eco}` : undefined}
+                    />
                     <InfoRow label="Tipo" value={vehiculo?.type} />
                     <InfoRow label="Comentario" value={vehiculo?.commentary ?? "-"} />
                     <InfoRow
@@ -1220,10 +1226,10 @@ export default function Proyecto() {
                         value={`${vehiculo?.user?.name}`}
                     />
 
-                    { vehiculo?.photos && 
+                    { vehiculo?.photos?.length > 0 && 
                         <div className="text">
                             <span className="font-bold border-b-1 block border-neutral-400">
-                                Fotografía(s)
+                                Fotografía(s) 
                             </span>
                             <div className="overflow-x-scroll flex gap-2 p-2">
                                 {vehiculo?.photos
@@ -1254,7 +1260,7 @@ export default function Proyecto() {
                 <div className="contenedor-botones">
                     {
                         //Mostrar solo si es del mismo usuario, o bien si es admin
-                        (user?.role === "admin" || vehiculo?.user?.id === user?.id)
+                        ((user?.role === "admin" || vehiculo?.user?.id === user?.id) && proyecto?.is_open)
                         &&
                         <button
                             className="btn btn-danger"
