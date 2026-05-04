@@ -44,11 +44,11 @@ export default function Vehiculo() {
             <InfoRow label="Centro" value={vehiculo?.centre?.name} />
 
 
-            <h3 className="title-3 mt-4">Proyectos</h3>
+            <h3 className="title-3 mt-4 mb-0">Proyectos</h3>
             {vehiculo?.projects?.length > 0 ? (
-                <table className="w-full text-sm border-collapse">
+                <table className="w-full text-sm border-collapse text">
                     <thead>
-                        <tr className="border-b border-neutral-300 text-left ">
+                        <tr className="border-b border-neutral-300">
                             <th className="py-1 pr-4 font-semibold">Servicio</th>
                             <th className="py-1 font-semibold">Centro</th>
                             <th className="py-1 font-semibold">Fecha del proyecto</th>
@@ -56,16 +56,16 @@ export default function Vehiculo() {
                     </thead>
                     <tbody>
                         {vehiculo.projects.map((proyecto) => (
-                            <tr key={proyecto.id} className="border-b border-neutral-100 hover:bg-neutral-50">
+                            <tr key={proyecto.id} className="border-b border-neutral-100 ">
                                 <td className="py-1 pr-4">
                                     <Link to={`/proyectos/${proyecto.id}`} className="text-blue-500 underline">
                                         {proyecto.service?.name}
                                     </Link>
                                 </td>
-                                <td className="py-1 text-neutral-600">
+                                <td className="py-1 text">
                                     {proyecto.centre?.name}
                                 </td>
-                                <td className="py-1 text-neutral-600">
+                                <td className="py-1 text text-right">
                                     {proyecto.date ? format(new Date(proyecto.date), { date: "medium" }, "es") : "-"}
                                 </td>
                             </tr>

@@ -82,7 +82,7 @@ export default function Header() {
                 </div>
                 <button
                     onClick={toggleDarkMode}
-                    className="w-8 h-8 rounded-full border border-neutral-200 dark:border-neutral-700 flex items-center justify-center text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                    className="cursor-pointer w-8 h-8 rounded-full border border-neutral-200 dark:border-neutral-700 flex items-center justify-center text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                 >
                     {darkMode ? <Sun size={15} /> : <Moon size={15} />}
                 </button>

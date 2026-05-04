@@ -6,7 +6,7 @@ import Tabla from "../../components/Tabla";
 import {Link} from "react-router-dom";
 import { toast } from "react-toastify";
 import {Truck} from "lucide-react"
-
+import InfoRow from "@/components/UI/InfoRow";
 
 export default function Vehiculos() {
     const [vehiculos, setVehiculos] = useState([]);
@@ -123,12 +123,12 @@ export default function Vehiculos() {
             <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
                 <h2 className="title-3">Vehículo</h2>
                 <div className="flex flex-col gap-3 pl-2">
-                    <div className="text">
-                        <span className="label-modal">
-                            Económico
-                        </span>{" "}
-                        <p>{vehiculo?.eco}</p>
-                    </div>
+
+                    <InfoRow 
+                        label="Económico" 
+                        value={vehiculo?.eco} 
+                        link={vehiculo?.id ? `/vehiculos/${vehiculo?.eco}` : undefined}
+                    />
                     <div className="text">
                         <span className="label-modal">
                             Tipo
@@ -145,7 +145,7 @@ export default function Vehiculos() {
                     {vehiculo.projects?.length > 0 && (
                         <div className="text">
                             <span className="label-modal">
-                                Proyectos recientes
+                                Últimos 5 proyectos
                             </span>{" "}
                             <ul className="text-sm list-disc pl-5 mt-1">
                                 {vehiculo.projects.map((project) => (
