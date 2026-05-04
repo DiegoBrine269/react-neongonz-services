@@ -16,7 +16,7 @@ export default function OtrosDatos({ formData, setFormData, errors = {}, cotizac
             <h3 className="title-3">Otros datos</h3>
 
             {   
-                cotizacion.oc && 
+                cotizacion?.oc && 
                 <>
 
                     <label htmlFor="oc" className="label">Número de OC</label>
@@ -33,7 +33,7 @@ export default function OtrosDatos({ formData, setFormData, errors = {}, cotizac
             }
 
             {   
-                cotizacion.f_receipt && 
+                cotizacion?.f_receipt && 
                 <>
                     <label htmlFor="f_receipt" className="label">Número de F</label>
                     <input
@@ -50,7 +50,7 @@ export default function OtrosDatos({ formData, setFormData, errors = {}, cotizac
 
 
             {   
-                cotizacion.validation_date && 
+                cotizacion?.validation_date && 
                 <>
                     <label htmlFor="validation_date" className="label">Fecha de validación</label>
                     <input
