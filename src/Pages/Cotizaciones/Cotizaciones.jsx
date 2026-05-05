@@ -886,13 +886,13 @@ export default function Cotizaciones() {
 
 
                     <div className="flex justify-end gap-2 w-full">
-                        <button
+                        {activeTab !== 'factura' && activeTab !== 'f' && activeTab != 'complemento' && <button
                             className="btn btn-danger"
                             onClick={handleEliminarCotizacion}
                         >
                             <Trash2 />
                             Eliminar
-                        </button>
+                        </button>}
                         {
                             // (cotizacion.status === 'envio' || cotizacion.status === 'oc') && 
                             

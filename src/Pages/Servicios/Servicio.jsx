@@ -43,10 +43,10 @@ export default function Servicio() {
             setFormData({
                 ...formData,
                 ...res.data,
-                vehicles_types_prices: res.data.vehicle_types.map(
-                    (item) => item.pivot
-                )}
-            );
+                vehicles_types_prices: res.data.vehicle_types
+                    .map((item) => item.pivot)
+                    .filter((item) => item.price !== null)
+            });
             // console.log(vehicles_types_prices);
         } catch (error) {
             console.error("Error fetching data:", error);

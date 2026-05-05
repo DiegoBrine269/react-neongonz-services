@@ -46,7 +46,7 @@ export default function Vehiculo() {
 
             <h3 className="title-3 mt-4 mb-0">Proyectos</h3>
             {vehiculo?.projects?.length > 0 ? (
-                <table className="w-full text-sm border-collapse text">
+                <table className="w-full  border-collapse text">
                     <thead>
                         <tr className="border-b border-neutral-300">
                             <th className="py-1 pr-4 font-semibold">Servicio</th>
@@ -57,15 +57,15 @@ export default function Vehiculo() {
                     <tbody>
                         {vehiculo.projects.map((proyecto) => (
                             <tr key={proyecto.id} className="border-b border-neutral-100 ">
-                                <td className="py-1 pr-4">
+                                <td className="py-1 pr-4 text-sm">
                                     <Link to={`/proyectos/${proyecto.id}`} className="text-blue-500 underline">
                                         {proyecto.service?.name}
                                     </Link>
                                 </td>
-                                <td className="py-1 text">
+                                <td className="py-1 text text-sm">
                                     {proyecto.centre?.name}
                                 </td>
-                                <td className="py-1 text text-right">
+                                <td className="py-1 text text-right text-sm">
                                     {proyecto.date ? format(new Date(proyecto.date), { date: "medium" }, "es") : "-"}
                                 </td>
                             </tr>

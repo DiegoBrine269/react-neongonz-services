@@ -451,7 +451,7 @@ export default function Proyecto() {
                 showCancelButton: true,
                 confirmButtonText: "Sí, eliminar proyecto",
                 cancelButtonText: "Cancelar",
-                ...swalConfig(),
+                ...swalConfig({ danger: true }),
             });
 
             if (result.isConfirmed) {
