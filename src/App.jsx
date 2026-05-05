@@ -35,6 +35,7 @@ import Desempeno from "@/Pages/Reportes/Desempeno"
 import ResetPassword from "@/Pages/Auth/ResetPassword";
 // import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
 
+import Galeria from "@/Pages/Galeria/Galeria";
 
 
 export default function App() {
@@ -90,6 +91,8 @@ export default function App() {
                                 <Route path="/proyectos" element={<Proyectos />} />
                                 <Route path="/proyectos/:id" element={<Proyecto />} />
                                 <Route path="/mi-cuenta" element={<MiCuenta />} />
+                                <Route path="/galeria" element={<Galeria />} />
+
 
                                 
                             </>

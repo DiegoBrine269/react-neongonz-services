@@ -65,6 +65,7 @@ export default function Proyecto() {
     const [lightboxIndex, setLightboxIndex] = useState(0);
 
     const [previews, setPreviews] = useState([]);
+    const [imageUrls, setImageUrls] = useState({});
 
     // Sets para los filtros
     const [usuarios, setUsuarios] = useState([]);
@@ -120,6 +121,8 @@ export default function Proyecto() {
             Authorization: `Bearer ${token}`,
             },
     }).then(res => res.data);
+
+
 
 
     const handleRowClick = useCallback((e, row) => {
@@ -597,6 +600,32 @@ export default function Proyecto() {
             fetchProyectosAbiertos();
         }
     }, [proyecto?.centre?.id]);
+
+    // Se hace fetch de las imágenes del vehículo seleccionado para mostrar en el modal de consulta
+    useEffect(() => {
+        
+        if (!vehiculo?.photos) return;
+
+        const loadImages = async () => {
+            const results = await Promise.all(
+                vehiculo.photos.map(photo =>
+                    clienteAxios
+                        .get(`/api/project-vehicles-photos/${photo.id}`, requestHeader)
+                        .then(res => ({
+                            id: photo.id,
+                            url: res.data.url
+                        }))
+                )
+            );
+
+            const mapped = {};
+            results.forEach(r => mapped[r.id] = r.url);
+
+            setImageUrls(mapped);
+        };
+
+        loadImages();
+    }, [vehiculo]);
 
 
     const fetchTypesOnEcoChange = async () => {
@@ -1236,7 +1265,8 @@ export default function Proyecto() {
                                     ? vehiculo.photos.map((photo, i) => (
                                         <img
                                             key={photo.id}
-                                            src={photo.url}
+                                            src={imageUrls[photo.id]} 
+                                            loading="lazy"
                                             className="w-40 h-40 object-cover rounded-lg cursor-pointer"
                                             onClick={() => {
                                                 setLightboxIndex(i);
@@ -1286,7 +1316,9 @@ export default function Proyecto() {
                 open={lightboxOpen}
                 close={() => setLightboxOpen(false)}
                 index={lightboxIndex}
-                slides={vehiculo?.photos?.map(photo => ({ src: photo.url }))}
+                slides={vehiculo?.photos?.map(photo => ({
+                    src: imageUrls[photo.id]
+                })).filter(s => s.src)}
                 plugins={[Zoom]}
                 controller={{ closeOnBackdropClick: true }}
             />

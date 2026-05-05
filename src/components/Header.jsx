@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { NavLink } from "react-router-dom";
 import {
     Menu, X, Car, Factory, Wrench, User, LogOut,
-    Sun, Moon, LogIn, UserRoundPlus, BriefcaseBusiness, Receipt, Users
+    Sun, Moon, LogIn, UserRoundPlus, BriefcaseBusiness, Receipt, Users,
+    Images
 } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import { useContext } from "react";
@@ -44,6 +45,7 @@ export default function Header() {
                 {user && user.role === "admin" && <Item to="/servicios" text="Servicios" children={<Wrench size={15} />} />}
                 {user && <Item to="/proyectos" text="Proyectos" children={<BriefcaseBusiness size={15} />} />}
                 {user && user.role === "admin" && <Item to="/cotizaciones" text="Cotizaciones" children={<Receipt size={15} />} />}
+                {user && <Item to="/galeria" text="Galería" children={<Images size={15} />} />}
                 {user && <Item to="/mi-cuenta" text="Mi cuenta" children={<User size={15} />} />}
                 {user && user.role === "admin" && <Item to="/usuarios" text="Usuarios" children={<Users size={15} />} />}
                 {user && <Item to="/logout" text="Cerrar sesión" children={<LogOut size={15} />} onClick={handleLogout} />}
@@ -55,7 +57,7 @@ export default function Header() {
 
     return (
         <header className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 relative">
-            <div className="p-5 max-w-screen-lg mx-auto flex items-center justify-between ">
+            <div className="p-5 max-w-screen-xl mx-auto flex items-center justify-between ">
 
                 {/* Controles derecha */}
                 <div className="flex items-center gap-2">
