@@ -127,7 +127,6 @@ export default function Proyecto() {
 
     const handleRowClick = useCallback((e, row) => {
         setVehiculo(row.getData());
-        console.log("Vehículo seleccionado:", row.getData());
         setModalConsultarOpen(true);
     }, []);
 
@@ -594,7 +593,7 @@ export default function Proyecto() {
             // }
         }
 
-    }, [proyecto?.id])
+    }, [proyecto?.vehicles?.length])
 
     useEffect(() => {
         if (proyecto?.centre?.id) {
