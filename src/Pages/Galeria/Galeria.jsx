@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import clienteAxios from '@/config/axios';
 import { useContext, useState, useRef } from 'react';
 import { AppContext } from '@/context/AppContext';
+import { Link } from 'react-router-dom';
 
 export default function Galeria() {
 
@@ -17,7 +18,8 @@ export default function Galeria() {
              const res = await clienteAxios.get('/api/project-vehicles-photos', {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                }
+                },
+                params: { page } // 👈 esto
             });
 
             setImages((prev) => [...prev, ...res.data.data]);
@@ -49,9 +51,18 @@ export default function Galeria() {
         <>
             <h2 className="title-2">Galería</h2>
 
-            {images.map((img) => (
-                <img key={img.id} src={img.path} alt={img.name} />
-            ))}
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2'>
+                {images.map((img) => (
+                    <div key={img.id}>
+                        <p className="text"><Link className='link' to={`/proyectos/${img?.project_vehicle?.project?.id}`}>{img?.project_vehicle?.project?.service?.name}, {img?.project_vehicle?.project?.centre?.name}</Link> - {img?.project_vehicle?.vehicle?.eco}</p>
+                        <img 
+                            src={img.url} 
+                            alt={img.name} 
+                            className='w-full h-48 object-cover rounded'
+                        />
+                    </div>
+                ))}
+            </div>
 
             {/* Este div invisible es el trigger del scroll */}
             <div ref={loaderRef}>

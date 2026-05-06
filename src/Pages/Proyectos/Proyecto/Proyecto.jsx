@@ -127,6 +127,7 @@ export default function Proyecto() {
 
     const handleRowClick = useCallback((e, row) => {
         setVehiculo(row.getData());
+        console.log("Vehículo seleccionado:", row.getData());
         setModalConsultarOpen(true);
     }, []);
 
@@ -1275,7 +1276,7 @@ export default function Proyecto() {
                                             }}
                                         />
                                     ))
-                                    : // Skeleton mientras no hay datos
+                                    : 
                                     Array.from({ length: 4 }).map((_, i) => (
                                         <div
                                             key={i}

@@ -7,7 +7,7 @@ export default function InfoRow({label, value, link}) {
                 {label}
             </span>{" "}
             {link ? (
-                <Link to={link} className="text-blue-500 underline">
+                <Link to={link} className="link">
                     {value}
                 </Link>
             ) : (
