@@ -66,7 +66,7 @@ export default function Vehiculo() {
                                     {proyecto.centre?.name}
                                 </td>
                                 <td className="py-1 text text-right text-sm">
-                                    {proyecto.date ? format(new Date(proyecto.date), { date: "medium" }, "es") : "-"}
+                                    {proyecto.date ? format(proyecto.date, { date: "medium" }, "es") : "-"}
                                 </td>
                             </tr>
                         ))}
