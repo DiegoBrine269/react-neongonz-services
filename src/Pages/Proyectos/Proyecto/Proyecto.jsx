@@ -87,7 +87,7 @@ export default function Proyecto() {
     };
 
     const { data: proyecto, error, isLoading } = useSWR(
-        token && filtros.length == 0 ? [`/api/projects/${id}`, token] : null, // null evita llamadas si no hay token
+        token && filtros?.length == 0 ? [`/api/projects/${id}`, token] : null, // null evita llamadas si no hay token
         ([url, token]) => fetcher(url, token),
         {
             refreshInterval: 5000,
@@ -593,7 +593,7 @@ export default function Proyecto() {
             // }
         }
 
-    }, [proyecto]);
+    }, [proyecto?.id])
 
     useEffect(() => {
         if (proyecto?.centre?.id) {
@@ -732,7 +732,7 @@ export default function Proyecto() {
         },
     ];
 
-    
+
     return (
         <div className="relative">
                 {/* <Camera
@@ -895,6 +895,7 @@ export default function Proyecto() {
                 onRowClick={handleRowClick}
                 columns={columns}
                 data={vehiculos}
+                key={proyecto?.id}
             />
 
             <Modal isOpen={editando} onClose={() => setEditando(false)}>

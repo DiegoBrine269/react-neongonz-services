@@ -60,6 +60,11 @@ export default function Tabla({
         onRowClick?.(e, row);
     };
 
+       useEffect(() => {
+        if (tableRef.current && data?.length > 0) {
+            tableRef.current.replaceData(data);
+        }
+    }, [tableRef.current, data]); // 👈 agrega tableRef.current como dependencia
 
     return (
         <>
