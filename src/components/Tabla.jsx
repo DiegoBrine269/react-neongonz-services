@@ -60,7 +60,7 @@ export default function Tabla({
         onRowClick?.(e, row);
     };
 
-       useEffect(() => {
+    useEffect(() => {
         if (tableRef.current && data?.length > 0) {
             tableRef.current.replaceData(data);
         }

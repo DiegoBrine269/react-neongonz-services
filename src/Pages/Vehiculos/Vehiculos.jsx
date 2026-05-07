@@ -3,10 +3,11 @@ import { AppContext } from "../../context/AppContext";
 import { useContext, useEffect, useState, useRef, useCallback } from "react";
 import Modal from "@/components/Modal";
 import Tabla from "../../components/Tabla";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { toast } from "react-toastify";
 import {Truck} from "lucide-react"
 import InfoRow from "@/components/UI/InfoRow";
+// import { useNavigate } from "react-router-dom";
 
 export default function Vehiculos() {
     const [vehiculos, setVehiculos] = useState([]);
@@ -15,6 +16,8 @@ export default function Vehiculos() {
     const [isModal2Open, setModal2Open] = useState(false);
     const [formData, setFormData] = useState({});
     const [errors, setErrors] = useState([]);
+
+    const navigate = useNavigate();
 
     const [vehiculo, setVehiculo] = useState({
         eco: "",
@@ -34,9 +37,11 @@ export default function Vehiculos() {
 
 
     const handleRowClick = useCallback((e, row) => {
-        const data = row.getData();
-        setVehiculo(data);
-        setModalOpen(true);
+        
+        navigate(`/vehiculos/${row.getData().eco}`);
+        // const data = row.getData();
+        // setVehiculo(data);
+        // setModalOpen(true);
     }, []);
 
     const handleSubmit = async (e) => {

@@ -160,6 +160,22 @@ export default function Cotizaciones() {
         setSelectedRows(selectedData);
     }, []);
 
+    const validarMismoCentro = () => {
+        const multipleCentres = new Set(selectedRows.map(r => r.centre_id)).size > 1;
+        if (multipleCentres) {
+            Swal.fire({
+                title: "Selecciona cotizaciones del mismo Centro de Ventas",
+                text: "Solo puedes facturar de manera múltiple a un mismo Centro de Ventas a la vez.",
+                icon: "error",
+                ...swalConfig(),
+            });
+            setLoading(false);
+            return false;
+        }
+        return true;
+    };
+
+
     useEffect(() => {
         // cuando la tabla se “reconstruye”, vuelves a aplicar
         if (tableRef.current && savedFiltersRef.current?.length) {
@@ -184,8 +200,6 @@ export default function Cotizaciones() {
             const res = await clienteAxios.get(`/api/invoices/${cotizacion?.id}/pdf`, requestHeader);
 
             const pdfUrl = res.data.url;
-            console.log(pdfUrl);
-
             window.open(pdfUrl, "_blank");
 
 
@@ -287,11 +301,7 @@ export default function Cotizaciones() {
 
             try {
                 setLoading(true);
-                const res = await clienteAxios.post(`/api/invoices/send`, {
-                                    invoice_ids: selectedRows.map(r => r.id), 
-                                }, 
-                                requestHeader
-                            );
+                const res = await clienteAxios.post(`/api/invoices/send`, {invoice_ids: selectedRows.map(r => r.id), }, requestHeader);
                 
                 toast.success(res.data.message || "Cotizaciones enviadas correctamente");
                 recargarTabla();
@@ -304,6 +314,37 @@ export default function Cotizaciones() {
             }
         }
     
+    }
+
+    async function handleReenviarFacturas() {
+        if (!validarMismoCentro()) return;
+        
+        const result = await Swal.fire({
+            title: "¿Estás segur@ de querer reenviar la(s) factur(as)?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, enviar",
+            cancelButtonText: "Cancelar",
+            ...swalConfig(true),
+        });
+
+        if (result.isConfirmed) {
+
+
+            try {
+                setLoading(true);
+                const res = await clienteAxios.post(`/api/invoices/billings/resend`, {invoice_ids: selectedRows.map(r => r.id), }, requestHeader);
+                
+                toast.success(res.data.message);
+                recargarTabla();
+
+            } catch (error) {
+                toast.error("Error al enviar las facturas");
+            } finally {
+                setLoading(false);
+                setSelectedRows([]);
+            }
+        }
     }
 
     async function handleEliminarCotizacion() {
@@ -551,6 +592,17 @@ export default function Cotizaciones() {
                                 </motion.button>}
 
                                 {
+                                    (activeTab == 'f') &&
+                                    <MotionButton
+                                        onClick={handleReenviarFacturas}
+                                        icon={<MailIcon />}
+                                        {...motionProps}
+                                    >
+                                        Reenviar facturas
+                                    </MotionButton>
+                                }
+
+                                {
                                     (activeTab == 'envio' || activeTab == 'oc') &&
                                     <MotionButton
                                         onClick={handleEnviarCotizaciones}
@@ -566,18 +618,7 @@ export default function Cotizaciones() {
                                     <motion.button
                                         className="btn"
                                         onClick={() => {
-                                            //Verificar que todas las filas sean de cotizaciones del mismo CV
-                                            const multipleCentres = new Set(selectedRows.map(r => r.centre_id)).size > 1;
-                                            if(multipleCentres){
-                                                Swal.fire({
-                                                    title: "Selecciona cotizaciones del mismo Centro de Ventas",
-                                                    text: "Solo puedes facturar de manera múltiple a un mismo Centro de Ventas a la vez.",
-                                                    icon: "error",
-                                                    ...swalConfig(),
-                                                });
-                                                setLoading(false);
-                                                return;
-                                            }
+                                            if (!validarMismoCentro()) return;  
                                             setModal2(true)
                                             setErrors({})
                                             setFormData({...formData, joined:1});
