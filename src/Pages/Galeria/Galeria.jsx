@@ -3,6 +3,8 @@ import clienteAxios from '@/config/axios';
 import { useContext, useState, useRef } from 'react';
 import { AppContext } from '@/context/AppContext';
 import { Link } from 'react-router-dom';
+import Lightbox from 'yet-another-react-lightbox';
+import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 
 export default function Galeria() {
 
@@ -13,22 +15,35 @@ export default function Galeria() {
     const [hasMore, setHasMore] = useState(true);
     const loaderRef = useRef(null);
 
-    const fetchImages = async () => {
-        try {
-             const res = await clienteAxios.get('/api/project-vehicles-photos', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                params: { page } // 👈 esto
-            });
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
 
+    const isFetching = useRef(false);
+
+    const fetchImages = async () => {
+        if (isFetching.current) return; 
+        isFetching.current = true;
+        try {
+            const res = await clienteAxios.get('/api/project-vehicles-photos', {
+                headers: { Authorization: `Bearer ${token}` },
+                params: { page }
+            });
             setImages((prev) => [...prev, ...res.data.data]);
             setHasMore(res.data.next_page_url !== null);
-
         } catch (error) {
             console.error('Error fetching images:', error);
+        } finally {
+            isFetching.current = false; 
         }
-    }
+    };
+
+    const handleLightboxView = ({ index }) => {
+        setLightboxIndex(index);
+        // Si está a 2 fotos del final y hay más, fetchea
+        if (index >= images.length - 2 && hasMore) {
+            setPage((p) => p + 1);
+        }
+    };
 
     useEffect(() => {
         fetchImages(page);
@@ -59,6 +74,10 @@ export default function Galeria() {
                             src={img.url} 
                             alt={img.name} 
                             className='w-full h-48 object-cover rounded'
+                            onClick={() => {
+                                setLightboxIndex(images.findIndex(i => i.id === img.id));
+                                setLightboxOpen(true);
+                            }}
                         />
                     </div>
                 ))}
@@ -68,6 +87,17 @@ export default function Galeria() {
             <div ref={loaderRef}>
                 {hasMore && <span>Cargando...</span>}
             </div>
+
+            
+            <Lightbox
+                open={lightboxOpen}
+                close={() => setLightboxOpen(false)}
+                index={lightboxIndex}
+                slides={images.map(img => ({ src: img.url, alt: img.name }))}
+                plugins={[Zoom]}
+                 on={{ view: handleLightboxView }} 
+                controller={{ closeOnBackdropClick: true }}
+            />
         </>
     )
 }
