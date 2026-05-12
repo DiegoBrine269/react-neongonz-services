@@ -48,7 +48,7 @@ export default function Nueva() {
                 // lanzarError = true;
                 return;
             }
-            sub += parseInt(s.price);
+            sub += parseFloat(s.price);
         });
 
         // if(lanzarError)
