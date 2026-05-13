@@ -21,7 +21,7 @@ export default function Galeria() {
     const isFetching = useRef(false);
 
     const fetchImages = async () => {
-        if (isFetching.current) return; 
+        if (isFetching.current) return;
         isFetching.current = true;
         try {
             const res = await clienteAxios.get('/api/project-vehicles-photos', {
@@ -33,9 +33,23 @@ export default function Galeria() {
         } catch (error) {
             console.error('Error fetching images:', error);
         } finally {
-            isFetching.current = false; 
+            isFetching.current = false;
         }
     };
+
+    // 👇 Después de cada fetch, revisar si el loader sigue en pantalla
+    useEffect(() => {
+        if (!hasMore) return;
+        const loader = loaderRef.current;
+        if (!loader) return;
+
+        const rect = loader.getBoundingClientRect();
+        const isVisible = rect.top < window.innerHeight;
+
+        if (isVisible) {
+            setPage((p) => p + 1);
+        }
+}, [images]); // se dispara cuando llegan nuevas imágenes
 
     const handleLightboxView = ({ index }) => {
         setLightboxIndex(index);
