@@ -46,7 +46,7 @@ export default function Layout() {
             >
                 <Header />
 
-                <div className="bg-gray-100 dark:bg-neutral-900 p-4 md:px-24 lg:px-[25%] box-border max-w-[100vw]">
+                <div className="bg-gray-100 dark:bg-neutral-900 p-4 md:px-12 xl:px-[15%] box-border max-w-[100vw]">
                     <Outlet />
                 </div>
 

@@ -1,5 +1,5 @@
 
-import { CirclePlus, UserRoundPen, Trash2, CircleCheck, Receipt, Pencil, MailIcon } from "lucide-react";
+import { CirclePlus, UserRoundPen, Trash2, CircleCheck, Receipt, Pencil, MailIcon, StickyNotePlus, List } from "lucide-react";
 import { Link } from "react-router-dom";
 import Tabla from "../../components/Tabla";
 import { useContext, useState, useRef, useEffect, useCallback } from "react";
@@ -17,9 +17,10 @@ import get from 'lodash.get';
 import ButtonSubmit from "@/components/UI/Buttons/ButtonSubmit";
 import FacturacionPreview from "@/Pages/Cotizaciones/FacturacionPreview";
 import ComplementoPreview from "@/Pages/Cotizaciones/ComplementoPreview";
+import ModalLateral from "@/components/ModalLateral";
 
 import ReactDOMServer from "react-dom/server";
-import { columnasCotizaciones } from "./configCotizaciones";
+import { getColumnasCotizaciones } from "./configCotizaciones";
 
 const MotionButton = motion.create(ButtonSubmit);
 
@@ -38,6 +39,8 @@ export default function Cotizaciones() {
     const [modal, setModal] = useState(false);
     const [modal2, setModal2] = useState(false);
     const [modal3, setModal3] = useState(false);
+    const [modal4, setModal4] = useState(false);
+
 
 
     const [formData, setFormData] = useState({
@@ -64,6 +67,28 @@ export default function Cotizaciones() {
         { id: 'finalizada', label: 'Finalizadas' },
     ];
 
+    const columnasCotizaciones = getColumnasCotizaciones({
+        renderAcciones: (data) => (
+            <div className="">
+                    {
+                        selectedRows.some(r => r.id === data.id) ?
+                            <button className="btn" onClick={(e) => {
+                                setSelectedRows([...selectedRows, data])}
+                            }>
+                                <StickyNotePlus />
+                            </button>
+                        :
+                            <button className="btn btn-secondary" onClick={(e) => {
+                                const _selectedRows = selectedRows.filter(r => r.id !== data.id);
+                                setSelectedRows(_selectedRows)}
+                            }>
+                                <StickyNotePlus />
+                            </button>
+                    }             
+
+            </div>
+        )
+    });
 
     const { tableRef, token, setLoading, pendientes, fetchPendientes,  pendientesEnvio, fetchPendientesEnvio, requestHeader, fetchCustomers, customers } = useContext(AppContext);
 
@@ -104,6 +129,7 @@ export default function Cotizaciones() {
 
         // console.log(grouped)
         // setListaComplementos(grouped);
+        setModal4(false);
 
         const ocs = new Set(selectedRows.map(r => r.oc));
 
@@ -573,115 +599,54 @@ export default function Cotizaciones() {
             setFormData(prevFormData => ({...prevFormData, payment_form: ''}));
         }
 
-        // if(activeTab === 'factura')
-        //     setFormData({...formData, joined: 1});
+
     }, [formData.payment_method, formData.payment_form, activeTab]);
+
+
+    useEffect(()=>{
+        setSelectedRows([]);
+    }, [activeTab]);
+
+    
 
     return (
         <>
             <h2 className="title-2">Cotizaciones</h2>
 
-            <div className="contenedor-botones">
+            <div className="contenedor-botones gap-4">
                 <AnimatePresence mode="wait">
 
                 
-                    {
-                        selectedRows.length > 0 ?
-                            
-                            <motion.div
-                                key="acciones"
-                                className="contenedor-botones"
-                                {...motionProps}
-                            >
-                                { activeTab !== 'factura' && activeTab !== 'f' && activeTab != 'complemento' && <motion.button
+                <motion.div
+                    key="acciones"
+                    className="contenedor-botones"
+                    {...motionProps}
+                >
+                    <Link className="btn" to="/cotizaciones/nueva">
+                        <CirclePlus />
+                        Crear ordinaria
+                    </Link>
 
-                                    className="btn btn-danger"
-                                    onClick={handleEliminarCotizaciones}
-                                    {...motionProps}
-                                >
-                                    <Trash2 />
-                                    Eliminar
-                                </motion.button>}
+                    <Link
+                        className="btn btn-secondary relative"
+                        to="/cotizaciones/personalizadas"
+                    >
+                        <UserRoundPen/>
+                        Personalizadas{" "}
+                        <span className="counter">{pendientes?.length}</span>
+                    </Link>
 
-                                {
-                                    (activeTab == 'f') &&
-                                    <MotionButton
-                                        onClick={handleReenviarFacturas}
-                                        icon={<MailIcon />}
-                                        {...motionProps}
-                                    >
-                                        Reenviar facturas
-                                    </MotionButton>
-                                }
+                    {   
+                        selectedRows.length > 0 &&
+                        <button className="btn btn-secondary relative" onClick={()=>{setModal4(true)}}>
+                            <List/>
+                            Lista de cotizaciones
+                            <span className="counter">{selectedRows?.length}</span>
 
-                                {
-                                    (activeTab == 'envio' || activeTab == 'oc') &&
-                                    <MotionButton
-                                        onClick={handleEnviarCotizaciones}
-                                        icon={<MailIcon />}
-                                        {...motionProps}
-                                    >
-                                        Enviar
-                                    </MotionButton>
-                                }
-
-                                {
-                                    activeTab == 'factura' &&
-                                    <motion.button
-                                        className="btn"
-                                        onClick={() => {
-                                            if (!validarMismoCentro()) return;  
-                                            setModal2(true)
-                                            setErrors({})
-                                            setFormData({...formData, joined:1});
-                                        }}
-                                        {...motionProps}
-                                    > 
-                                            <>
-                                                <MailIcon />
-                                                Facturar y enviar
-                                            </>
-                                        
-                                    </motion.button>
-                                }
-                                {
-                                    activeTab == 'complemento' &&
-                                    <motion.button
-                                        className="btn"
-                                        onClick={handleClickComplemento}
-                                        
-                                        {...motionProps}
-                                    > 
-                                            <>
-                                                <Receipt />
-                                                Emitir complemento
-                                            </>
-                                        
-                                    </motion.button>
-                                }
-                            </motion.div>
-                            
-                        :
-                            <motion.div
-                                key="acciones"
-                                className="contenedor-botones"
-                                {...motionProps}
-                            >
-                                <Link className="btn" to="/cotizaciones/nueva">
-                                    <CirclePlus />
-                                    Crear ordinaria
-                                </Link>
-
-                                <Link
-                                    className="btn btn-secondary relative"
-                                    to="/cotizaciones/personalizadas"
-                                >
-                                    <UserRoundPen/>
-                                    Personalizadas{" "}
-                                    <span className="counter">{pendientes?.length}</span>
-                                </Link>
-                            </motion.div>
+                        </button>
                     }
+                </motion.div>
+                    
                 </AnimatePresence>
             </div>
 
@@ -720,6 +685,7 @@ export default function Cotizaciones() {
                     layout="fitColumns"
                     options={{
                         // selectable: true,
+                        selectablePersistence: true,
                         pagination: true, //enable pagination
                         paginationMode: "remote", //enable remote pagination
                         ajaxURL: `${import.meta.env.VITE_API_URL}/api/invoices`,
@@ -736,6 +702,7 @@ export default function Cotizaciones() {
                     }}
                     onRowClick={handleRowClick}
                     onSelectionChange={handleRowSelectionChanged}
+
                 />
             </div>
 
@@ -957,6 +924,8 @@ export default function Cotizaciones() {
                             <Trash2 />
                             Eliminar
                         </button>}
+
+
                         {
                             // (cotizacion.status === 'envio' || cotizacion.status === 'oc') && 
                             
@@ -980,6 +949,28 @@ export default function Cotizaciones() {
                             </>
                         }
 
+                        {(() => {
+                            const isSelected = selectedRows.some(r => r.id === cotizacion.id);
+                            return (
+                                <button
+                                    className={`btn ${isSelected ? 'btn-secondary' : ''}`}
+                                    onClick={() => {
+                                        setSelectedRows(prev =>
+                                            isSelected
+                                                ? prev.filter(r => r.id !== cotizacion.id)
+                                                : [...prev, cotizacion]
+                                        );
+                                        setModal(false);
+
+
+                                        setModal4(true);
+                                    }}
+                                >
+                                    <StickyNotePlus />
+                                    {isSelected ? 'Quitar de la lista' : 'Añadir a la lista'}
+                                </button>
+                            );
+                        })()}
                     </div>
                 </div>
             </Modal>
@@ -1132,6 +1123,112 @@ export default function Cotizaciones() {
                     </div>
                 </form>
             </Modal>
+
+            <ModalLateral isOpen={modal4} onClose={() => setModal4(false)}>
+                <h2 className="title-3">Lista de cotizaciones seleccionadas</h2>
+
+                <div className="flex flex-col gap-3">
+                    {
+                        selectedRows.map((cot, index) => (
+                            <div key={index} className="card text relative">
+                                <button 
+                                    className="cursor-pointer absolute top-0 right-2"
+                                    onClick={()=>{
+                                        setSelectedRows(prev => prev.filter(r => r.id !== cot.id));
+                                        if(selectedRows.length === 1){
+                                            setModal4(false);
+                                        }
+                                    }}
+                                >x</button>
+
+                                <p><span className="font-bold">Número de cotización:</span> {cot.invoice_number}</p>
+                                <p><span className="font-bold">Centro:</span> {cot.centre}</p>
+                                <p><span className="font-bold">Fecha de cotización:</span> {format(cot.date, "DD/MM/YYYY")}</p>
+                                <p><span className="font-bold">Monto total:</span> {formatoMoneda.format(cot.total)}</p>
+                            </div>
+                        ))
+                    }
+
+                    {
+                        selectedRows.length > 0 &&
+                            
+                            <motion.div
+                                key="acciones"
+                                className="contenedor-botones"
+                                {...motionProps}
+                            >
+                            { activeTab !== 'factura' && activeTab !== 'f' && activeTab != 'complemento' && <motion.button
+
+                                className="btn btn-danger"
+                                onClick={handleEliminarCotizaciones}
+                                {...motionProps}
+                            >
+                                <Trash2 />
+                                Eliminar permanentemente
+                            </motion.button>}
+
+                            {
+                                (activeTab == 'f') &&
+                                <MotionButton
+                                    onClick={handleReenviarFacturas}
+                                    icon={<MailIcon />}
+                                    {...motionProps}
+                                >
+                                    Reenviar facturas
+                                </MotionButton>
+                            }
+
+                            {
+                                (activeTab == 'envio' || activeTab == 'oc') &&
+                                <MotionButton
+                                    onClick={handleEnviarCotizaciones}
+                                    icon={<MailIcon />}
+                                    {...motionProps}
+                                >
+                                    Enviar
+                                </MotionButton>
+                            }
+
+                            {
+                                activeTab == 'factura' &&
+                                <motion.button
+                                    className="btn"
+                                    onClick={() => {
+                                        if (!validarMismoCentro()) return;  
+                                        setModal2(true)
+                                        setErrors({})
+                                        setFormData({...formData, joined:1});
+                                        setModal4(false);
+                                    }}
+                                    {...motionProps}
+                                > 
+                                        <>
+                                            <MailIcon />
+                                            Facturar y enviar
+                                        </>
+                                    
+                                </motion.button>
+                            }
+                            {
+                                activeTab == 'complemento' &&
+                                <motion.button
+                                    className="btn"
+                                    onClick={handleClickComplemento}
+                                    
+                                    {...motionProps}
+                                > 
+                                        <>
+                                            <Receipt />
+                                            Emitir complemento
+                                        </>
+                                    
+                                </motion.button>
+                            }
+                        </motion.div>
+                    }
+                </div>
+            </ModalLateral>
+            
         </>
     );
 }

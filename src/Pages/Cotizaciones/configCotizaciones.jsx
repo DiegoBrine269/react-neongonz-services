@@ -1,17 +1,33 @@
 import { formatoMoneda } from "@/config/variables";
 import { format } from "@formkit/tempo";
+import { createRoot } from 'react-dom/client';
 
-const columnasCotizaciones =
-[
-                        {
-                            title: "",
-                            formatter: "rowSelection",
-                            titleFormatter: "rowSelection", // opcional: checkbox en el header para seleccionar todos
-                            hozAlign: "center",
-                            headerSort: false,
-                            width: 50,
-                            resizable: false,
-                        },
+
+export function getColumnasCotizaciones({ renderAcciones }) {
+
+return [
+                        // {
+                        //     title: "",
+                        //     formatter: "rowSelection",
+                        //     titleFormatter: "rowSelection", // opcional: checkbox en el header para seleccionar todos
+                        //     hozAlign: "center",
+                        //     headerSort: false,
+                        //     width: 50,
+                        //     resizable: false,
+                        // },
+                        // {
+                        //     title: "",
+                        //     formatter: (cell) => {
+                        //         const data = cell.getRow().getData();
+                        //         const container = document.createElement('div');
+
+                        //         container.addEventListener('click', (e) => e.stopPropagation()); // ← DOM nativo
+
+                        //         createRoot(container).render(renderAcciones(data));
+
+                        //         return container;
+                        //     }
+                        // },
                         {
                             title: "Centro",
                             field: "centre",
@@ -85,6 +101,8 @@ const columnasCotizaciones =
                             field: "oc",
                             headerFilter: true,
                             resizable: false,
+                            // width: 220,
+
                         },
                         {
                             title: "Forma de pago",
@@ -123,6 +141,7 @@ const columnasCotizaciones =
                             resizable: false,
                             // visible: false,
                         },
-                    ];
+                    ]
+}
 
-export {columnasCotizaciones};
+// export {columnasCotizaciones};

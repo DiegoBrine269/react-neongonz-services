@@ -2,7 +2,7 @@ const tabulatorConfig = {
     // locale: true,
     // resizableRows: true,
     placeholder: "Sin resultados",
-    layout: "fitDataFill",
+    layout: "fitData",
     resizableColumns: false,
     paginationSize: 50,
     // paginationSizeSelector: [10, 25, 50, 100],
