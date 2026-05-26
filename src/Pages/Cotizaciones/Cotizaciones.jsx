@@ -1,5 +1,5 @@
 
-import { CirclePlus, UserRoundPen, Trash2, CircleCheck, Receipt, Pencil, MailIcon, StickyNote, StickyNoteList } from "lucide-react";
+import { CirclePlus, UserRoundPen, Trash2, CircleCheck, Receipt, Pencil, MailIcon, StickyNote, StickyNoteList, List } from "lucide-react";
 import { Link } from "react-router-dom";
 import Tabla from "../../components/Tabla";
 import { useContext, useState, useRef, useEffect, useCallback } from "react";
