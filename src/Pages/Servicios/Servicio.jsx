@@ -243,7 +243,7 @@ export default function Servicio() {
                     type="text"
                     id="sat_key_prod_serv"
                     placeholder='Clave de producto o servicio del SAT'
-                    value={formData.sat_key_prod_serv || servicio.sat_key_prod_serv}
+                    value={formData.sat_key_prod_serv ?? servicio.sat_key_prod_serv}
                     onChange={(e) => setFormData({...formData, sat_key_prod_serv: e.target.value})}
                 />
                 {errors.sat_key_prod_serv && <p className="error">{errors.sat_key_prod_serv}</p>}

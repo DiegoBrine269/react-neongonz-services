@@ -87,7 +87,6 @@ export default function Tabla({
 
 
                         ajaxResponse: (url, params, response) => {
-                            console.log(response.total);
                             setTotalFilas(response.total);
                             return response;
                         },

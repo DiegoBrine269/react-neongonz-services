@@ -86,13 +86,6 @@ const columnasCotizaciones =
                             headerFilter: true,
                             resizable: false,
                         },
-
-                        {
-                            title: "Folio fiscal",
-                            field: "uuid",
-                            headerFilter: true,
-                            resizable: false,
-                        },
                         {
                             title: "Forma de pago",
                             field: "payment_form",

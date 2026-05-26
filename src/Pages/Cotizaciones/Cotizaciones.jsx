@@ -246,6 +246,12 @@ export default function Cotizaciones() {
         }
     }
 
+    const handleSearch = (value) => {
+        const table = tableRef.current;
+        if (!table) return;
+
+        table.setData(undefined, { search: value ?? '' });
+    };
 
     async function handleEliminarCotizaciones() {
 
@@ -691,6 +697,14 @@ export default function Cotizaciones() {
                         </button>
                     ))}
                 </div>
+
+
+                <input
+                    type="text"
+                    placeholder="Búsqueda global"
+                    onChange={(e) => handleSearch(e.target.value)}
+                    className="my-2"
+                />
 
                 <Tabla
                     key={reloadKey}

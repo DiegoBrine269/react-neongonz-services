@@ -22,7 +22,7 @@ export default function Nueva() {
    
 
     const { token, setLoading, loading, centros, fetchCentros, fetchResponsables, responsables, setLoadingMessage} = useContext(AppContext);
-    const {vehiculosPendientes, setVehiculosPendientes, centro, setCentro, formData, setFormData, selected, toggle, clear, isSelected, setSelected, selectAll, handleCheckboxChange, checkedMap, setCheckedMap, centrosPendientes, setCentrosPendientes, proyectosPendientes, setProyectosPendientes, seleccionarTodo, setSeleccionarTodo, proyectosSeleccionados, setProyectosSeleccionados, subTotal, setSubTotal} = useContext(CotizacionesContext);
+    const {vehiculosPendientes, setVehiculosPendientes, fetchCentro, centro, setCentro, formData, setFormData, selected, toggle, clear, isSelected, setSelected, selectAll, handleCheckboxChange, checkedMap, setCheckedMap, centrosPendientes, setCentrosPendientes, proyectosPendientes, setProyectosPendientes, seleccionarTodo, setSeleccionarTodo, proyectosSeleccionados, setProyectosSeleccionados, subTotal, setSubTotal} = useContext(CotizacionesContext);
 
     const [errors, setErrors] = useState({});
     const [lanzarError, setLanzarError] = useState(false);
@@ -173,6 +173,7 @@ export default function Nueva() {
             setLoading(true);
             await Promise.all([fetchResponsables()]);
             await Promise.all([fetchCentros()]);
+            // await Promise.all([fetchCentro()]);
             await Promise.all([fetchVehiculosPendientes()]);
             setLoading(false);
         };
