@@ -26,6 +26,9 @@ const MotionButton = motion.create(ButtonSubmit);
 export default function Cotizaciones() {
 
 
+    const searchRef = useRef('');        
+    const searchInputRef = useRef(null); 
+
     const [cotizacion, setCotizacion] = useState({});
 
     const [selectedRows, setSelectedRows] = useState([]);
@@ -250,7 +253,10 @@ export default function Cotizaciones() {
         const table = tableRef.current;
         if (!table) return;
 
-        table.setData(undefined, { search: value ?? '' });
+        searchRef.current = value;
+
+        const url = `${import.meta.env.VITE_API_URL}/api/invoices`;
+        table.setData(url);
     };
 
     async function handleEliminarCotizaciones() {
@@ -723,6 +729,9 @@ export default function Cotizaciones() {
                                 Authorization: `Bearer ${token}`,
                             },
                         },
+                        ajaxParams: () => ({
+                            search: searchRef.current ?? ''
+                        }),
                         filterMode: "remote",
                     }}
                     onRowClick={handleRowClick}
