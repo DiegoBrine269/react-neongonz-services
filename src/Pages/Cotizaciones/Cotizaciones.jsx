@@ -1,5 +1,5 @@
 
-import { CirclePlus, UserRoundPen, Trash2, CircleCheck, Receipt, Pencil, MailIcon, StickyNotePlus, List } from "lucide-react";
+import { CirclePlus, UserRoundPen, Trash2, CircleCheck, Receipt, Pencil, MailIcon, StickyNote,, StickyNote List } from "lucide-react";
 import { Link } from "react-router-dom";
 import Tabla from "../../components/Tabla";
 import { useContext, useState, useRef, useEffect, useCallback } from "react";
@@ -75,14 +75,14 @@ export default function Cotizaciones() {
                             <button className="btn" onClick={(e) => {
                                 setSelectedRows([...selectedRows, data])}
                             }>
-                                <StickyNotePlus />
+                                <StickyNote />
                             </button>
                         :
                             <button className="btn btn-secondary" onClick={(e) => {
                                 const _selectedRows = selectedRows.filter(r => r.id !== data.id);
                                 setSelectedRows(_selectedRows)}
                             }>
-                                <StickyNotePlus />
+                                <StickyNote />
                             </button>
                     }             
 
@@ -966,7 +966,7 @@ export default function Cotizaciones() {
                                         setModal4(true);
                                     }}
                                 >
-                                    <StickyNotePlus />
+                                    <StickyNote />
                                     {isSelected ? 'Quitar de la lista' : 'Añadir a la lista'}
                                 </button>
                             );
