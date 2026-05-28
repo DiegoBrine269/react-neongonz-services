@@ -1,7 +1,7 @@
 import { formatoMoneda } from "@/config/variables";
 import { format } from "@formkit/tempo";
 import { createRoot } from 'react-dom/client';
-
+import { formasPago, metodosPago } from '@/helpers/sat.js';
 
 export function getColumnasCotizaciones({ renderAcciones }) {
 
@@ -106,20 +106,28 @@ return [
                         },
                         {
                             title: "Forma de pago",
-                            field: "payment_form",
-                            headerFilter: true,
+                            field: "billing.payment_form",
+                            // headerFilter: true,
                             resizable: false,
+                            formatter: (cell) => {
+                                if (!cell.getValue()) return "";
+                                return formasPago[cell.getValue()] || cell.getValue();
+                            },
                         },
                         {
                             title: "Método de pago",
-                            field: "payment_method",
+                            field: "billing.payment_method",
                             headerFilter: true,
                             resizable: false,
+                            formatter: (cell) => {
+                                if (!cell.getValue()) return "";
+                                return metodosPago[cell.getValue()] || cell.getValue();
+                            },
                         },
                         {
                             title: "F",
                             field: "f_receipt",
-                            headerFilter: true,
+                            // headerFilter: true,
                             resizable: false,
                         },
                         {

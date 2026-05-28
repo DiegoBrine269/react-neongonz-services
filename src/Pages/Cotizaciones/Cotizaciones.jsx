@@ -1,5 +1,5 @@
 
-import { CirclePlus, UserRoundPen, Trash2, CircleCheck, Receipt, Pencil, MailIcon, StickyNote, StickyNoteList, List } from "lucide-react";
+import { CirclePlus, UserRoundPen, Trash2, CircleCheck, Receipt, Pencil, MailIcon, StickyNote,  List } from "lucide-react";
 import { Link } from "react-router-dom";
 import Tabla from "../../components/Tabla";
 import { useContext, useState, useRef, useEffect, useCallback } from "react";
@@ -12,7 +12,7 @@ import Swal from "sweetalert2";
 import { format } from "@formkit/tempo";
 import { motion, AnimatePresence } from "framer-motion";
 import ErrorLabel from '@/components/UI/ErrorLabel';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import get from 'lodash.get';
 import ButtonSubmit from "@/components/UI/Buttons/ButtonSubmit";
 import FacturacionPreview from "@/Pages/Cotizaciones/FacturacionPreview";
@@ -497,6 +497,7 @@ export default function Cotizaciones() {
 
             toast.success(res.data.message || "Factura(s) emitida(s) correctamente");
             setModal2(false);
+            setModal4(false);
             setCotizacion({});
             recargarTabla();
         }   
@@ -1127,10 +1128,10 @@ export default function Cotizaciones() {
             <ModalLateral isOpen={modal4} onClose={() => setModal4(false)}>
                 <h2 className="title-3">Lista de cotizaciones seleccionadas</h2>
 
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
                     {
                         selectedRows.map((cot, index) => (
-                            <div key={index} className="card text relative">
+                            <div key={index} className="card m-0 text relative">
                                 <button 
                                     className="cursor-pointer absolute top-0 right-2"
                                     onClick={()=>{
@@ -1149,83 +1150,85 @@ export default function Cotizaciones() {
                         ))
                     }
 
-                    {
-                        selectedRows.length > 0 &&
-                            
-                            <motion.div
-                                key="acciones"
-                                className="contenedor-botones"
-                                {...motionProps}
-                            >
-                            { activeTab !== 'factura' && activeTab !== 'f' && activeTab != 'complemento' && <motion.button
-
-                                className="btn btn-danger"
-                                onClick={handleEliminarCotizaciones}
-                                {...motionProps}
-                            >
-                                <Trash2 />
-                                Eliminar permanentemente
-                            </motion.button>}
-
-                            {
-                                (activeTab == 'f') &&
-                                <MotionButton
-                                    onClick={handleReenviarFacturas}
-                                    icon={<MailIcon />}
+                    <div className="contenedor-botones">
+                        {
+                            selectedRows.length > 0 &&
+                                
+                                <motion.div
+                                    key="acciones"
+                                    className="contenedor-botones"
                                     {...motionProps}
                                 >
-                                    Reenviar facturas
-                                </MotionButton>
-                            }
+                                { activeTab !== 'factura' && activeTab !== 'f' && activeTab != 'complemento' && <motion.button
 
-                            {
-                                (activeTab == 'envio' || activeTab == 'oc') &&
-                                <MotionButton
-                                    onClick={handleEnviarCotizaciones}
-                                    icon={<MailIcon />}
+                                    className="btn btn-danger"
+                                    onClick={handleEliminarCotizaciones}
                                     {...motionProps}
                                 >
-                                    Enviar
-                                </MotionButton>
-                            }
+                                    <Trash2 />
+                                    Eliminar permanentemente
+                                </motion.button>}
 
-                            {
-                                activeTab == 'factura' &&
-                                <motion.button
-                                    className="btn"
-                                    onClick={() => {
-                                        if (!validarMismoCentro()) return;  
-                                        setModal2(true)
-                                        setErrors({})
-                                        setFormData({...formData, joined:1});
-                                        setModal4(false);
-                                    }}
-                                    {...motionProps}
-                                > 
-                                        <>
-                                            <MailIcon />
-                                            Facturar y enviar
-                                        </>
-                                    
-                                </motion.button>
-                            }
-                            {
-                                activeTab == 'complemento' &&
-                                <motion.button
-                                    className="btn"
-                                    onClick={handleClickComplemento}
-                                    
-                                    {...motionProps}
-                                > 
-                                        <>
-                                            <Receipt />
-                                            Emitir complemento
-                                        </>
-                                    
-                                </motion.button>
-                            }
-                        </motion.div>
-                    }
+                                {
+                                    (activeTab == 'f') &&
+                                    <MotionButton
+                                        onClick={handleReenviarFacturas}
+                                        icon={<MailIcon />}
+                                        {...motionProps}
+                                    >
+                                        Reenviar facturas
+                                    </MotionButton>
+                                }
+
+                                {
+                                    (activeTab == 'envio' || activeTab == 'oc') &&
+                                    <MotionButton
+                                        onClick={handleEnviarCotizaciones}
+                                        icon={<MailIcon />}
+                                        {...motionProps}
+                                    >
+                                        Enviar
+                                    </MotionButton>
+                                }
+
+                                {
+                                    activeTab == 'factura' &&
+                                    <motion.button
+                                        className="btn"
+                                        onClick={() => {
+                                            if (!validarMismoCentro()) return;  
+                                            setModal2(true)
+                                            setErrors({})
+                                            setFormData({...formData, joined:1});
+                                            setModal4(false);
+                                        }}
+                                        {...motionProps}
+                                    > 
+                                            <>
+                                                <MailIcon />
+                                                Facturar y enviar
+                                            </>
+                                        
+                                    </motion.button>
+                                }
+                                {
+                                    activeTab == 'complemento' &&
+                                    <motion.button
+                                        className="btn"
+                                        onClick={handleClickComplemento}
+                                        
+                                        {...motionProps}
+                                    > 
+                                            <>
+                                                <Receipt />
+                                                Emitir complemento
+                                            </>
+                                        
+                                    </motion.button>
+                                }
+                            </motion.div>
+                        }
+                    </div>
                 </div>
             </ModalLateral>
             

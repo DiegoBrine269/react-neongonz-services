@@ -7,7 +7,7 @@ const Modal = ({ isOpen, onClose, children }) => {
             onClick={onClose} // 👈 click fuera
         >
             <div
-                className="bg-white rounded-2xl shadow-lg p-6 max-w-lg w-full relative mx-2 dark:bg-neutral-800 animate__animated animate__slideInRight"
+                className="bg-white rounded-2xl shadow-lg p-6 max-w-lg w-full relative mx-2 dark:bg-neutral-800 animate__animated animate__slideInRight overflow-y-scroll"
                 onClick={(e) => e.stopPropagation()} 
             >
                 <button
