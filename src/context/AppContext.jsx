@@ -219,7 +219,7 @@ export default function AppProvider({ children }) {
 
     const fetchTypes = async () => {
         try {
-            const res = await clienteAxios.get(`/api/vehicles/types`, {
+            const res = await clienteAxios.get(`/api/vehicles-types`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

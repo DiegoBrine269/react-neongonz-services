@@ -21,7 +21,7 @@ export default function Tipos() {
     const handleCreateSubmit = async (e) => {
         e.preventDefault();
         try {
-            await clienteAxios.post("/api/vehicles/types", formData, requestHeader);
+            await clienteAxios.post("/api/vehicles-types", formData, requestHeader);
             setErrors({});
             fetchTypes();
             setModalCreate(false);
@@ -38,7 +38,7 @@ export default function Tipos() {
     const handleUpdateSubmit = async (e) => {
         e.preventDefault();
         try {
-            await clienteAxios.put(`/api/vehicles/types/${formData.id}`, formData, requestHeader);
+            await clienteAxios.put(`/api/vehicles-types/${formData.id}`, formData, requestHeader);
             setErrors({});
             fetchTypes();
             setModalEdit(false);

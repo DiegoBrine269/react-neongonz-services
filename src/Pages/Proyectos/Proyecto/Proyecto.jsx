@@ -1113,7 +1113,9 @@ export default function Proyecto() {
                         <option value="" disabled>
                             Seleccione un tipo
                         </option>
-                        {types.map((type) => (
+                        {
+                        
+                        types?.map((type) => (
                             <option key={type.id} value={type.id}>
                                 {type.type}
                             </option>
