@@ -172,9 +172,14 @@ export default function Nueva() {
         const fetchData = async () => {
             setLoading(true);
             await Promise.all([fetchResponsables()]);
-            await Promise.all([fetchCentros()]);
-            // await Promise.all([fetchCentro()]);
+            await fetchCentros();
             await Promise.all([fetchVehiculosPendientes()]);
+
+            // Refresca el centro seleccionado
+            if (centro?.id) {
+                setCentro(prev => centros.find(c => c.id === prev?.id) ?? prev);
+            }
+
             setLoading(false);
         };
 

@@ -53,8 +53,9 @@ export default function Layout() {
                 <Footer />
             </div>
             <ToastContainer
-                autoClose={2500}
+                autoClose={2000}
                 draggable
+                closeOnClick={true}
             />
         </>
     );

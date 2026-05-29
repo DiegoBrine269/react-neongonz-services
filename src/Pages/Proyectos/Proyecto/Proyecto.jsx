@@ -318,7 +318,7 @@ export default function Proyecto() {
                 showCancelButton: true,
                 confirmButtonText: `Sí, ${proyecto?.is_open ? "cerrar" : "abrir"} proyecto`,
                 cancelButtonText: "Cancelar",
-                ...swalConfig(),
+                ...swalConfig({danger:true}),
             });
 
             if (result.isConfirmed) {
