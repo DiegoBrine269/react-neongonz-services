@@ -13,7 +13,7 @@ export default function SearchInput({htmlId, initialValue, lista, placeholder, o
     const [listaFiltrada, setListaFiltrada] = useState(lista);
 
     useEffect(() => {
-        console.log("Initial value effect:", initialValue);
+        // console.log("Initial value effect:", initialValue);
         if (initialValue) {
             const item = lista.find((item) => item.id.toString() === initialValue.toString());
             if (item) {

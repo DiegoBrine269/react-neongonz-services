@@ -18,20 +18,22 @@ import get from 'lodash.get';
 import { useParams } from "react-router-dom";
 import { CotizacionesContext } from "@/context/CotizacionesContext";
 import OtrosDatos from "./EditarComponents/OtrosDatos.jsx";
-
+import SearchInput from "@/components/UI/SearchInput";
+import Modal from "@/components/Modal";
+import { formatearDinero } from "@/utils/utils";
 
 export default function Personalizadas() {
 
     const { id } = useParams();
 
     const { cotizacion, fetchCotizacion, setCotizacion } = useContext(CotizacionesContext);
-    const { token, setLoading, centros, fetchCentros, pendientes, fetchPendientes, responsables, fetchResponsables, fetchUnits, units} = useContext(AppContext);
+    const { token, setLoading, centros, fetchCentros, pendientes, fetchPendientes, responsables, fetchResponsables, fetchUnits, units, servicios, fetchServicios } = useContext(AppContext);
 
     const navigate = useNavigate();
 
-    const {register, control, handleSubmit } = useForm({
+    const {register, control, handleSubmit, watch, setValue } = useForm({
             defaultValues: {
-            items: [{ concept: '', quantity: '', price: '' }]
+            items: [{ concept: '', quantity: '', price: '', isListActive: false }]
         }
     });
 
@@ -50,6 +52,10 @@ export default function Personalizadas() {
     const [errors, setErrors] = useState({});
     const [accion, setAccion] = useState(null); // create or update
     const [mostrarBotones, setMostrarBotones] = useState(true);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [precios, setPrecios] = useState([]);
+
+    const items = watch('items');
 
     useEffect(() => {
         fetchResponsables();
@@ -57,6 +63,7 @@ export default function Personalizadas() {
         fetchCentros();
         fetchUnits();
         setCotizacion(null);
+        fetchServicios();
 
         if(id){
             setAccion("edit");
@@ -67,8 +74,10 @@ export default function Personalizadas() {
 
     useEffect(()=>{
         // console.log(cotizacion);
-        if(cotizacion)
+        if(cotizacion){
             handleSelectCotizacion(null, cotizacion);
+
+        }
     },[cotizacion]);
 
     useEffect(() => {
@@ -78,6 +87,7 @@ export default function Personalizadas() {
             comments: "",
             internal_commentary: "",
             date: format(new Date(), "YYYY-MM-DD"),
+
         });
         setErrors({});
     }, [accion]);    
@@ -125,8 +135,6 @@ export default function Personalizadas() {
     
         let selectedCot;
 
-        console.log("Seleccionando cotización", { e, cotizacion });
-
         if(!cotizacion){
             const selectedId = parseInt(e.target.value);
             selectedCot = pendientes.find(
@@ -145,10 +153,13 @@ export default function Personalizadas() {
                 concept: selectedCot.concept,
                 quantity: selectedCot.quantity,
                 price: selectedCot.price,
-                internal_commentary:
-                    selectedCot.internal_commentary,
+                internal_commentary: selectedCot.internal_commentary,
                 date: selectedCot.date,
                 responsible_id: selectedCot.responsible_id,
+                status: selectedCot.status,
+                oc: selectedCot.oc,
+                f_receipt: selectedCot.f_receipt,
+                validation_date: selectedCot.validation_date,
             });
 
             removeAll();
@@ -167,6 +178,24 @@ export default function Personalizadas() {
         }
     }
 
+    const handleServiceSelect = (index) => (id, name) => {
+        const servicio = servicios.find(s => s.id.toString() === id.toString());
+
+        if (servicio) {
+            setValue(`items.${index}.concept`, servicio?.name);
+            setValue(`items.${index}.sat_unit_key`, servicio?.sat_unit_key);
+            setValue(`items.${index}.sat_key_prod_serv`, servicio?.sat_key_prod_serv?.trim());
+        }
+
+        if(servicio?.prices?.length > 0){
+            setPrecios(servicio.prices);
+            console.log(servicio.prices);
+            setModalOpen(true);
+        }
+
+        // setValue(`items.${index}.price`, servicio?.price);
+    };
+
     const onSubmit = async (data) => {
         setLoading(true);
 
@@ -176,6 +205,8 @@ export default function Personalizadas() {
             completed: completed,
             is_budget: isBudget,
         };
+
+
 
         try {
             const response = await clienteAxios.post(
@@ -396,12 +427,26 @@ export default function Personalizadas() {
                                     </div>
 
                                     <div>
-                                        <textarea
-                                            {...register(`items.${index}.concept`)}
-                                            placeholder="Concepto"
-                                            className="min-h-9 field-sizing-content"
-                                        />
-                                        {/* <ErrorLabel>{errors?.['rows.0.concept']}</ErrorLabel> */}
+                                        {items[index]?.isListActive ?
+                                            <SearchInput
+                                                lista={servicios}
+                                                error={errors.service_id}
+                                                onSelectItem={handleServiceSelect(index)}  
+                                                placeholder="Elige un servicio (opcional)"
+                                                placeholder="Concepto"
+                                                className="min-h-9 field-sizing-content"
+                                                {...register(`items.${index}.concept`)}
+                                            />
+                                            :
+                                            <input
+                                                {...register(`items.${index}.concept`)}
+                                                placeholder="Concepto"
+                                                className="input"
+                                                type="text"
+                                            />
+                                        }
+                                        <ErrorLabel>{get(errors, `rows.${index}.concept`)}</ErrorLabel>
+
                                     </div>
 
                                     <div>
@@ -442,6 +487,15 @@ export default function Personalizadas() {
                                         />
                                         <ErrorLabel>{get(errors, `rows.${index}.sat_key_prod_serv`)}</ErrorLabel>
                                     </div>
+
+                                </div>
+                                
+                                <div className="contenedor-botones">
+                                    <button className="link block" type="button" onClick={() => {
+                                        setValue(`items.${index}.isListActive`, !items[index]?.isListActive);
+                                    }}>
+                                        {items[index]?.isListActive ? 'Ocultar' : 'Ver'} lista de servicios
+                                    </button>
                                 </div>
                             </div>
                         ))}
@@ -546,6 +600,37 @@ export default function Personalizadas() {
                         </div>
                 </form>
             )}
+
+            <Modal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+            >
+                <h2 className="title-3">Selecciona un precio</h2>
+
+                <table className="text border dark:border-neutral-600">
+                    <tbody>
+                        {precios.map((precio, index) => (
+                            <tr key={index} className="" >
+                                <td className="border dark:border-neutral-600 p-2">$ {formatearDinero(precio.price)}</td>
+                                <td className="border dark:border-neutral-600 p-2">{precio.vehicle_type.type}</td>
+                                <td className="border dark:border-neutral-600 p-2">
+                                    <button
+                                        key={index}
+                                        className="btn"
+                                        onClick={() => {
+                                            setValue(`items.${items.findIndex(item => item.isListActive)}.price`, precio.price);
+                                            setModalOpen(false);
+                                        }}
+                                    >
+                                        Seleccionar
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+            </Modal>
         </div>
     );
 }
