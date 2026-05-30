@@ -141,6 +141,10 @@ export default function Cotizaciones() {
             params.append(`filter[${i}][value]`, oc);
         });
 
+        params.append(`filter[${Array.from(ocs).length}][field]`, 'status');
+        params.append(`filter[${Array.from(ocs).length}][type]`, '=');
+        params.append(`filter[${Array.from(ocs).length}][value]`, 'complemento');
+
         clienteAxios.get(`/api/invoices?${params.toString()}`, requestHeader)
             .then(res => {
                 const grouped = Object.values(
