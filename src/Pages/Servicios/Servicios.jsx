@@ -6,6 +6,7 @@ import Modal from "../../components/Modal";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { CirclePlus } from "lucide-react";
+import ErrorLabel from "@/components/UI/ErrorLabel";
 
 export default function Servicios() {
     const [servicios, setServicios] = useState([]);
@@ -17,6 +18,7 @@ export default function Servicios() {
 
     const [formData, setFormData] = useState({
         name: "",
+        multiple_quantity: false,
     });
 
     const [errors, setErrors] = useState({});
@@ -122,10 +124,23 @@ export default function Servicios() {
                             setFormData({ ...formData, name: e.target.value })
                         }
                     />
-                    {errors.name && (
-                        <p className="text-red-500">{errors.name[0]}</p>
-                    )}
+                    <ErrorLabel>{errors.name}</ErrorLabel>
 
+                    <label className="label">
+                        Piezas múltiples (Ej. rieles, rotulación de x lados, etc.)
+                    </label>
+                
+                    <select 
+                        name="multiple_quantity" 
+                        id="mutiple_quantity"
+                        onChange={(e) => setFormData({ ...formData, multiple_quantity: e.target.value === "true" })}
+                    >
+                        <option value="false" selected={formData.multiple_quantity === false}>No</option>
+                        <option value="true" selected={formData.multiple_quantity === true}>Sí</option>
+                    </select>
+                    <ErrorLabel>{errors.multiple_quantity}</ErrorLabel>
+
+                        
                     
                     <div className="contenedor-botones">
                         <input

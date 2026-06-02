@@ -106,6 +106,8 @@ export default function Proyecto() {
         commentary: "",
         extra_projects: [],
         usar_placa: usarPlaca,
+        quantity: 1,
+
     });
 
     const [formDataEdit, setFormDataEdit] = useState({
@@ -724,7 +726,11 @@ export default function Proyecto() {
             resizable: false,
             width: 180,
         },
-
+        {
+            title: "No. piezas",
+            field: "quantity",
+            resizable: false,
+        },
         {
             title: "Comentario",
             field: "commentary",
@@ -1024,6 +1030,7 @@ export default function Proyecto() {
                         commentary: "",
                         extra_projects: [],
                         usar_placa: false,
+                        quantity: 1,
                     });
                     setPreviews([]);
                     setErrors({});
@@ -1098,6 +1105,8 @@ export default function Proyecto() {
                             />
                         )}
                     </div>
+
+
                     <select
                         className="input"
                         id="type"
@@ -1122,6 +1131,35 @@ export default function Proyecto() {
                         ))}
                     </select>
                     <ErrorLabel>{errors?.type}</ErrorLabel>
+
+                    
+                    {
+                        
+                        proyecto?.service?.multiple_quantity && <>
+                            <div className="flex items-center gap-2">
+                            <label className="label" htmlFor="cantidad">
+                                Número de piezas
+                            </label>
+
+                            </div>
+                            <input
+                                type="number"
+                                name=""
+                                placeholder="Número de piezas (opcional)"
+                                id="cantidad"
+                                className="input"
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        quantity: e.target.value,
+                                    })
+                                }
+                                value={formData.quantity || ""}
+                            />
+                            <ErrorLabel>{errors?.quantity}</ErrorLabel>
+                        </>
+                    }
+
 
                     <label className="label" htmlFor="commentary">
                         Comentario (opcional)
@@ -1248,15 +1286,18 @@ export default function Proyecto() {
                         link={vehiculo?.id ? `/vehiculos/${vehiculo?.eco}` : undefined}
                     />
                     <InfoRow label="Tipo" value={vehiculo?.type} />
-                    <InfoRow label="Comentario" value={vehiculo?.commentary ?? "-"} />
-                    <InfoRow
-                        label="Fecha y hora de registro"
-                        value={format(vehiculo?.created_at, { date: "full", time: "medium" },"es")}
-                    />
                     <InfoRow
                         label="Registrado por"
                         value={`${vehiculo?.user?.name}`}
                     />
+                    <InfoRow
+                        label="Fecha y hora de registro"
+                        value={format(vehiculo?.created_at, { date: "full", time: "medium" },"es")}
+                    />
+
+                    { vehiculo?.quantity > 1 && <InfoRow label="No. de piezas" value={vehiculo?.quantity} /> }
+                    
+                    { vehiculo?.commentary && <InfoRow label="Comentario" value={vehiculo?.commentary ?? "-"} /> }
 
                     { vehiculo?.photos?.length > 0 && 
                         <div className="text">

@@ -78,11 +78,7 @@ export default function AppProvider({ children }) {
     async function getUser() {
         try {
             setLoading(true);
-            const res = await clienteAxios.get("/api/user", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const res = await clienteAxios.get("/api/user", requestHeader);
 
             setUser(res.data);
         } catch (error) {
@@ -105,11 +101,7 @@ export default function AppProvider({ children }) {
         setLoading(true);
 
         try {
-            await clienteAxios.post("/api/logout", null, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            await clienteAxios.post("/api/logout", null, requestHeader);
 
             localStorage.removeItem("NEON_GONZ_TOKEN");
             setToken(null);
@@ -122,11 +114,7 @@ export default function AppProvider({ children }) {
 
     async function fetchUsuarios() {
         try {
-            const res = await clienteAxios.get("/api/users", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const res = await clienteAxios.get("/api/users", requestHeader);
 
             setUsuarios(res.data);
         } catch (error) {
@@ -137,11 +125,7 @@ export default function AppProvider({ children }) {
 
     async function fetchCentros() {
         try {
-            const res = await clienteAxios.get("/api/centres", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const res = await clienteAxios.get("/api/centres", requestHeader);
 
             setCentros(res.data);
         } catch (error) {
@@ -153,11 +137,7 @@ export default function AppProvider({ children }) {
 
         async function fetchResponsables() {
         try {
-            const res = await clienteAxios.get("/api/responsibles", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const res = await clienteAxios.get("/api/responsibles", requestHeader);
 
             setResponsables(res.data);
         } catch (error) {
@@ -179,11 +159,7 @@ export default function AppProvider({ children }) {
 
     async function fetchServicios() {
         try {
-            const res = await clienteAxios.get("/api/services", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const res = await clienteAxios.get("/api/services", requestHeader);
 
             setServicios(res.data);
         } catch (error) {
@@ -195,11 +171,7 @@ export default function AppProvider({ children }) {
 
     async function fetchPendientes() {
         try {
-            const res = await clienteAxios.get("/api/invoices/pending", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const res = await clienteAxios.get("/api/invoices/pending", requestHeader);
             setPendientes(res.data);
         } catch (error) {
             setPendientes([]);
@@ -219,11 +191,7 @@ export default function AppProvider({ children }) {
 
     const fetchTypes = async () => {
         try {
-            const res = await clienteAxios.get(`/api/vehicles-types`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const res = await clienteAxios.get(`/api/vehicles-types`, requestHeader);
             setTypes(res.data);
         } catch (error) {
             toast.error("Error al cargar los tipos de vehículos");
@@ -234,11 +202,7 @@ export default function AppProvider({ children }) {
     const fetchUnits = async () => {
         setLoading(true);
         try {
-            const res = await clienteAxios.get(`/api/invoices/units`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const res = await clienteAxios.get(`/api/invoices/units`, requestHeader);
             setUnits(res.data);
         } catch (error) {
             console.error("Error fetching data:", error);

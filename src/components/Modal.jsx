@@ -1,14 +1,14 @@
-const Modal = ({ isOpen, onClose, children }) => {
+const Modal = ({ isOpen, onClose, children, size }) => {
     if (!isOpen) return null;
 
     return (
         <div
             className="fixed inset-0 z-10 flex justify-center items-start bg-black/75 overflow-y-auto py-10"
-            onClick={onClose} // 👈 click fuera
+            onClick={onClose} 
         >
             <div
-                className="bg-white rounded-2xl shadow-lg p-6 max-w-lg w-full relative mx-2 dark:bg-neutral-800 animate__animated animate__fadeIn"
-                onClick={(e) => e.stopPropagation()} // 👈 evita cerrar si click dentro
+                className={`bg-white rounded-2xl shadow-lg p-6  w-full relative mx-2 dark:bg-neutral-800 animate__animated animate__fadeIn ${size === 'sm' ? 'max-w-md' : size === 'lg' ? 'max-w-3xl' : size === 'xl' ? 'max-w-6xl' : 'max-w-lg'}`}
+                onClick={(e) => e.stopPropagation()} 
             >
                 <button
                     onClick={onClose}

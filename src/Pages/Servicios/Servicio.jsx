@@ -21,7 +21,8 @@ export default function Servicio() {
         centre_id: null,
         name: '',
         sat_unit_key: '',
-        vehicles_types_prices: []
+        vehicles_types_prices: [],
+        multiple_quantity: false,
     });
 
     const currentCentreId =
@@ -209,6 +210,18 @@ export default function Servicio() {
                     }}
                 />
                 {errors.name && <p className="error">{errors.name}</p>}
+
+                <label htmlFor="multiple_quantity" className="label">
+                    Piezas múltiples
+                </label>
+                <select 
+                    name="multiple_quantity" 
+                    id="mutiple_quantity"
+                    onChange={(e) => setFormData({ ...formData, multiple_quantity: e.target.value === "true" })}
+                >
+                    <option value="false" selected={formData.multiple_quantity === false}>No</option>
+                    <option value="true" selected={formData.multiple_quantity === true}>Sí</option>
+                </select>
 
                 <label htmlFor="sat_unit_key" className="label">
                     Unidad de medida del SAT

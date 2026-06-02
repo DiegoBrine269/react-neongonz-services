@@ -9,7 +9,7 @@ export const CotizacionesContext = createContext();
 
 export default function CotizacionesProvider({ children }) {
 
-    const { token, setLoading } = useContext(AppContext);
+    const { token, setLoading, requestHeader } = useContext(AppContext);
 
 
     const [cotizacion, setCotizacion] = useState(null);
@@ -29,21 +29,28 @@ export default function CotizacionesProvider({ children }) {
     const [subTotal, setSubTotal] = useState(0);
     const selection = useSelection(); // { selected, toggle, clear, ... }
 
+    const [inbox, setInbox] = useState([]);
+
+
     const fetchCotizacion = async (id) => {
         try {
             setLoading(true);
-            const res = await clienteAxios.get(`/api/invoices/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,   
-                },  
-            });
-
+            const res = await clienteAxios.get(`/api/invoices/${id}`, requestHeader);
             setCotizacion(res.data);
 
         } catch (error) {
             console.log(error);
         } finally {
             setLoading(false);
+        }
+    }
+
+    async function fetchInbox() {
+        try {
+            const response = await clienteAxios.get('/api/inbox', requestHeader);
+            setInbox(response.data);
+        } catch (error) {
+            console.error('Error fetching inbox:', error);
         }
     }
 
@@ -59,7 +66,9 @@ export default function CotizacionesProvider({ children }) {
             subTotal, setSubTotal,
             ...selection,  // expande todas las propiedades del hook
 
-            cotizacion, fetchCotizacion, setCotizacion
+            cotizacion, fetchCotizacion, setCotizacion,
+            inbox, 
+            fetchInbox
         }}>
             {children}
         </CotizacionesContext.Provider>

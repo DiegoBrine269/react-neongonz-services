@@ -42,13 +42,13 @@ export default function Nueva() {
         setLanzarError(false);
 
         conjuntoSeleccionados.forEach((s) => {
-
+            // console.log(s);
             if(!s.price){
                 setLanzarError(true);
                 // lanzarError = true;
                 return;
             }
-            sub += parseFloat(s.price);
+            sub += parseFloat(s.price * s.quantity);
         });
 
         // if(lanzarError)
@@ -186,19 +186,6 @@ export default function Nueva() {
         fetchData();
     }, []);
 
-
-
-    // useEffect(() => {
-
-
-    //     vehiculosPendientes.forEach(v => {
-    //         if(proyectosSeleccionados[v.project_id])
-    //             setSeleccionados((prev) => [...prev, v]);
-    //         else
-    //             setSeleccionados((prev) => prev.filter((i) => i !== v));
-    //     });
-
-    // }, [proyectosSeleccionados]);
 
 
     useEffect(() => {
