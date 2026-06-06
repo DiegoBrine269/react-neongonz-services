@@ -9,9 +9,10 @@ export default function ModalAdjuntarCopia({responsables, isOpen, onClose, setFo
         <Modal
             isOpen={isOpen}
             onClose={onClose}
+            size="xl"
         >
             <h3 className="title-3">¿Deseas adjuntar copia a alguien?</h3>
-            <div className="flex gap-1">
+            <div className="flex flex-wrap gap-1">
                 {
                     responsables.map(r => 
                         <PeerLabel
