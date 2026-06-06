@@ -1,6 +1,6 @@
 import React from 'react'
-import Modal from '@/Components/Modal'
-import PeerLabel from '@/Components/UI/PeerLabel'
+import Modal from '@/components/Modal'
+import PeerLabel from '@/components/UI/PeerLabel'
 
 
 
