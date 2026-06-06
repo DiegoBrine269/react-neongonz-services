@@ -18,6 +18,10 @@ import ButtonSubmit from "@/components/UI/Buttons/ButtonSubmit";
 import FacturacionPreview from "@/Pages/Cotizaciones/FacturacionPreview";
 import ComplementoPreview from "@/Pages/Cotizaciones/ComplementoPreview";
 import ModalLateral from "@/components/ModalLateral";
+import ModalInbox from "@/Pages/Cotizaciones/CotizacionesComponents/ModalInbox";
+import { CotizacionesContext } from "@/context/CotizacionesContext";
+import ModalAdjuntarCopia from "@/Pages/Cotizaciones/CotizacionesComponents/ModalAdjuntarCopia";
+
 
 import ReactDOMServer from "react-dom/server";
 import { getColumnasCotizaciones } from "./configCotizaciones";
@@ -28,20 +32,19 @@ export default function Cotizaciones() {
 
 
     const searchRef = useRef('');        
-    const searchInputRef = useRef(null); 
 
     const [cotizacion, setCotizacion] = useState({});
 
     const [selectedRows, setSelectedRows] = useState([]);
     const [listaComplementos, setListaComplementos] = useState([]);
 
-    
+
     const [modal, setModal] = useState(false);
     const [modal2, setModal2] = useState(false);
     const [modal3, setModal3] = useState(false);
     const [modal4, setModal4] = useState(false);
-
-
+    const [modalInbox, setModalInbox] = useState(false);
+    const [modalAdjuntarCopia, setModalAdjuntarCopia] = useState(false);
 
     const [formData, setFormData] = useState({
         validation_date: format(new Date(), "YYYY-MM-DD"),
@@ -90,7 +93,8 @@ export default function Cotizaciones() {
         )
     });
 
-    const { tableRef, token, setLoading, pendientes, fetchPendientes,  pendientesEnvio, fetchPendientesEnvio, requestHeader, fetchCustomers, customers } = useContext(AppContext);
+    const { fetchInbox } = useContext(CotizacionesContext);
+    const { tableRef, token, setLoading, pendientes, fetchPendientes,  pendientesEnvio, fetchPendientesEnvio, requestHeader, fetchCustomers, customers, responsables, fetchResponsables } = useContext(AppContext);
 
     const [reloadKey, setReloadKey] = useState(0);
     const savedFiltersRef = useRef([]);
@@ -330,7 +334,23 @@ export default function Cotizaciones() {
         }
     }
 
-    async function handleEnviarCotizaciones() {
+    async function handleSeleccionarCorreo(emailSeleccionado) {
+        setModalInbox(true);
+    }
+
+    async function handleClickFacturar() {
+
+        if (!validarMismoCentro()) return;  
+
+        setModal2(true)
+        setErrors({})
+        setFormData({...formData, joined:1});
+        setModal4(false);
+    }
+
+    async function handleEnviarCotizaciones(email) {
+
+        
         const result = await Swal.fire({
             title: "¿Estás segur@ de querer enviar la(s) cotización(es)?",
             icon: "warning",
@@ -344,7 +364,7 @@ export default function Cotizaciones() {
 
             try {
                 setLoading(true);
-                const res = await clienteAxios.post(`/api/invoices/send`, {invoice_ids: selectedRows.map(r => r.id), }, requestHeader);
+                const res = await clienteAxios.post(`/api/invoices/send`, {...formData, invoice_ids: selectedRows.map(r => r.id), email:email }, requestHeader);
                 
                 toast.success(res.data.message || "Cotizaciones enviadas correctamente");
                 recargarTabla();
@@ -451,7 +471,7 @@ export default function Cotizaciones() {
         }
     }
 
-    const handleFacturar = async () => {
+    const handleFacturar = async (email) => {
         try {
             // 1. Primero valida sin ejecutar
             setLoading(true);
@@ -462,6 +482,7 @@ export default function Cotizaciones() {
                         invoice_ids: selectedRows.map(r => r.id),
                         ...formData,
                         dry_run: true, 
+                        email:email
                     },
                     requestHeader
                 );
@@ -496,6 +517,8 @@ export default function Cotizaciones() {
                 {
                     invoice_ids: selectedRows.map(r => r.id),
                     ...formData,
+                    email:email
+
                 },
                 requestHeader
             );
@@ -594,6 +617,10 @@ export default function Cotizaciones() {
         fetchPendientesEnvio();
 
         fetchCustomers();
+
+        fetchInbox();
+
+        fetchResponsables();
     }, []);
 
     useEffect(()=>{
@@ -1049,7 +1076,12 @@ export default function Cotizaciones() {
 
                         <div className="contenedor-botones">
                             <ButtonSubmit
-                                onClick={handleFacturar}
+                                onClick={()=>{
+                                    setModal4(false)
+                                    setModal2(false)
+                                    // setModalInbox(true)
+                                    setModalAdjuntarCopia(true)
+                                }}
                                 icon={<CircleCheck />}
                             >
                                 Aceptar
@@ -1188,7 +1220,7 @@ export default function Cotizaciones() {
                                 {
                                     (activeTab == 'envio' || activeTab == 'oc') &&
                                     <MotionButton
-                                        onClick={handleEnviarCotizaciones}
+                                        onClick={() => setModalAdjuntarCopia(true)}
                                         icon={<MailIcon />}
                                         {...motionProps}
                                     >
@@ -1200,13 +1232,14 @@ export default function Cotizaciones() {
                                     activeTab == 'factura' &&
                                     <motion.button
                                         className="btn"
-                                        onClick={() => {
-                                            if (!validarMismoCentro()) return;  
-                                            setModal2(true)
-                                            setErrors({})
-                                            setFormData({...formData, joined:1});
-                                            setModal4(false);
-                                        }}
+                                        onClick={handleClickFacturar}
+                                        // onClick={() => {
+                                        //     if (!validarMismoCentro()) return;  
+                                        //     setModal2(true)
+                                        //     setErrors({})
+                                        //     setFormData({...formData, joined:1});
+                                        //     setModal4(false);
+                                        // }}
                                         {...motionProps}
                                     > 
                                             <>
@@ -1236,6 +1269,32 @@ export default function Cotizaciones() {
                     </div>
                 </div>
             </ModalLateral>
+
+            <ModalInbox 
+                isOpen={modalInbox} 
+                onClose={() => setModalInbox(false)} 
+                onSelectEmail={(email) => {
+                    setModalInbox(false);
+
+                    if(activeTab === 'factura')
+                        handleFacturar(email);
+                    else 
+                        handleEnviarCotizaciones(email);
+                    
+                }}
+            />
+
+            <ModalAdjuntarCopia 
+                isOpen={modalAdjuntarCopia} 
+                onClose={() => setModalAdjuntarCopia(false)} 
+                responsables={responsables}
+                setFormData={setFormData}
+                formData={formData}
+                onContinue={() => {
+                    setModalAdjuntarCopia(false);
+                    setModalInbox(true);
+                }}
+            />
             
         </>
     );
