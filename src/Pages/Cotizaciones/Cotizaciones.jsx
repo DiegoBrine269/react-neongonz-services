@@ -42,7 +42,7 @@ export default function Cotizaciones() {
     const [modal, setModal] = useState(false);
     const [modal2, setModal2] = useState(false);
     const [modal3, setModal3] = useState(false);
-    const [modal4, setModal4] = useState(false);
+    const [modalLateral, setModalLateral] = useState(false);
     const [modalInbox, setModalInbox] = useState(false);
     const [modalAdjuntarCopia, setModalAdjuntarCopia] = useState(false);
 
@@ -69,6 +69,9 @@ export default function Cotizaciones() {
         { id: 'complemento', label: 'Para complemento' },
         { id: 'finalizada', label: 'Finalizadas' },
     ];
+    
+    const tabsMap = Object.fromEntries(tabs.map(t => [t.id, t.label]));
+
 
     const columnasCotizaciones = getColumnasCotizaciones({
         renderAcciones: (data) => (
@@ -133,7 +136,7 @@ export default function Cotizaciones() {
 
         // console.log(grouped)
         // setListaComplementos(grouped);
-        setModal4(false);
+        setModalLateral(false);
 
         const ocs = new Set(selectedRows.map(r => r.oc));
 
@@ -345,7 +348,7 @@ export default function Cotizaciones() {
         setModal2(true)
         setErrors({})
         setFormData({...formData, joined:1});
-        setModal4(false);
+        setModalLateral(false);
     }
 
     async function handleEnviarCotizaciones(email) {
@@ -525,7 +528,7 @@ export default function Cotizaciones() {
 
             toast.success(res.data.message || "Factura(s) emitida(s) correctamente");
             setModal2(false);
-            setModal4(false);
+            setModalLateral(false);
             setCotizacion({});
             recargarTabla();
         }   
@@ -636,14 +639,14 @@ export default function Cotizaciones() {
     }, [formData.payment_method, formData.payment_form, activeTab]);
 
 
-    useEffect(()=>{
-        setSelectedRows([]);
-    }, [activeTab]);
+    // useEffect(()=>{
+    //     setSelectedRows([]);
+    // }, [activeTab]);
 
     
 
     return (
-        <>
+        <div className="relative">
             <h2 className="title-2">Cotizaciones</h2>
 
             <div className="contenedor-botones gap-4">
@@ -669,15 +672,7 @@ export default function Cotizaciones() {
                         <span className="counter">{pendientes?.length}</span>
                     </Link>
 
-                    {   
-                        selectedRows.length > 0 &&
-                        <button className="btn btn-secondary relative" onClick={()=>{setModal4(true)}}>
-                            <List/>
-                            Lista de cotizaciones
-                            <span className="counter">{selectedRows?.length}</span>
 
-                        </button>
-                    }
                 </motion.div>
                     
                 </AnimatePresence>
@@ -996,7 +991,7 @@ export default function Cotizaciones() {
                                         setModal(false);
 
 
-                                        setModal4(true);
+                                        setModalLateral(true);
                                     }}
                                 >
                                     <StickyNote />
@@ -1077,7 +1072,7 @@ export default function Cotizaciones() {
                         <div className="contenedor-botones">
                             <ButtonSubmit
                                 onClick={()=>{
-                                    setModal4(false)
+                                    setModalLateral(false)
                                     setModal2(false)
                                     // setModalInbox(true)
                                     setModalAdjuntarCopia(true)
@@ -1162,7 +1157,7 @@ export default function Cotizaciones() {
                 </form>
             </Modal>
 
-            <ModalLateral isOpen={modal4} onClose={() => setModal4(false)}>
+            <ModalLateral isOpen={modalLateral} onClose={() => setModalLateral(false)}>
                 <h2 className="title-3">Lista de cotizaciones seleccionadas</h2>
 
                 <div className="flex flex-col gap-2">
@@ -1174,7 +1169,7 @@ export default function Cotizaciones() {
                                     onClick={()=>{
                                         setSelectedRows(prev => prev.filter(r => r.id !== cot.id));
                                         if(selectedRows.length === 1){
-                                            setModal4(false);
+                                            setModalLateral(false);
                                         }
                                     }}
                                 >x</button>
@@ -1183,6 +1178,8 @@ export default function Cotizaciones() {
                                 <p><span className="font-bold">Centro:</span> {cot.centre}</p>
                                 <p><span className="font-bold">Fecha de cotización:</span> {format(cot.date, "DD/MM/YYYY")}</p>
                                 <p><span className="font-bold">Monto total:</span> {formatoMoneda.format(cot.total)}</p>
+                                <p><span className="font-bold">Servicios:</span> {cot.services}</p>
+                                <p><span className="font-bold">Estatus:</span> {tabsMap[cot.status] || cot.status}</p>
                             </div>
                         ))
                     }
@@ -1196,7 +1193,7 @@ export default function Cotizaciones() {
                                     className="contenedor-botones"
                                     {...motionProps}
                                 >
-                                { activeTab !== 'factura' && activeTab !== 'f' && activeTab != 'complemento' && <motion.button
+                                { selectedRows.every(row => row.status === 'envio' || row.status === 'oc' || row.status === 'factura') && <motion.button
 
                                     className="btn btn-danger"
                                     onClick={handleEliminarCotizaciones}
@@ -1207,7 +1204,7 @@ export default function Cotizaciones() {
                                 </motion.button>}
 
                                 {
-                                    (activeTab == 'f') &&
+                                    selectedRows.every(row => row.status === 'f') &&
                                     <MotionButton
                                         onClick={handleReenviarFacturas}
                                         icon={<MailIcon />}
@@ -1218,7 +1215,7 @@ export default function Cotizaciones() {
                                 }
 
                                 {
-                                    (activeTab == 'envio' || activeTab == 'oc') &&
+                                    selectedRows.every(row => row.status === 'envio' || row.status === 'oc') &&
                                     <MotionButton
                                         onClick={() => setModalAdjuntarCopia(true)}
                                         icon={<MailIcon />}
@@ -1229,17 +1226,10 @@ export default function Cotizaciones() {
                                 }
 
                                 {
-                                    activeTab == 'factura' &&
+                                    selectedRows.every(row => row.status === 'factura') &&
                                     <motion.button
                                         className="btn"
                                         onClick={handleClickFacturar}
-                                        // onClick={() => {
-                                        //     if (!validarMismoCentro()) return;  
-                                        //     setModal2(true)
-                                        //     setErrors({})
-                                        //     setFormData({...formData, joined:1});
-                                        //     setModal4(false);
-                                        // }}
                                         {...motionProps}
                                     > 
                                             <>
@@ -1250,7 +1240,7 @@ export default function Cotizaciones() {
                                     </motion.button>
                                 }
                                 {
-                                    activeTab == 'complemento' &&
+                                    selectedRows.every(row => row.status === 'complemento') &&
                                     <motion.button
                                         className="btn"
                                         onClick={handleClickComplemento}
@@ -1275,6 +1265,7 @@ export default function Cotizaciones() {
                 onClose={() => setModalInbox(false)} 
                 onSelectEmail={(email) => {
                     setModalInbox(false);
+                    console.log(email);
 
                     if(activeTab === 'factura')
                         handleFacturar(email);
@@ -1296,6 +1287,14 @@ export default function Cotizaciones() {
                 }}
             />
             
-        </>
+            {   
+                selectedRows.length > 0 && !modalLateral &&
+                <button className=" btn !w-auto rounded-full bg-blue-600 text-white p-4 fixed bottom-10 right-10 z-50" onClick={()=>{setModalLateral(true)}}>
+                    <List/>
+                    <span className="counter">{selectedRows?.length}</span>
+                </button>
+            }
+
+        </div>
     );
 }
