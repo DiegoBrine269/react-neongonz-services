@@ -433,7 +433,6 @@ export default function Personalizadas() {
                                                 error={errors.service_id}
                                                 onSelectItem={handleServiceSelect(index)}  
                                                 placeholder="Elige un servicio (opcional)"
-                                                placeholder="Concepto"
                                                 className="min-h-9 field-sizing-content"
                                                 {...register(`items.${index}.concept`)}
                                             />

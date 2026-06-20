@@ -216,11 +216,12 @@ export default function Servicio() {
                 </label>
                 <select 
                     name="multiple_quantity" 
-                    id="mutiple_quantity"
+                    id="multiple_quantity"
+                    value={formData.multiple_quantity ? "true" : "false"}
                     onChange={(e) => setFormData({ ...formData, multiple_quantity: e.target.value === "true" })}
                 >
-                    <option value="false" selected={formData.multiple_quantity === false}>No</option>
-                    <option value="true" selected={formData.multiple_quantity === true}>Sí</option>
+                    <option value="false">No</option>
+                    <option value="true">Sí</option>
                 </select>
 
                 <label htmlFor="sat_unit_key" className="label">
