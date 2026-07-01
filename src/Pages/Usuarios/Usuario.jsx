@@ -16,14 +16,13 @@ export default function Usuario() {
     const navigate = useNavigate();
 
     const [usuario, setUsuario] = useState({});
-    const {requestHeader} = useContext(AppContext)
+    const {requestHeader, token } = useContext(AppContext)
 
     async function fetchUsuario() {
         try {
             const res = await clienteAxios.get(`/api/users/${id}`, requestHeader);
 
-            setUsuario(res.data);
-            console.log(res.data)
+            setUsuario(res.data.user);
         } catch (error) {
             setUsuario({});
             console.error("Error fetching data:", error);
@@ -47,14 +46,30 @@ export default function Usuario() {
             <h3 className="title-3 mt-2">Registros</h3>
 
             <Tabla
+            
+                className="custom-table"
                 columns={[
                     // { title: "ID", field: "id" },
-                    { title: "Proyecto", field: "project.centre.name" },
+                    { title: "Centro", field: "project.centre.name" },
                     { title: "Proyecto", field: "project.service.name" },
                     { title: "Vehículo", field: "vehicle.eco" },
                     { title: "Fecha de creación", field: "created_at", formatter: (cell) => format(cell.getValue(), 'DD/MM/YYYY') },
                 ]}
-                data={usuario.project_vehicles || []}
+                
+                options={{
+                    // selectable: true,
+                    pagination: true, //enable pagination
+                    paginationMode: "remote", //enable remote pagination
+                    ajaxURL: `${import.meta.env.VITE_API_URL}/api/users/${id}/project-vehicles`, //set url for ajax request
+                    ajaxConfig: {
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    },
+                    ajaxResponse: (url, params, response) => response.project_vehicles, 
+                    filterMode: "remote",
+                }}
 
                 onRowClick={(e, row) => {
                     navigate(`/proyectos/${row.getData().project.id}`);
