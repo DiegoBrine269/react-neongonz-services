@@ -1289,6 +1289,7 @@ export default function Proyecto() {
                     <InfoRow
                         label="Registrado por"
                         value={`${vehiculo?.user?.name}`}
+                        link={vehiculo?.user?.id && user.role === 'admin' ? `/usuarios/${vehiculo?.user?.id}` : undefined}
                     />
                     <InfoRow
                         label="Fecha y hora de registro"
