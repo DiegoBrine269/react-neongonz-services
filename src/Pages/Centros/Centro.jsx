@@ -63,7 +63,6 @@ export default function Centro() {
                     <thead>
                         <tr className="border-b border-neutral-300">
                             <th className="py-1 pr-4 font-semibold">Servicio</th>
-                            <th className="py-1 font-semibold">Centro</th>
                             <th className="py-1 font-semibold">Fecha del proyecto</th>
                         </tr>
                     </thead>
@@ -74,9 +73,6 @@ export default function Centro() {
                                     <Link to={`/proyectos/${proyecto.id}`} className="text-blue-500 underline">
                                         {proyecto.service?.name}
                                     </Link>
-                                </td>
-                                <td className="py-1 text text-sm">
-                                    {proyecto.centre?.name}
                                 </td>
                                 <td className="py-1 text text-right text-sm">
                                     {proyecto.date ? format(proyecto.date, { date: "medium" }, "es") : "-"}

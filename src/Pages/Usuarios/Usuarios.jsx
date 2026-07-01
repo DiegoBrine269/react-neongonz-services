@@ -105,9 +105,11 @@ export default function Usuarios() {
 
                                         <div className="flex-1">
                                             
-                                            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                                            <Link 
+                                                to={`/usuarios/${u.id}`}
+                                                className="link text-lg font-semibold  dark:text-slate-100">
                                                 {u.name} {u.last_name}
-                                            </h3>
+                                            </Link>
 
                                             <div className="mt-1 space-y-1 text-sm text-slate-600 dark:text-slate-300">
                                                 <p>
