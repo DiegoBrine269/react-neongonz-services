@@ -36,7 +36,7 @@ export default function Centro() {
     return (
         <>
             <div className="flex justify-between items-center w-full">
-                <h2 className="title-2">Centro</h2>
+                <h2 className="title-2">{centro?.name}</h2>
                 <button
                     onClick={() => {
                         navigate(`/centros-de-venta/editar/${centro.id}`);
