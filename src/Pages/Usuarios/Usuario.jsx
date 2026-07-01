@@ -50,10 +50,26 @@ export default function Usuario() {
                 className="custom-table"
                 columns={[
                     // { title: "ID", field: "id" },
-                    { title: "Centro", field: "project.centre.name" },
-                    { title: "Proyecto", field: "project.service.name" },
-                    { title: "Vehículo", field: "vehicle.eco" },
-                    { title: "Fecha de creación", field: "created_at", formatter: (cell) => format(cell.getValue(), 'DD/MM/YYYY') },
+                    { 
+                        title: "Centro", 
+                        field: "project.centre.name", 
+                        resizable: false,
+                    },
+                    { 
+                        title: "Proyecto", 
+                        field: "project.service.name", 
+                        resizable: false,
+                    },
+                    { 
+                        title: "Vehículo", 
+                        field: "vehicle.eco", 
+                        resizable: false 
+                    },
+                    { 
+                        title: "Fecha de creación", 
+                        field: "created_at", formatter: (cell) => format(cell.getValue(), 'DD/MM/YYYY'), 
+                        resizable: false 
+                    },
                 ]}
                 
                 options={{
