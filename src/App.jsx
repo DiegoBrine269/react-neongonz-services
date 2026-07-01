@@ -11,6 +11,8 @@ import Responsables from "@/Pages/Responsables/Responsables";
 import Clientes from "@/Pages/Clientes/Clientes";
 
 import Centros from "@/Pages/Centros/Centros";
+import Centro from "@/Pages/Centros/Centro";
+
 import EditarCentros from "@/Pages/Centros/Editar";
 
 import Servicios from "@/Pages/Servicios/Servicios";
@@ -88,6 +90,7 @@ export default function App() {
                                 )}
                                 <Route path="/vehiculos" element={<Vehiculos />} />
                                 <Route path="/vehiculos/:id" element={<Vehiculo />} />
+                                <Route path="/centros-de-venta/:id" element={<Centro />} />
                                 <Route path="/proyectos" element={<Proyectos />} />
                                 <Route path="/proyectos/:id" element={<Proyecto />} />
                                 <Route path="/mi-cuenta" element={<MiCuenta />} />

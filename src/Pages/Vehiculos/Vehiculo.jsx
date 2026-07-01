@@ -11,15 +11,11 @@ export default function Vehiculo() {
     const { id } = useParams();
     const [vehiculo, setVehiculo] = useState({});
 
-    const { token } = useContext(AppContext);
+    const { requestHeader } = useContext(AppContext);
 
     const fetchVehiculo = async () => {
         try {
-            const { data } = await clienteAxios.get(`/api/vehicles/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                }
-            });
+            const { data } = await clienteAxios.get(`/api/vehicles/${id}`, requestHeader);
             setVehiculo(data);
         }   
         catch (error) {

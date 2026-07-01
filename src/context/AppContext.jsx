@@ -19,6 +19,7 @@ export default function AppProvider({ children }) {
     //
     const [centros, setCentros] = useState([]);
 
+
     //
     const [proyectos, setProyectos] = useState([]);
 
@@ -135,7 +136,9 @@ export default function AppProvider({ children }) {
         }
     }
 
-        async function fetchResponsables() {
+
+
+    async function fetchResponsables() {
         try {
             const res = await clienteAxios.get("/api/responsibles", requestHeader);
 
@@ -245,6 +248,8 @@ export default function AppProvider({ children }) {
                 loading,
                 setLoading: handleLoading,
                 fetchCentros,
+
+
                 centros,
                 setCentros,
 

@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { Building2, CirclePlus, UsersRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import  ErrorLabel  from '@/components/UI/ErrorLabel.jsx';
+import { useNavigate } from "react-router-dom";
 
 export default function Centros() {
     // const [centros, setCentros] = useState([]);
@@ -15,6 +16,8 @@ export default function Centros() {
 
     const [isModalCreateOpen, setModalCreateOpen] = useState(false);
     const [isModalViewOpen, setModalViewOpen] = useState(false);
+
+    const navigate = useNavigate();
 
 
     const [formData, setFormData] = useState({
@@ -59,9 +62,10 @@ export default function Centros() {
     }
 
     const handleRowClick = useCallback((e, row) => {
-        setModalViewOpen(true);
-        const data = row.getData();
-        setCentro(data);
+        // setModalViewOpen(true);
+        // const data = row.getData();
+        // setCentro(data);
+        navigate(`/centros-de-venta/${row.getData().id}`);
     }, []);
 
     // Consultar todas las agencias  al cargar el componente
