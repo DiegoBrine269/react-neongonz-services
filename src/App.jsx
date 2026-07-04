@@ -32,6 +32,8 @@ import ForgotPassword from "@/Pages/Auth/ForgotPassword";
 import Cotizaciones from "@/Pages/Cotizaciones/Cotizaciones";
 import Nueva from "@/Pages/Cotizaciones/Nueva";
 import Personalizadas from "@/Pages/Cotizaciones/Personalizadas";
+import Estadisticas from "@/Pages/Cotizaciones/Estadisticas";
+
 import Enviar from "@/Pages/Cotizaciones/Enviar";
 import Editar from "@/Pages/Cotizaciones/Editar";
 
@@ -81,6 +83,7 @@ export default function App() {
                                         <Route path="/cotizaciones/nueva" element={<Nueva />} />
                                         <Route path="/cotizaciones/personalizadas" element={<Personalizadas />} />
                                         <Route path="/cotizaciones/personalizadas/:id" element={<Personalizadas />} />
+                                        <Route path="/cotizaciones/estadisticas" element={<Estadisticas />} />
                                         <Route path="/cotizaciones/enviar" element={<Enviar />} />
                                         <Route path="/cotizaciones/editar/:id" element={<Editar />} />
                                         <Route path="/servicios/:id" element={<Servicio />} />

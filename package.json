@@ -36,6 +36,7 @@
     "react-tabulator": "^0.21.0",
     "react-toastify": "^11.0.5",
     "react-webcam": "^7.2.0",
+    "recharts": "^3.9.1",
     "sweetalert2": "^11.21.0",
     "swr": "^2.3.4",
     "tailwindcss": "^4.1.3",

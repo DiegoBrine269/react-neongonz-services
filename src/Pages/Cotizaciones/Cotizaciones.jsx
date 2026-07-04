@@ -1,5 +1,5 @@
 
-import { CirclePlus, UserRoundPen, Trash2, CircleCheck, Receipt, Pencil, MailIcon, StickyNote,  List } from "lucide-react";
+import { CirclePlus, UserRoundPen, Trash2, CircleCheck, Receipt, Pencil, MailIcon, StickyNote,  List, ChartColumn } from "lucide-react";
 import { Link } from "react-router-dom";
 import Tabla from "../../components/Tabla";
 import { useContext, useState, useRef, useEffect, useCallback } from "react";
@@ -21,6 +21,7 @@ import ModalLateral from "@/components/ModalLateral";
 import ModalInbox from "@/Pages/Cotizaciones/CotizacionesComponents/ModalInbox";
 import { CotizacionesContext } from "@/context/CotizacionesContext";
 import ModalAdjuntarCopia from "@/Pages/Cotizaciones/CotizacionesComponents/ModalAdjuntarCopia";
+import {tabs} from "@/utils/utils.js"
 
 
 import ReactDOMServer from "react-dom/server";
@@ -60,15 +61,7 @@ export default function Cotizaciones() {
     });
 
     const [activeTab, setActiveTab] = useState('todas');
-    const tabs = [
-        { id: 'todas', label: 'Todas' },
-        { id: 'envio', label: 'Para envío'},
-        { id: 'oc', label: 'Para OC' },
-        { id: 'factura', label: 'Para factura' },
-        { id: 'f', label: 'Para F' },
-        { id: 'complemento', label: 'Para complemento' },
-        { id: 'finalizada', label: 'Finalizadas' },
-    ];
+
     
     const tabsMap = Object.fromEntries(tabs.map(t => [t.id, t.label]));
 
@@ -670,6 +663,14 @@ export default function Cotizaciones() {
                         <UserRoundPen/>
                         Personalizadas{" "}
                         <span className="counter">{pendientes?.length}</span>
+                    </Link>
+
+                    <Link
+                        className="btn btn-secondary"
+                        to="/cotizaciones/estadisticas"
+                    >
+                        <ChartColumn/>
+                        Estadísticas{" "}
                     </Link>
 
 
