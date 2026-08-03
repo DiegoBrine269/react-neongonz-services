@@ -454,6 +454,7 @@ export default function Personalizadas() {
                                             placeholder="Precio"
                                             className="input"
                                             type="number"
+                                            step="any"
                                         />
                                         <ErrorLabel>{get(errors, `rows.${index}.price`)}</ErrorLabel>
                                     </div>
