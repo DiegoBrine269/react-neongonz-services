@@ -317,6 +317,7 @@ export default function AppProvider({ children }) {
                 images,
                 hasMoreImages,
                 fetchImages,
+                isFetchingImages,
             }}
         >
             {children}

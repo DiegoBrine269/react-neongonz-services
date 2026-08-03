@@ -7,7 +7,7 @@ import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 
 export default function Galeria() {
 
-    const {  images, hasMore, fetchImages } = useContext(AppContext);
+    const {  images, hasMoreImages, fetchImages, isFetchingImages } = useContext(AppContext);
     
 
     const [page, setPage] = useState(1);
@@ -27,7 +27,7 @@ export default function Galeria() {
     useEffect(() => {
         const observer = new IntersectionObserver(
             ([entry]) => {
-                if (entry.isIntersecting && hasMore && !isFetching.current) {
+                if (entry.isIntersecting && hasMoreImages && !isFetchingImages.current) {
                     setPage((p) => p + 1);
                 }
             },
@@ -36,11 +36,11 @@ export default function Galeria() {
 
         if (loaderRef.current) observer.observe(loaderRef.current);
         return () => observer.disconnect();
-    }, [hasMore]); 
+    }, [hasMoreImages, isFetchingImages]); 
 
     const handleLightboxView = ({ index }) => {
         setLightboxIndex(index);
-        if (index >= images.length - 2 && hasMore && !isFetching.current) {
+        if (index >= images.length - 2 && hasMoreImages && !isFetchingImages.current) {
             setPage((p) => p + 1);
         }
     };
@@ -71,7 +71,7 @@ export default function Galeria() {
             </div>
 
             <div ref={loaderRef}>
-                {hasMore && <span>Cargando...</span>}
+                {hasMoreImages && <span>Cargando...</span>}
             </div>
 
             <Lightbox
