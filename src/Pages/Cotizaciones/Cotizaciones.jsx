@@ -22,7 +22,7 @@ import ModalInbox from "@/Pages/Cotizaciones/CotizacionesComponents/ModalInbox";
 import { CotizacionesContext } from "@/context/CotizacionesContext";
 import ModalAdjuntarCopia from "@/Pages/Cotizaciones/CotizacionesComponents/ModalAdjuntarCopia";
 import {tabs} from "@/utils/utils.js"
-
+import { useCachedAjax } from "@/hooks/useCachedAjax";
 
 import ReactDOMServer from "react-dom/server";
 import { getColumnasCotizaciones } from "./configCotizaciones";
@@ -38,6 +38,7 @@ export default function Cotizaciones() {
 
     const [selectedRows, setSelectedRows] = useState([]);
     const [listaComplementos, setListaComplementos] = useState([]);
+
 
 
     const [modal, setModal] = useState(false);
@@ -91,6 +92,7 @@ export default function Cotizaciones() {
 
     const { fetchInbox } = useContext(CotizacionesContext);
     const { tableRef, token, setLoading, pendientes, fetchPendientes,  pendientesEnvio, fetchPendientesEnvio, requestHeader, fetchCustomers, customers, responsables, fetchResponsables } = useContext(AppContext);
+    const ajaxRequestFunc = useCachedAjax("cotizaciones", token);
 
     const [reloadKey, setReloadKey] = useState(0);
     const savedFiltersRef = useRef([]);
@@ -108,27 +110,6 @@ export default function Cotizaciones() {
     };
 
     const handleClickComplemento = () => {
-        // const grouped = Object.values(
-        //     selectedRows.reduce((acc, item) => {
-        //         const id = item.billing.id;
-        //         const uuid = item.billing.uuid;
-
-        //         if (!acc[id]) {
-        //             acc[id] = {
-        //                 id: id,
-        //                 uuid: uuid,
-        //                 total: 0,
-        //             };
-        //         }
-                
-        //         acc[id].total += parseInt(item.total)*1.16;
-
-        //         return acc;
-        //     }, {})
-        // );
-
-        // console.log(grouped)
-        // setListaComplementos(grouped);
         setModalLateral(false);
 
         const ocs = new Set(selectedRows.map(r => r.oc));
@@ -644,60 +625,62 @@ export default function Cotizaciones() {
 
             <div className="contenedor-botones gap-4">
                 <AnimatePresence mode="wait">
-
-                
-                <motion.div
-                    key="acciones"
-                    className="contenedor-botones"
-                    {...motionProps}
-                >
-                    <Link className="btn" to="/cotizaciones/nueva">
-                        <CirclePlus />
-                        Crear ordinaria
-                    </Link>
-
-                    <Link
-                        className="btn btn-secondary relative"
-                        to="/cotizaciones/personalizadas"
+                    <motion.div
+                        key="acciones"
+                        className="contenedor-botones"
+                        {...motionProps}
                     >
-                        <UserRoundPen/>
-                        Personalizadas{" "}
-                        <span className="counter">{pendientes?.length}</span>
-                    </Link>
+                        <Link className="btn" to="/cotizaciones/nueva">
+                            <CirclePlus />
+                            Crear ordinaria
+                        </Link>
 
-                    <Link
-                        className="btn btn-secondary"
-                        to="/cotizaciones/estadisticas"
-                    >
-                        <ChartColumn/>
-                        Estadísticas{" "}
-                    </Link>
+                        <Link
+                            className="btn btn-secondary relative"
+                            to="/cotizaciones/personalizadas"
+                        >
+                            <UserRoundPen />
+                            Personalizadas{" "}
+                            <span className="counter">
+                                {pendientes?.length}
+                            </span>
+                        </Link>
 
-
-                </motion.div>
-                    
+                        <Link
+                            className="btn btn-secondary"
+                            to="/cotizaciones/estadisticas"
+                        >
+                            <ChartColumn />
+                            Estadísticas{" "}
+                        </Link>
+                    </motion.div>
                 </AnimatePresence>
             </div>
 
             <div>
-
                 <div className="tabs">
-                    {tabs.map(tab => (
+                    {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => {
-
-                                setActiveTab(tab.id)
-                                const filter = ["status", "=", tab.id === 'todas' ? "" : tab.id];
+                                setActiveTab(tab.id);
+                                const filter = [
+                                    "status",
+                                    "=",
+                                    tab.id === "todas" ? "" : tab.id,
+                                ];
                                 tableRef.current.setFilter(...filter);
                             }}
-                            className={activeTab === tab.id || tab.active ? 'tab active' : 'tab'}
+                            className={
+                                activeTab === tab.id || tab.active
+                                    ? "tab active"
+                                    : "tab"
+                            }
                         >
                             {tab.label}
                         </button>
                     ))}
                 </div>
-
 
                 <input
                     type="text"
@@ -718,67 +701,68 @@ export default function Cotizaciones() {
                         pagination: true, //enable pagination
                         paginationMode: "remote", //enable remote pagination
                         ajaxURL: `${import.meta.env.VITE_API_URL}/api/invoices`,
-                        ajaxConfig: {
-                            method: "GET",
-                            headers: {
-                                Authorization: `Bearer ${token}`,
-                            },
-                        },
+                        ajaxRequestFunc,
                         ajaxParams: () => ({
-                            search: searchRef.current ?? ''
+                            search: searchRef.current ?? "",
                         }),
                         filterMode: "remote",
                     }}
                     onRowClick={handleRowClick}
                     onSelectionChange={handleRowSelectionChanged}
-
                 />
             </div>
 
             <Modal isOpen={modal} onClose={() => setModal(false)}>
                 <h2 className="title-3">{cotizacion?.invoice_number}</h2>
                 <div className="flex flex-col gap-3 pl-2">
-
-                    {
-                        activeTab === 'oc' &&
+                    {activeTab === "oc" && (
                         <div className="text">
                             <span className="label-modal">
                                 Número de Orden de Compra
                             </span>{" "}
                             <div className="flex gap-1 mt-1 items-center">
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     className="input"
-                                    placeholder="Ingresa el número de Orden de Compra" 
-                                    value={formData.oc || ''}
-                                    onChange={e => setFormData({...formData, oc: e.target.value})}
+                                    placeholder="Ingresa el número de Orden de Compra"
+                                    value={formData.oc || ""}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            oc: e.target.value,
+                                        })
+                                    }
                                     autoFocus
                                 />
-                                <button 
+                                <button
                                     className="btn w-11 h-9"
                                     onClick={handleUpdateStatus}
-                                    >
+                                >
                                     <CircleCheck />
                                 </button>
                             </div>
                             <ErrorLabel>{errors?.oc}</ErrorLabel>
                         </div>
-                    }
+                    )}
 
-                    {
-                        activeTab === 'f' &&
+                    {activeTab === "f" && (
                         <>
                             <div className="text">
                                 <span className="label-modal">
                                     Número de recibo (F)
                                 </span>{" "}
                                 <div className="mt-2">
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         className="input"
-                                        placeholder="Ingresa el número de recibo (F)" 
-                                        value={formData.f_receipt || ''}
-                                        onChange={e => setFormData({...formData, f_receipt: e.target.value})}
+                                        placeholder="Ingresa el número de recibo (F)"
+                                        value={formData.f_receipt || ""}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                f_receipt: e.target.value,
+                                            })
+                                        }
                                         autoFocus
                                     />
                                     <ErrorLabel>{errors?.f_receipt}</ErrorLabel>
@@ -790,14 +774,21 @@ export default function Cotizaciones() {
                                     Fecha de validación
                                 </span>{" "}
                                 <div className="mt-2">
-                                    <input 
-                                        type="date" 
+                                    <input
+                                        type="date"
                                         className="input"
-                                        placeholder="Fecha de validación" 
-                                        value={formData.validation_date || ''}
-                                        onChange={e => setFormData({...formData, validation_date: e.target.value})}
+                                        placeholder="Fecha de validación"
+                                        value={formData.validation_date || ""}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                validation_date: e.target.value,
+                                            })
+                                        }
                                     />
-                                    <ErrorLabel>{errors?.validation_date}</ErrorLabel>
+                                    <ErrorLabel>
+                                        {errors?.validation_date}
+                                    </ErrorLabel>
                                 </div>
                             </div>
 
@@ -810,82 +801,75 @@ export default function Cotizaciones() {
                                 </button>
                             </div>
                         </>
-                    }
+                    )}
 
                     <div className="text">
-                        <span className="label-modal">
-                            Centro de ventas
-                        </span>{" "}
+                        <span className="label-modal">Centro de ventas</span>{" "}
                         <p>{cotizacion?.centre}</p>
                     </div>
 
                     <div className="text">
-                        <span className="label-modal">
-                            Fecha de cotización
-                        </span>{" "}
+                        <span className="label-modal">Fecha de cotización</span>{" "}
                         <p>{format(cotizacion?.date, "DD/MM/YYYY")}</p>
                     </div>
 
-                    { cotizacion?.billing?.date && 
-                    <div className="text">
-                        <span className="label-modal">
-                            Fecha de facturación
-                        </span>{" "}
-                        <p>{format(cotizacion?.billing.date, "DD/MM/YYYY")}</p>
-                    </div>}
+                    {cotizacion?.billing?.date && (
+                        <div className="text">
+                            <span className="label-modal">
+                                Fecha de facturación
+                            </span>{" "}
+                            <p>
+                                {format(cotizacion?.billing.date, "DD/MM/YYYY")}
+                            </p>
+                        </div>
+                    )}
 
                     {cotizacion?.validation_date && (
                         <div className="text">
                             <span className="label-modal">
                                 Fecha de validación
                             </span>{" "}
-                            <p>{format(cotizacion?.validation_date, "DD/MM/YYYY")}</p>
+                            <p>
+                                {format(
+                                    cotizacion?.validation_date,
+                                    "DD/MM/YYYY",
+                                )}
+                            </p>
                         </div>
                     )}
 
                     {cotizacion?.services && (
                         <div className="text">
-                            <span className="label-modal">
-                                Servicios
-                            </span>{" "}
+                            <span className="label-modal">Servicios</span>{" "}
                             <p>{cotizacion?.services}</p>
                         </div>
                     )}
 
-                    {
-                        cotizacion?.oc &&
+                    {cotizacion?.oc && (
                         <div className="text">
                             <span className="label-modal">
                                 No. de orden de compra
                             </span>{" "}
                             <p>{cotizacion?.oc}</p>
                         </div>
-                    }
+                    )}
 
-                    {
-                        cotizacion?.uuid &&
+                    {cotizacion?.uuid && (
                         <div className="text">
-                            <span className="label-modal">
-                                Folio fiscal
-                            </span>{" "}
+                            <span className="label-modal">Folio fiscal</span>{" "}
                             <p>{cotizacion?.uuid}</p>
                         </div>
-                    }
+                    )}
 
-                    {
-                        cotizacion?.f_receipt &&
+                    {cotizacion?.f_receipt && (
                         <div className="text">
-                            <span className="label-modal">
-                                Número de F
-                            </span>{" "}
+                            <span className="label-modal">Número de F</span>{" "}
                             <p>{cotizacion?.f_receipt}</p>
                         </div>
-                    }
+                    )}
 
                     <div className="text">
-                        <span className="label-modal">
-                            Monto total
-                        </span>{" "}
+                        <span className="label-modal">Monto total</span>{" "}
                         <p>{formatoMoneda.format(cotizacion?.total)}</p>
                     </div>
 
@@ -901,39 +885,33 @@ export default function Cotizaciones() {
                         </button>
                     </div>
 
-                    {
-                        cotizacion?.billing?.pdf_path &&
+                    {cotizacion?.billing?.pdf_path && (
                         <div className="text">
-                            <span className="label-modal">
-                                Factura
-                            </span>{" "}
+                            <span className="label-modal">Factura</span>{" "}
                             <button
                                 className="underline cursor-pointer py-1"
-                                onClick={()=>fetchZipFile(cotizacion.billing.id)}
+                                onClick={() =>
+                                    fetchZipFile(cotizacion.billing.id)
+                                }
                             >
                                 Descargar archivos 📄
                             </button>
                         </div>
-                    }
+                    )}
 
-                    {
-                        cotizacion?.complements?.map(
-                            (complement, index) =>
-                                <div className="text" key={index}>
-                                    <span className="label-modal">
-                                        Complemento {index + 1} 
-                                    </span>{" "}
-                                    <button
-                                        className="underline cursor-pointer py-1"
-                                        onClick={()=>fetchZipFile(complement.id)}
-
-                                    >
-                                        Descargar archivos 📄
-                                    </button>
-                                </div>
-                        )
-                    }
-
+                    {cotizacion?.complements?.map((complement, index) => (
+                        <div className="text" key={index}>
+                            <span className="label-modal">
+                                Complemento {index + 1}
+                            </span>{" "}
+                            <button
+                                className="underline cursor-pointer py-1"
+                                onClick={() => fetchZipFile(complement.id)}
+                            >
+                                Descargar archivos 📄
+                            </button>
+                        </div>
+                    ))}
 
                     {cotizacion?.internal_commentary && (
                         <div className="text">
@@ -944,22 +922,24 @@ export default function Cotizaciones() {
                         </div>
                     )}
 
-
                     <div className="flex justify-end gap-2 w-full">
-                        {activeTab !== 'factura' && activeTab !== 'f' && activeTab != 'complemento' && <button
-                            className="btn btn-danger"
-                            onClick={handleEliminarCotizacion}
-                        >
-                            <Trash2 />
-                            Eliminar
-                        </button>}
-
+                        {activeTab !== "factura" &&
+                            activeTab !== "f" &&
+                            activeTab != "complemento" && (
+                                <button
+                                    className="btn btn-danger"
+                                    onClick={handleEliminarCotizacion}
+                                >
+                                    <Trash2 />
+                                    Eliminar
+                                </button>
+                            )}
 
                         {
-                            // (cotizacion.status === 'envio' || cotizacion.status === 'oc') && 
-                            
+                            // (cotizacion.status === 'envio' || cotizacion.status === 'oc') &&
+
                             <>
-                                {!cotizacion.is_custom ? 
+                                {!cotizacion.is_custom ? (
                                     <Link
                                         className="btn btn-secondary"
                                         to={`/cotizaciones/editar/${cotizacion?.id}`}
@@ -967,36 +947,44 @@ export default function Cotizaciones() {
                                         <Pencil />
                                         Editar
                                     </Link>
-                                :
+                                ) : (
                                     <Link
                                         className="btn btn-secondary"
                                         to={`/cotizaciones/personalizadas/${cotizacion?.id}`}
                                     >
                                         <Pencil />
                                         Editar
-                                    </Link>}
+                                    </Link>
+                                )}
                             </>
                         }
 
                         {(() => {
-                            const isSelected = selectedRows.some(r => r.id === cotizacion.id);
+                            const isSelected = selectedRows.some(
+                                (r) => r.id === cotizacion.id,
+                            );
                             return (
                                 <button
-                                    className={`btn ${isSelected ? 'btn-secondary' : ''}`}
+                                    className={`btn ${isSelected ? "btn-secondary" : ""}`}
                                     onClick={() => {
-                                        setSelectedRows(prev =>
+                                        setSelectedRows((prev) =>
                                             isSelected
-                                                ? prev.filter(r => r.id !== cotizacion.id)
-                                                : [...prev, cotizacion]
+                                                ? prev.filter(
+                                                      (r) =>
+                                                          r.id !==
+                                                          cotizacion.id,
+                                                  )
+                                                : [...prev, cotizacion],
                                         );
                                         setModal(false);
-
 
                                         setModalLateral(true);
                                     }}
                                 >
                                     <StickyNote />
-                                    {isSelected ? 'Quitar de la lista' : 'Añadir a la lista'}
+                                    {isSelected
+                                        ? "Quitar de la lista"
+                                        : "Añadir a la lista"}
                                 </button>
                             );
                         })()}
@@ -1007,82 +995,122 @@ export default function Cotizaciones() {
             <Modal isOpen={modal2} onClose={() => setModal2(false)}>
                 <h2 className="title-3">Ingresa los siguientes datos</h2>
                 <div className="">
+                    <label className="label" htmlFor="payment_form">
+                        Forma de pago:
+                    </label>
+                    <select
+                        id="payment_form"
+                        defaultValue=""
+                        value={formData.payment_form || ""}
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                payment_form: e.target.value,
+                            })
+                        }
+                        disabled={formData.payment_method === "PPD"}
+                        autoFocus
+                    >
+                        <option value="" disabled>
+                            Selecciona una opción
+                        </option>
+                        <option value="01">Efectivo</option>
+                        <option value="03">
+                            Transferencia electrónica de fondos
+                        </option>
+                        <option value="99">Por definir</option>
+                    </select>
+                    <ErrorLabel>{errors.payment_form}</ErrorLabel>
 
-                        <label className="label" htmlFor="payment_form">Forma de pago:</label>
-                        <select  
-                            id="payment_form"
-                            defaultValue=""
-                            value={formData.payment_form || ''}
-                            onChange={e => setFormData({...formData, payment_form: e.target.value})}
-                            disabled={formData.payment_method === 'PPD'}
-                            autoFocus
-                        >
-                            <option value="" disabled>Selecciona una opción</option>
-                            <option value="01">Efectivo</option>
-                            <option value="03">Transferencia electrónica de fondos</option>
-                            <option value="99">Por definir</option>
-                        </select>
-                        <ErrorLabel>{errors.payment_form}</ErrorLabel>
+                    <label className="label" htmlFor="payment_method">
+                        Método de pago:
+                    </label>
+                    <select
+                        id="payment_method"
+                        defaultValue=""
+                        value={formData.payment_method || ""}
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                payment_method: e.target.value,
+                            })
+                        }
+                    >
+                        <option value="">Selecciona una opción</option>
+                        <option value="PUE">
+                            (PUE) Pago en una sola exhibición
+                        </option>
+                        <option value="PPD">
+                            (PPD) Pago en parcialidades o diferido
+                        </option>
+                    </select>
+                    <ErrorLabel>{errors.payment_method}</ErrorLabel>
 
-                        <label className="label" htmlFor="payment_method">Método de pago:</label>
-                        <select 
-                            id="payment_method"
-                            defaultValue=""
-                            value={formData.payment_method || ''}
-                            onChange={e => setFormData({...formData, payment_method: e.target.value})}
-                        >
-                            <option value="">Selecciona una opción</option>
-                            <option value="PUE">(PUE) Pago en una sola exhibición</option>
-                            <option value="PPD">(PPD) Pago en parcialidades o diferido</option>
-                        </select>
-                        <ErrorLabel>{errors.payment_method}</ErrorLabel>
-
-                       {selectedRows.length > 1 && (
+                    {selectedRows.length > 1 && (
                         <>
                             <label className="label">Forma de facturar</label>
                             <div className="pl-2">
-                                <label 
-                                    htmlFor="joined" 
+                                <label
+                                    htmlFor="joined"
                                     className="text text-sm flex gap-1 mt-0"
-                                    onClick={() => setFormData({...formData, joined: 1})}
+                                    onClick={() =>
+                                        setFormData({ ...formData, joined: 1 })
+                                    }
                                 >
-                                    <input type="radio" name="joined" id="joined" value={1} defaultChecked />
-                                    <span className="bre">Facturar de manera conjunta (una factura por todas las cotizaciones)</span>
+                                    <input
+                                        type="radio"
+                                        name="joined"
+                                        id="joined"
+                                        value={1}
+                                        defaultChecked
+                                    />
+                                    <span className="bre">
+                                        Facturar de manera conjunta (una factura
+                                        por todas las cotizaciones)
+                                    </span>
                                 </label>
-    
-                                <label 
-                                    htmlFor="not-joined" 
+
+                                <label
+                                    htmlFor="not-joined"
                                     className="text text-sm flex gap-1 mt-0"
-                                    onClick={() => setFormData({...formData, joined: 0})}
+                                    onClick={() =>
+                                        setFormData({ ...formData, joined: 0 })
+                                    }
                                 >
-                                    <input type="radio" name="joined" id="not-joined" value={0} />
-                                    <span className="bre">Facturar de manera individual (una factura por cada cotización)</span>
+                                    <input
+                                        type="radio"
+                                        name="joined"
+                                        id="not-joined"
+                                        value={0}
+                                    />
+                                    <span className="bre">
+                                        Facturar de manera individual (una
+                                        factura por cada cotización)
+                                    </span>
                                 </label>
                             </div>
                             <ErrorLabel>{errors.joined}</ErrorLabel>
-                       </>) }
+                        </>
+                    )}
 
-                        <ErrorLabel>{errors.product_key}</ErrorLabel>
-                        <ErrorLabel>{errors.sat_unit_key}</ErrorLabel>
-                        <ErrorLabel>{errors.customer}</ErrorLabel>
-                        <ErrorLabel>{errors.error}</ErrorLabel>
-                        
+                    <ErrorLabel>{errors.product_key}</ErrorLabel>
+                    <ErrorLabel>{errors.sat_unit_key}</ErrorLabel>
+                    <ErrorLabel>{errors.customer}</ErrorLabel>
+                    <ErrorLabel>{errors.error}</ErrorLabel>
 
-
-
-                        <div className="contenedor-botones">
-                            <ButtonSubmit
-                                onClick={()=>{
-                                    setModalLateral(false)
-                                    setModal2(false)
-                                    // setModalInbox(true)
-                                    setModalAdjuntarCopia(true)
-                                }}
-                                icon={<CircleCheck />}
-                            >
-                                Aceptar
-                            </ButtonSubmit>
-                        </div>
+                    <div className="contenedor-botones">
+                        <ButtonSubmit
+                            onClick={() => {
+                                setModalLateral(false);
+                                setModal2(false);
+                                // setModalInbox(true)
+                                setModalAdjuntarCopia(true);
+                            }}
+                            icon={<CircleCheck />}
+                        >
+                            Aceptar
+                        </ButtonSubmit>
+                    </div>
                 </div>
             </Modal>
 
@@ -1090,61 +1118,89 @@ export default function Cotizaciones() {
             <Modal isOpen={modal3} onClose={() => setModal3(false)}>
                 <h2 className="title-3">Ingresa los siguientes datos</h2>
                 <form className="" onSubmit={handleSubmit(handleComplemento)}>
-                    <label className="label" htmlFor="payment_form">Forma de pago:</label>
-                    <select  
+                    <label className="label" htmlFor="payment_form">
+                        Forma de pago:
+                    </label>
+                    <select
                         id="payment_form"
                         defaultValue=""
                         value={formData.payment_form}
-                        onChange={e => setFormData({...formData, payment_form: e.target.value})}
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                payment_form: e.target.value,
+                            })
+                        }
                         autoFocus
                     >
                         <option value="">Selecciona una opción</option>
                         <option value="01">Efectivo</option>
-                        <option value="03">Transferencia electrónica de fondos</option>
+                        <option value="03">
+                            Transferencia electrónica de fondos
+                        </option>
                     </select>
                     <ErrorLabel>{errors.payment_form}</ErrorLabel>
 
-
-                    <label className="label" htmlFor="payment_date">Fecha de pago</label>
-                    <input 
-                        type="date" 
+                    <label className="label" htmlFor="payment_date">
+                        Fecha de pago
+                    </label>
+                    <input
+                        type="date"
                         className="input"
                         id="payment_date"
-                        onChange={e => setFormData({...formData, payment_date: e.target.value})}
-                     />
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                payment_date: e.target.value,
+                            })
+                        }
+                    />
                     <ErrorLabel>{errors.payment_date}</ErrorLabel>
 
-                    <label className="label" htmlFor="customer">Cliente fiscal</label>
-                    <select  
+                    <label className="label" htmlFor="customer">
+                        Cliente fiscal
+                    </label>
+                    <select
                         id="customer"
                         defaultValue=""
                         // value={formData.payment_form || ''}
-                        onChange={e => setFormData({...formData, customer_id: e.target.value})}
-                    >
-                        <option value="" disabled>Selecciona una opción</option>
-                        {
-                            customers.map(customer => (
-                                <option key={customer.id} value={customer.id}>{customer.legal_name}</option>
-                            ))
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                customer_id: e.target.value,
+                            })
                         }
+                    >
+                        <option value="" disabled>
+                            Selecciona una opción
+                        </option>
+                        {customers.map((customer) => (
+                            <option key={customer.id} value={customer.id}>
+                                {customer.legal_name}
+                            </option>
+                        ))}
                     </select>
                     <ErrorLabel>{errors.customer_id}</ErrorLabel>
-                    {
-                        listaComplementos.map((row, index) =>(
-                            <>
-                                <label className="label" htmlFor={row.id}>Importe de pago de {row.uuid.substring(0,8) + '...'} ({formatoMoneda.format(row.total)})</label>
-                                <input
-                                    {...register(`items.${index}.amount`)}
-                                    id={row.id}
-                                    type="number" 
-                                    className="input" 
-                                    placeholder="Importe de pago"
-                                    min="1"
-                                />
-                                <ErrorLabel>{get(errors, `data.${index}.amount`)}</ErrorLabel>
-                            </>
-                        ))
-                    }
+                    {listaComplementos.map((row, index) => (
+                        <>
+                            <label className="label" htmlFor={row.id}>
+                                Importe de pago de{" "}
+                                {row.uuid.substring(0, 8) + "..."} (
+                                {formatoMoneda.format(row.total)})
+                            </label>
+                            <input
+                                {...register(`items.${index}.amount`)}
+                                id={row.id}
+                                type="number"
+                                className="input"
+                                placeholder="Importe de pago"
+                                min="1"
+                            />
+                            <ErrorLabel>
+                                {get(errors, `data.${index}.amount`)}
+                            </ErrorLabel>
+                        </>
+                    ))}
 
                     <div className="contenedor-botones">
                         <ButtonSubmit
@@ -1158,54 +1214,86 @@ export default function Cotizaciones() {
                 </form>
             </Modal>
 
-            <ModalLateral isOpen={modalLateral} onClose={() => setModalLateral(false)}>
+            <ModalLateral
+                isOpen={modalLateral}
+                onClose={() => setModalLateral(false)}
+            >
                 <h2 className="title-3">Lista de cotizaciones seleccionadas</h2>
 
                 <div className="flex flex-col gap-2">
-                    {
-                        selectedRows.map((cot, index) => (
-                            <div key={index} className="card m-0 text relative">
-                                <button 
-                                    className="cursor-pointer absolute top-0 right-2"
-                                    onClick={()=>{
-                                        setSelectedRows(prev => prev.filter(r => r.id !== cot.id));
-                                        if(selectedRows.length === 1){
-                                            setModalLateral(false);
-                                        }
-                                    }}
-                                >x</button>
+                    {selectedRows.map((cot, index) => (
+                        <div key={index} className="card m-0 text relative">
+                            <button
+                                className="cursor-pointer absolute top-0 right-2"
+                                onClick={() => {
+                                    setSelectedRows((prev) =>
+                                        prev.filter((r) => r.id !== cot.id),
+                                    );
+                                    if (selectedRows.length === 1) {
+                                        setModalLateral(false);
+                                    }
+                                }}
+                            >
+                                x
+                            </button>
 
-                                <p><span className="font-bold">Número de cotización:</span> {cot.invoice_number}</p>
-                                <p><span className="font-bold">Centro:</span> {cot.centre}</p>
-                                <p><span className="font-bold">Fecha de cotización:</span> {format(cot.date, "DD/MM/YYYY")}</p>
-                                <p><span className="font-bold">Monto total:</span> {formatoMoneda.format(cot.total)}</p>
-                                <p><span className="font-bold">Servicios:</span> {cot.services}</p>
-                                <p><span className="font-bold">Estatus:</span> {tabsMap[cot.status] || cot.status}</p>
-                            </div>
-                        ))
-                    }
+                            <p>
+                                <span className="font-bold">
+                                    Número de cotización:
+                                </span>{" "}
+                                {cot.invoice_number}
+                            </p>
+                            <p>
+                                <span className="font-bold">Centro:</span>{" "}
+                                {cot.centre}
+                            </p>
+                            <p>
+                                <span className="font-bold">
+                                    Fecha de cotización:
+                                </span>{" "}
+                                {format(cot.date, "DD/MM/YYYY")}
+                            </p>
+                            <p>
+                                <span className="font-bold">Monto total:</span>{" "}
+                                {formatoMoneda.format(cot.total)}
+                            </p>
+                            <p>
+                                <span className="font-bold">Servicios:</span>{" "}
+                                {cot.services}
+                            </p>
+                            <p>
+                                <span className="font-bold">Estatus:</span>{" "}
+                                {tabsMap[cot.status] || cot.status}
+                            </p>
+                        </div>
+                    ))}
 
                     <div className="contenedor-botones">
-                        {
-                            selectedRows.length > 0 &&
-                                
-                                <motion.div
-                                    key="acciones"
-                                    className="contenedor-botones"
-                                    {...motionProps}
-                                >
-                                { selectedRows.every(row => row.status === 'envio' || row.status === 'oc' || row.status === 'factura') && <motion.button
+                        {selectedRows.length > 0 && (
+                            <motion.div
+                                key="acciones"
+                                className="contenedor-botones"
+                                {...motionProps}
+                            >
+                                {selectedRows.every(
+                                    (row) =>
+                                        row.status === "envio" ||
+                                        row.status === "oc" ||
+                                        row.status === "factura",
+                                ) && (
+                                    <motion.button
+                                        className="btn btn-danger"
+                                        onClick={handleEliminarCotizaciones}
+                                        {...motionProps}
+                                    >
+                                        <Trash2 />
+                                        Eliminar permanentemente
+                                    </motion.button>
+                                )}
 
-                                    className="btn btn-danger"
-                                    onClick={handleEliminarCotizaciones}
-                                    {...motionProps}
-                                >
-                                    <Trash2 />
-                                    Eliminar permanentemente
-                                </motion.button>}
-
-                                {
-                                    selectedRows.every(row => row.status === 'f') &&
+                                {selectedRows.every(
+                                    (row) => row.status === "f",
+                                ) && (
                                     <MotionButton
                                         onClick={handleReenviarFacturas}
                                         icon={<MailIcon />}
@@ -1213,72 +1301,73 @@ export default function Cotizaciones() {
                                     >
                                         Reenviar facturas
                                     </MotionButton>
-                                }
+                                )}
 
-                                {
-                                    selectedRows.every(row => row.status === 'envio' || row.status === 'oc') &&
+                                {selectedRows.every(
+                                    (row) =>
+                                        row.status === "envio" ||
+                                        row.status === "oc",
+                                ) && (
                                     <MotionButton
-                                        onClick={() => setModalAdjuntarCopia(true)}
+                                        onClick={() =>
+                                            setModalAdjuntarCopia(true)
+                                        }
                                         icon={<MailIcon />}
                                         {...motionProps}
                                     >
                                         Enviar
                                     </MotionButton>
-                                }
+                                )}
 
-                                {
-                                    selectedRows.every(row => row.status === 'factura') &&
+                                {selectedRows.every(
+                                    (row) => row.status === "factura",
+                                ) && (
                                     <motion.button
                                         className="btn"
                                         onClick={handleClickFacturar}
                                         {...motionProps}
-                                    > 
-                                            <>
-                                                <MailIcon />
-                                                Facturar y enviar
-                                            </>
-                                        
+                                    >
+                                        <>
+                                            <MailIcon />
+                                            Facturar y enviar
+                                        </>
                                     </motion.button>
-                                }
-                                {
-                                    selectedRows.every(row => row.status === 'complemento') &&
+                                )}
+                                {selectedRows.every(
+                                    (row) => row.status === "complemento",
+                                ) && (
                                     <motion.button
                                         className="btn"
                                         onClick={handleClickComplemento}
-                                        
                                         {...motionProps}
-                                    > 
-                                            <>
-                                                <Receipt />
-                                                Emitir complemento
-                                            </>
-                                        
+                                    >
+                                        <>
+                                            <Receipt />
+                                            Emitir complemento
+                                        </>
                                     </motion.button>
-                                }
+                                )}
                             </motion.div>
-                        }
+                        )}
                     </div>
                 </div>
             </ModalLateral>
 
-            <ModalInbox 
-                isOpen={modalInbox} 
-                onClose={() => setModalInbox(false)} 
+            <ModalInbox
+                isOpen={modalInbox}
+                onClose={() => setModalInbox(false)}
                 onSelectEmail={(email) => {
                     setModalInbox(false);
                     console.log(email);
 
-                    if(activeTab === 'factura')
-                        handleFacturar(email);
-                    else 
-                        handleEnviarCotizaciones(email);
-                    
+                    if (activeTab === "factura") handleFacturar(email);
+                    else handleEnviarCotizaciones(email);
                 }}
             />
 
-            <ModalAdjuntarCopia 
-                isOpen={modalAdjuntarCopia} 
-                onClose={() => setModalAdjuntarCopia(false)} 
+            <ModalAdjuntarCopia
+                isOpen={modalAdjuntarCopia}
+                onClose={() => setModalAdjuntarCopia(false)}
                 responsables={responsables}
                 setFormData={setFormData}
                 formData={formData}
@@ -1287,15 +1376,18 @@ export default function Cotizaciones() {
                     setModalInbox(true);
                 }}
             />
-            
-            {   
-                selectedRows.length > 0 && !modalLateral &&
-                <button className=" btn !w-auto rounded-full bg-blue-600 text-white p-4 fixed bottom-10 right-10 z-50" onClick={()=>{setModalLateral(true)}}>
-                    <List/>
+
+            {selectedRows.length > 0 && !modalLateral && (
+                <button
+                    className=" btn !w-auto rounded-full bg-blue-600 text-white p-4 fixed bottom-10 right-10 z-50"
+                    onClick={() => {
+                        setModalLateral(true);
+                    }}
+                >
+                    <List />
                     <span className="counter">{selectedRows?.length}</span>
                 </button>
-            }
-
+            )}
         </div>
     );
 }

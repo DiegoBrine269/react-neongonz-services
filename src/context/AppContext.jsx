@@ -48,6 +48,11 @@ export default function AppProvider({ children }) {
 
     const [loadingMessage, setLoadingMessage] = useState();
 
+    //Galería
+    const [images, setImages] = useState([]);
+    const [hasMoreImages, setHasMoreImages] = useState(true);
+    const isFetchingImages = useRef(false);
+
 
     let tableRef = useRef(null);
 
@@ -160,6 +165,7 @@ export default function AppProvider({ children }) {
         }
     }
 
+
     async function fetchServicios() {
         try {
             const res = await clienteAxios.get("/api/services", requestHeader);
@@ -212,6 +218,24 @@ export default function AppProvider({ children }) {
             toast.error("Error al cargar el servicio");
         } finally {
             setLoading(false);
+        }
+    };
+
+    // Galería
+    const fetchImages = async (pageNum) => {
+        if (isFetchingImages.current || !hasMoreImages) return;
+        isFetchingImages.current = true;
+        try {
+            const res = await clienteAxios.get('/api/project-vehicles-photos', {
+                headers: { Authorization: `Bearer ${token}` },
+                params: { page: pageNum }
+            });
+            setImages((prev) => [...prev, ...res.data.data]);
+            setHasMoreImages(res.data.next_page_url !== null);
+        } catch (error) {
+            console.error('Error fetching images:', error);
+        } finally {
+            isFetchingImages.current = false;
         }
     };
 
@@ -288,6 +312,11 @@ export default function AppProvider({ children }) {
                 //
                 loadingMessage,
                 setLoadingMessage,
+
+                //Galería
+                images,
+                hasMoreImages,
+                fetchImages,
             }}
         >
             {children}

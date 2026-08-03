@@ -7,11 +7,14 @@ import {Link, useNavigate} from "react-router-dom";
 import { toast } from "react-toastify";
 import {Truck} from "lucide-react"
 import InfoRow from "@/components/UI/InfoRow";
-// import { useNavigate } from "react-router-dom";
+import { useCachedAjax } from "@/hooks/useCachedAjax";
+
 
 export default function Vehiculos() {
     const [vehiculos, setVehiculos] = useState([]);
     const { token, setLoading, centros, fetchCentros, tableRef, user } = useContext(AppContext);
+    const ajaxRequestFunc = useCachedAjax("vehiculos", token);
+
     const [isModalOpen, setModalOpen] = useState(false);
     const [isModal2Open, setModal2Open] = useState(false);
     const [formData, setFormData] = useState({});
@@ -76,13 +79,17 @@ export default function Vehiculos() {
             <h2 className="title-2">Listado de vehículos</h2>
 
             <div>
-
-                {user.role === 'admin' && <div className="contenedor-botones">
-                    <Link to="/vehiculos/tipos" className="btn btn-secondary">
-                        <Truck className="w-4 h-4 mr-2" />
-                        Ver tipos de vehículos
-                    </Link>
-                </div>}
+                {user.role === "admin" && (
+                    <div className="contenedor-botones">
+                        <Link
+                            to="/vehiculos/tipos"
+                            className="btn btn-secondary"
+                        >
+                            <Truck className="w-4 h-4 mr-2" />
+                            Ver tipos de vehículos
+                        </Link>
+                    </div>
+                )}
 
                 <Tabla
                     columns={[
@@ -91,7 +98,7 @@ export default function Vehiculos() {
                             field: "eco",
                             headerFilter: true,
                             resizable: false,
-                            width: 105
+                            width: 105,
                         },
                         {
                             title: "Tipo",
@@ -111,39 +118,32 @@ export default function Vehiculos() {
                         pagination: true, //enable pagination
                         paginationMode: "remote", //enable remote pagination
                         ajaxURL: `${import.meta.env.VITE_API_URL}/api/vehicles`,
-                        ajaxConfig: {
-                            method: "GET",
-                            headers: {
-                                Authorization: `Bearer ${token}`,
-                            },
-                        },
+                        ajaxRequestFunc,
+
                         filterMode: "remote",
                     }}
-
                     onRowClick={handleRowClick}
-      
                 />
             </div>
 
             <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
                 <h2 className="title-3">Vehículo</h2>
                 <div className="flex flex-col gap-3 pl-2">
-
-                    <InfoRow 
-                        label="Económico" 
-                        value={vehiculo?.eco} 
-                        link={vehiculo?.id ? `/vehiculos/${vehiculo?.eco}` : undefined}
+                    <InfoRow
+                        label="Económico"
+                        value={vehiculo?.eco}
+                        link={
+                            vehiculo?.id
+                                ? `/vehiculos/${vehiculo?.eco}`
+                                : undefined
+                        }
                     />
                     <div className="text">
-                        <span className="label-modal">
-                            Tipo
-                        </span>{" "}
+                        <span className="label-modal">Tipo</span>{" "}
                         <p>{vehiculo?.type?.type}</p>
                     </div>
                     <div className="text">
-                        <span className="label-modal">
-                            Centro de ventas
-                        </span>{" "}
+                        <span className="label-modal">Centro de ventas</span>{" "}
                         <p>{vehiculo?.centre?.name}</p>
                     </div>
 

@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import clienteAxios from '@/config/axios';
 import { useContext, useState, useRef } from 'react';
 import { AppContext } from '@/context/AppContext';
 import { Link } from 'react-router-dom';
@@ -8,33 +7,16 @@ import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 
 export default function Galeria() {
 
-    const { token } = useContext(AppContext);
+    const {  images, hasMore, fetchImages } = useContext(AppContext);
     
-    const [images, setImages] = useState([]);
+
     const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
     const loaderRef = useRef(null);
-    const isFetching = useRef(false);
 
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
 
-    const fetchImages = async (pageNum) => {
-        if (isFetching.current || !hasMore) return;
-        isFetching.current = true;
-        try {
-            const res = await clienteAxios.get('/api/project-vehicles-photos', {
-                headers: { Authorization: `Bearer ${token}` },
-                params: { page: pageNum }
-            });
-            setImages((prev) => [...prev, ...res.data.data]);
-            setHasMore(res.data.next_page_url !== null);
-        } catch (error) {
-            console.error('Error fetching images:', error);
-        } finally {
-            isFetching.current = false;
-        }
-    };
+
 
     // Fetch cuando cambia la página
     useEffect(() => {
@@ -54,7 +36,7 @@ export default function Galeria() {
 
         if (loaderRef.current) observer.observe(loaderRef.current);
         return () => observer.disconnect();
-    }, [hasMore]); // ✅ reconectar solo si hasMore cambia
+    }, [hasMore]); 
 
     const handleLightboxView = ({ index }) => {
         setLightboxIndex(index);

@@ -185,7 +185,7 @@ body {
     }
     
     .error {
-        @apply text-red-600 text-sm font-normal ;
+        @apply text-red-600 text-sm font-normal;
     }
 
     .transition-max-height {

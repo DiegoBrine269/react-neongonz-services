@@ -9,10 +9,10 @@ import { CirclePlus } from "lucide-react";
 import ErrorLabel from "@/components/UI/ErrorLabel";
 
 export default function Servicios() {
-    const [servicios, setServicios] = useState([]);
+
     const navigate = useNavigate();
 
-    const { token, setLoading, totalFilas, setTotalFilas } = useContext(AppContext);
+    const { token, setLoading, servicios, fetchServicios } = useContext(AppContext);
 
     const [isModalOpen, setModalOpen] = useState(false);
 
@@ -45,20 +45,7 @@ export default function Servicios() {
         }
     };
 
-    async function fetchServicios() {
-        try {
-            const res = await clienteAxios.get("/api/services", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            setServicios(res.data);
-        } catch (error) {
-            setServicios([]);
-            console.error("Error fetching data:", error);
-            toast.error("Error al cargar los servicios");
-        }
-    }
+
 
     const handleRowClick = useCallback((e, row) => {
         const id = row.getData().id;

@@ -14,6 +14,7 @@ import { flushSync } from "react-dom";
 import Fuse from "fuse.js";
 import ErrorLabel from '@/components/UI/ErrorLabel';
 import SearchInput from "@/components/UI/SearchInput";
+import { useCachedAjax } from "@/hooks/useCachedAjax";
 
 
 export default function Proyectos() {
@@ -22,6 +23,8 @@ export default function Proyectos() {
     const hoy = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
 
     const { token, setLoading, user, fetchServicios, fetchCentros, centros, servicios, mostrarCerrados, setMostrarCerrados} = useContext(AppContext);
+    const ajaxRequestFunc = useCachedAjax("proyectos", token);
+
 
     const [isModalOpen, setModalOpen] = useState(false);
         
@@ -225,19 +228,13 @@ export default function Proyectos() {
                 key={reloadKey}
                 className="custom-table"
                 options={{
-                        // selectable: true,
-                        pagination: true, //enable pagination
-                        paginationMode: "remote", //enable remote pagination
-                        ajaxURL: `${import.meta.env.VITE_API_URL}/api/projects?show_closed=${showClosed}`, //set url for ajax request
-                        ajaxConfig: {
-                            method: "GET",
-                            headers: {
-                                Authorization: `Bearer ${token}`,
-                            },
-                        },
-                        filterMode: "remote",
-                    }}
-                
+                    // selectable: true,
+                    pagination: true, //enable pagination
+                    paginationMode: "remote", //enable remote pagination
+                    ajaxURL: `${import.meta.env.VITE_API_URL}/api/projects?show_closed=${showClosed}`, //set url for ajax request
+                    ajaxRequestFunc,
+                    filterMode: "remote",
+                }}
                 onRowClick={handleRowClick}
                 columns={columns}
                 title="Listado de proyectos"
@@ -286,7 +283,9 @@ export default function Proyectos() {
                             })
                         }
                     />
-                    {errors.date && (<p className="text-red-500">{errors.date[0]}</p>)}
+                    {errors.date && (
+                        <p className="text-red-500">{errors.date[0]}</p>
+                    )}
 
                     <label className="label" htmlFor="commentary">
                         Comentario (opcional)
