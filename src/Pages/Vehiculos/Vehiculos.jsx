@@ -12,8 +12,8 @@ import { useCachedAjax } from "@/hooks/useCachedAjax";
 
 export default function Vehiculos() {
     const [vehiculos, setVehiculos] = useState([]);
-    const { token, setLoading, centros, fetchCentros, tableRef, user } = useContext(AppContext);
-    const ajaxRequestFunc = useCachedAjax("vehiculos", token);
+    const { token, setLoading, centros, fetchCentros, tableRef, user, tableRef } = useContext(AppContext);
+    const ajaxRequestFunc = useCachedAjax("vehiculos", token, tableRef);
 
     const [isModalOpen, setModalOpen] = useState(false);
     const [isModal2Open, setModal2Open] = useState(false);
@@ -92,6 +92,7 @@ export default function Vehiculos() {
                 )}
 
                 <Tabla
+                    ref={tableRef}
                     columns={[
                         {
                             title: "Económico",
