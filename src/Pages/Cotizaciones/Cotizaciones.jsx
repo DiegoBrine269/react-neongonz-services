@@ -91,8 +91,8 @@ export default function Cotizaciones() {
     });
 
     const { fetchInbox } = useContext(CotizacionesContext);
-    const { tableRef, token, setLoading, pendientes, fetchPendientes,  pendientesEnvio, fetchPendientesEnvio, requestHeader, fetchCustomers, customers, responsables, fetchResponsables } = useContext(AppContext);
-    const ajaxRequestFunc = useCachedAjax("cotizaciones", token);
+    const { tableRef, token, setLoading, pendientes, fetchPendientes,  fetchPendientesEnvio, requestHeader, fetchCustomers, customers, responsables, fetchResponsables } = useContext(AppContext);
+    const ajaxRequestFunc = useCachedAjax("invoices", token, tableRef);
 
     const [reloadKey, setReloadKey] = useState(0);
     const savedFiltersRef = useRef([]);

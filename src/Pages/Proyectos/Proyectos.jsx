@@ -22,8 +22,8 @@ export default function Proyectos() {
     // const [servicios, setServicios] = useState([]);
     const hoy = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
 
-    const { token, setLoading, user, fetchServicios, fetchCentros, centros, servicios, mostrarCerrados, setMostrarCerrados} = useContext(AppContext);
-    const ajaxRequestFunc = useCachedAjax("proyectos", token);
+    const { token, setLoading, user, fetchServicios, fetchCentros, centros, servicios, mostrarCerrados, setMostrarCerrados, tableRef} = useContext(AppContext);
+    const ajaxRequestFunc = useCachedAjax("invoices", token, tableRef);
 
 
     const [isModalOpen, setModalOpen] = useState(false);
@@ -226,6 +226,7 @@ export default function Proyectos() {
 
             <Tabla
                 key={reloadKey}
+                ref={tableRef}
                 className="custom-table"
                 options={{
                     // selectable: true,
