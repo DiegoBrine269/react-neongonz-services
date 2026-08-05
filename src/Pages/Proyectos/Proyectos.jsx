@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, useCallback } from "react";
+import { useContext, useEffect, useState, useCallback, useRef } from "react";
 // import "../../node_modules/react-tabulator/css/materialize/tabulator_materialize.min.css";
 
 import clienteAxios from "../../config/axios";
@@ -15,7 +15,7 @@ import Fuse from "fuse.js";
 import ErrorLabel from '@/components/UI/ErrorLabel';
 import SearchInput from "@/components/UI/SearchInput";
 import { useCachedAjax } from "@/hooks/useCachedAjax";
-
+import { API_URL } from "@/lib/api";
 
 export default function Proyectos() {
 
@@ -23,6 +23,7 @@ export default function Proyectos() {
     const hoy = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
 
     const { token, setLoading, user, fetchServicios, fetchCentros, centros, servicios, mostrarCerrados, setMostrarCerrados, tableRef} = useContext(AppContext);
+    const mostrarCerradosRef = useRef(mostrarCerrados);
     const ajaxRequestFunc = useCachedAjax("invoices", token, tableRef);
 
 
@@ -85,19 +86,15 @@ export default function Proyectos() {
 
     
 
-    const showClosed = mostrarCerrados ? 1 : 0;
-    // const url = token ? `/api/projects?show_closed=${showClosed}` : null;
-    // const fetcher = async (url) => {
-    //     const res = await clienteAxios.get(url, {
-    //         headers: {
-    //             Authorization: `Bearer ${token}`,
-    //         },
-    //     });
-    //     return res.data;
-    // };
+    const toggleMostrarCerrados = () => {
+        const nuevoValor = !mostrarCerrados;
+        mostrarCerradosRef.current = nuevoValor; // el ref se actualiza YA, sin esperar re-render
+        setMostrarCerrados(nuevoValor); // esto es solo para el UI del checkbox
 
-    // Hook SWR
-    // const { data: proyectos, error, isLoading } = useSWR(url, fetcher);
+        // fuerza a Tabulator a re-pedir datos con los params actuales
+        tableRef.current?.replaceData();
+    };
+
 
     const handleRowClick = useCallback((e, row) => {
         const id = row.getData().id;
@@ -106,12 +103,8 @@ export default function Proyectos() {
 
     useEffect(() => {
         const fetchData = async () => {
-            // setLoading(true);
-            // await Promise.all([
-                // fetchProyectos();
-                fetchCentros();
-                fetchServicios();
-            // ]);
+            fetchCentros();
+            fetchServicios();
             setLoading(false);
         };
 
@@ -215,10 +208,7 @@ export default function Proyectos() {
                         type="checkbox"
                         id="mostrarCerrados"
                         checked={mostrarCerrados}
-                        onChange={() => {
-                            recargarTabla();
-                            setMostrarCerrados(!mostrarCerrados);
-                        }}
+                        onChange={toggleMostrarCerrados}
                     />
                     <span className="text">Mostrar cerrados</span>
                 </label>
@@ -229,10 +219,12 @@ export default function Proyectos() {
                 ref={tableRef}
                 className="custom-table"
                 options={{
-                    // selectable: true,
-                    pagination: true, //enable pagination
-                    paginationMode: "remote", //enable remote pagination
-                    ajaxURL: `${import.meta.env.VITE_API_URL}/api/projects?show_closed=${showClosed}`, //set url for ajax request
+                    pagination: true,
+                    paginationMode: "remote",
+                    ajaxURL: `${API_URL}/api/projects`, 
+                    ajaxParams: () => ({
+                        show_closed: mostrarCerradosRef.current ? 1 : 0, // lee el ref, siempre actual
+                    }),
                     ajaxRequestFunc,
                     filterMode: "remote",
                 }}

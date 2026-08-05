@@ -402,7 +402,7 @@ export default function Editar() {
                     />
                 </div>
 
-                {selected.length > 0 && (
+                {/* {selected.length > 0 && ( */}
                     <div className="contenedor-botones">
                         
 
@@ -414,7 +414,7 @@ export default function Editar() {
                             Actualizar
                         </button>
                     </div>
-                )}
+                {/* )} */}
             </form>
 
         </>

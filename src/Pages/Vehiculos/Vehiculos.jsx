@@ -11,7 +11,7 @@ import { useCachedAjax } from "@/hooks/useCachedAjax";
 
 
 export default function Vehiculos() {
-    const [vehiculos, setVehiculos] = useState([]);
+
     const { token, setLoading, centros, fetchCentros, tableRef, user } = useContext(AppContext);
     const ajaxRequestFunc = useCachedAjax("vehiculos", token, tableRef);
 
