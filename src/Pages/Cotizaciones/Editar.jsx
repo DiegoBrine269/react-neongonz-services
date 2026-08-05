@@ -393,7 +393,7 @@ export default function Editar() {
                     </div>
                 }
 
-                <div className="border-1 border-neutral-400 p-2 rounded my-4">
+                <div className="border border-neutral-400 p-2 rounded my-4">
                     <OtrosDatos
                         formData={formData}
                         setFormData={setFormData}
