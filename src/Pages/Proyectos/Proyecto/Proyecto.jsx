@@ -741,11 +741,13 @@ export default function Proyecto() {
 
     return (
         <div className="relative">
-                {/* <Camera
+            {/* <Camera
                     // onTakePhoto = { (dataUri) => { handleTakePhoto(dataUri); } }
                 /> */}
             <div className="flex items-center gap-2 justify-between">
-                <h2 className="title-2 mb-0 text-center w-full lg:text-left">{proyecto?.service?.name} - {proyecto?.centre?.name}</h2>
+                <h2 className="title-2 mb-0 text-center w-full lg:text-left">
+                    {proyecto?.service?.name} - {proyecto?.centre?.name}
+                </h2>
 
                 <button
                     onClick={() => {
@@ -772,29 +774,35 @@ export default function Proyecto() {
                 {proyecto?.is_open ? (
                     <button
                         className="btn"
-                        onClick={() => {setModalAgregarOpen(true);}}
+                        onClick={() => {
+                            setModalAgregarOpen(true);
+                        }}
                     >
                         <Car />
                         Agregar
                     </button>
                 ) : (
                     <p className="text-muted mb-2">
-                        El proyecto ha sido cerrado, no es posible agregar más vehículos.
+                        El proyecto ha sido cerrado, no es posible agregar más
+                        vehículos.
                     </p>
                 )}
             </div>
 
             {/* Filtros */}
             <div className="card" ref={formFiltrosRef}>
-                <label
-                    className="label flex m-0"
+                <button
+                    className="label flex m-0 cursor-pointer w-full"
                     onClick={() => setFiltrosColapsados((prev) => !prev)}
                 >
-                    <ChevronRight className={!filtrosColapsados ? "block" : "hidden"}
+                    <ChevronRight
+                        className={!filtrosColapsados ? "block" : "hidden"}
                     />
-                    <ChevronDown className={filtrosColapsados ? "block" : "hidden"}/>
+                    <ChevronDown
+                        className={filtrosColapsados ? "block" : "hidden"}
+                    />
                     <h3 className="text font-bold">Filtros</h3>
-                </label>
+                </button>
                 <form
                     action=""
                     className={`pl-2 pr-1 flex flex-wrap gap-1 overflow-hidden transition-max-height ${
@@ -806,8 +814,6 @@ export default function Proyecto() {
                         });
                     }}
                 >
-
-    
                     <input
                         className="input mb-1 mt-2"
                         type="search"
@@ -816,9 +822,7 @@ export default function Proyecto() {
                         id="eco"
                         placeholder="Económico"
                         onChange={(e) => filtrarTabla(e, "eco")}
-
                     />
-
 
                     <select
                         id="tipo"
@@ -952,8 +956,8 @@ export default function Proyecto() {
 
                     {proyectosAbiertos?.length > 1 && (
                         <div>
-                            <label
-                                className="label flex"
+                            <button
+                                className="label flex cursor-pointer"
                                 onClick={() => setIsCollapsed((prev) => !prev)}
                             >
                                 <ChevronRight
@@ -965,7 +969,7 @@ export default function Proyecto() {
                                     }
                                 />
                                 Enlazar con otros proyectos
-                            </label>
+                            </button>
                             <div
                                 className={`pl-2 pt-2 flex flex-wrap gap-1 overflow-hidden ${
                                     isCollapsed ? "max-h-0" : null
@@ -979,11 +983,11 @@ export default function Proyecto() {
                                                 toggleProyectoExtraEdit(p.id)
                                             }
                                             checked={formDataEdit?.extra_projects?.includes(
-                                                p.id
+                                                p.id,
                                             )}
                                             label={p.service}
                                         />
-                                    ) : null
+                                    ) : null,
                                 )}
                             </div>
                         </div>
@@ -1017,11 +1021,10 @@ export default function Proyecto() {
                 </form>
             </Modal>
 
-            
             <Modal
                 isOpen={isModalAgregarOpen}
                 onClose={() => {
-                    setModalAgregarOpen(false)
+                    setModalAgregarOpen(false);
                     setFormData({
                         eco: "",
                         type: "",
@@ -1076,7 +1079,7 @@ export default function Proyecto() {
                                 value={formData.eco}
                                 min={1}
                                 onChange={(e) => {
-                                    setErrors({...errors, eco: null});
+                                    setErrors({ ...errors, eco: null });
                                     setFormData({
                                         ...formData,
                                         eco: e.target.value,
@@ -1106,7 +1109,6 @@ export default function Proyecto() {
                         )}
                     </div>
 
-
                     <select
                         className="input"
                         id="type"
@@ -1122,9 +1124,7 @@ export default function Proyecto() {
                         <option value="" disabled>
                             Seleccione un tipo
                         </option>
-                        {
-                        
-                        types?.map((type) => (
+                        {types?.map((type) => (
                             <option key={type.id} value={type.id}>
                                 {type.type}
                             </option>
@@ -1132,15 +1132,12 @@ export default function Proyecto() {
                     </select>
                     <ErrorLabel>{errors?.type}</ErrorLabel>
 
-                    
-                    {
-                        
-                        proyecto?.service?.multiple_quantity && <>
+                    {proyecto?.service?.multiple_quantity && (
+                        <>
                             <div className="flex items-center gap-2">
-                            <label className="label" htmlFor="cantidad">
-                                Número de piezas
-                            </label>
-
+                                <label className="label" htmlFor="cantidad">
+                                    Número de piezas
+                                </label>
                             </div>
                             <input
                                 type="number"
@@ -1158,8 +1155,7 @@ export default function Proyecto() {
                             />
                             <ErrorLabel>{errors?.quantity}</ErrorLabel>
                         </>
-                    }
-
+                    )}
 
                     <label className="label" htmlFor="commentary">
                         Comentario (opcional)
@@ -1178,11 +1174,12 @@ export default function Proyecto() {
                     ></textarea>
                     <ErrorLabel>{errors?.commentary}</ErrorLabel>
 
-                    <label className="label" htmlFor="photos">Añadir fotografía(s)</label>
+                    <label className="label" htmlFor="photos">
+                        Añadir fotografía(s)
+                    </label>
 
                     {/* Tomar foto */}
                     <div>
-                        
                         <FileInput
                             handleSeleccionarFotos={handleSeleccionarFotos}
                         />
@@ -1190,27 +1187,40 @@ export default function Proyecto() {
 
                     <div className="grid grid-cols-4 gap-1 p-2">
                         {previews.map((url, i) => (
-                            <div key={i} className="flex flex-col items-center gap-1">
-                                <img  src={url} className="w-20 h-20 object-cover rounded-lg" />
-                                <ErrorLabel>{errors?.[`images.${i}`]}</ErrorLabel>
+                            <div
+                                key={i}
+                                className="flex flex-col items-center gap-1"
+                            >
+                                <img
+                                    src={url}
+                                    className="w-20 h-20 object-cover rounded-lg"
+                                />
+                                <ErrorLabel>
+                                    {errors?.[`images.${i}`]}
+                                </ErrorLabel>
                             </div>
                         ))}
                     </div>
-   
+
                     <ErrorLabel>{errors?.photos}</ErrorLabel>
 
                     {proyectosAbiertos?.length > 1 && (
                         <div>
-                            <label
-                                className="label flex"
-                                onClick={() =>
-                                    setIsCollapsed((prev) => !prev)
-                                }
+                            <button
+                                className="label flex cursor-pointer"
+                                onClick={() => setIsCollapsed((prev) => !prev)}
                             >
-                                <ChevronRight className={isCollapsed ? "block" : "hidden"}/>
-                                <ChevronDown className={!isCollapsed ? "block" : "hidden"}/>
-                                Agregar a otros proyectos de forma simultánea (opcional)
-                            </label>
+                                <ChevronRight
+                                    className={isCollapsed ? "block" : "hidden"}
+                                />
+                                <ChevronDown
+                                    className={
+                                        !isCollapsed ? "block" : "hidden"
+                                    }
+                                />
+                                Agregar a otros proyectos de forma simultánea
+                                (opcional)
+                            </button>
                             <div
                                 className={`pl-2 pt-2 flex flex-wrap gap-1 overflow-hidden ${
                                     isCollapsed ? "max-h-0" : null
@@ -1224,11 +1234,11 @@ export default function Proyecto() {
                                                 toggleProyectoExtra(p.id)
                                             }
                                             checked={formData?.extra_projects?.includes(
-                                                p.id
+                                                p.id,
                                             )}
                                             label={p.service}
                                         />
-                                    ) : null
+                                    ) : null,
                                 )}
                             </div>
                         </div>
@@ -1254,7 +1264,6 @@ export default function Proyecto() {
                     </div>
                 </form>
             </Modal>
-            
 
             <Modal
                 isOpen={selectingDate}
@@ -1279,71 +1288,92 @@ export default function Proyecto() {
             >
                 <h2 className="title-3">Vehículo</h2>
                 <div className="flex flex-col gap-3 pl-2">
-                    
-                    <InfoRow 
-                        label="Económico" 
-                        value={vehiculo?.eco} 
-                        link={vehiculo?.id ? `/vehiculos/${vehiculo?.eco}` : undefined}
+                    <InfoRow
+                        label="Económico"
+                        value={vehiculo?.eco}
+                        link={
+                            vehiculo?.id
+                                ? `/vehiculos/${vehiculo?.eco}`
+                                : undefined
+                        }
                     />
                     <InfoRow label="Tipo" value={vehiculo?.type} />
                     <InfoRow
                         label="Registrado por"
                         value={`${vehiculo?.user?.name}`}
-                        link={vehiculo?.user?.id && user.role === 'admin' ? `/usuarios/${vehiculo?.user?.id}` : undefined}
+                        link={
+                            vehiculo?.user?.id && user.role === "admin"
+                                ? `/usuarios/${vehiculo?.user?.id}`
+                                : undefined
+                        }
                     />
                     <InfoRow
                         label="Fecha y hora de registro"
-                        value={format(vehiculo?.created_at, { date: "full", time: "medium" },"es")}
+                        value={format(
+                            vehiculo?.created_at,
+                            { date: "full", time: "medium" },
+                            "es",
+                        )}
                     />
 
-                    { vehiculo?.quantity > 1 && <InfoRow label="No. de piezas" value={vehiculo?.quantity} /> }
-                    
-                    { vehiculo?.commentary && <InfoRow label="Comentario" value={vehiculo?.commentary ?? "-"} /> }
+                    {vehiculo?.quantity > 1 && (
+                        <InfoRow
+                            label="No. de piezas"
+                            value={vehiculo?.quantity}
+                        />
+                    )}
 
-                    { vehiculo?.photos?.length > 0 && 
+                    {vehiculo?.commentary && (
+                        <InfoRow
+                            label="Comentario"
+                            value={vehiculo?.commentary ?? "-"}
+                        />
+                    )}
+
+                    {vehiculo?.photos?.length > 0 && (
                         <div className="text">
                             <span className="font-bold border-b-1 block border-neutral-400">
-                                Fotografía(s) 
+                                Fotografía(s)
                             </span>
                             <div className="overflow-x-scroll flex gap-2 p-2">
                                 {vehiculo?.photos
                                     ? vehiculo.photos.map((photo, i) => (
-                                        <img
-                                            key={photo.id}
-                                            src={imageUrls[photo.id]} 
-                                            loading="lazy"
-                                            className="w-40 h-40 object-cover rounded-lg cursor-pointer"
-                                            onClick={() => {
-                                                setLightboxIndex(i);
-                                                setLightboxOpen(true);
-                                            }}
-                                        />
-                                    ))
-                                    : 
-                                    Array.from({ length: 4 }).map((_, i) => (
-                                        <div
-                                            key={i}
-                                            className="w-40 h-40 rounded-lg mr-2 mb-2 bg-neutral-200 animate-pulse"
-                                        />
-                                    ))
-                                }
+                                          <img
+                                              key={photo.id}
+                                              src={imageUrls[photo.id]}
+                                              loading="lazy"
+                                              className="w-40 h-40 object-cover rounded-lg cursor-pointer"
+                                              onClick={() => {
+                                                  setLightboxIndex(i);
+                                                  setLightboxOpen(true);
+                                              }}
+                                          />
+                                      ))
+                                    : Array.from({ length: 4 }).map((_, i) => (
+                                          <div
+                                              key={i}
+                                              className="w-40 h-40 rounded-lg mr-2 mb-2 bg-neutral-200 animate-pulse"
+                                          />
+                                      ))}
                             </div>
                         </div>
-                    }
+                    )}
                 </div>
 
                 <div className="contenedor-botones">
                     {
                         //Mostrar solo si es del mismo usuario, o bien si es admin
-                        ((user?.role === "admin" || vehiculo?.user?.id === user?.id) && proyecto?.is_open)
-                        &&
-                        <button
-                            className="btn btn-danger"
-                            onClick={handleEliminarVehiculo}
-                        >
-                            <Trash2 />
-                            Eliminar del proyecto
-                        </button>
+                        (user?.role === "admin" ||
+                            vehiculo?.user?.id === user?.id) &&
+                            proyecto?.is_open && (
+                                <button
+                                    className="btn btn-danger"
+                                    onClick={handleEliminarVehiculo}
+                                >
+                                    <Trash2 />
+                                    Eliminar del proyecto
+                                </button>
+                            )
                     }
                     <button
                         className="btn"
@@ -1361,9 +1391,11 @@ export default function Proyecto() {
                 open={lightboxOpen}
                 close={() => setLightboxOpen(false)}
                 index={lightboxIndex}
-                slides={vehiculo?.photos?.map(photo => ({
-                    src: imageUrls[photo.id]
-                })).filter(s => s.src)}
+                slides={vehiculo?.photos
+                    ?.map((photo) => ({
+                        src: imageUrls[photo.id],
+                    }))
+                    .filter((s) => s.src)}
                 plugins={[Zoom]}
                 controller={{ closeOnBackdropClick: true }}
             />
