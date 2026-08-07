@@ -794,6 +794,7 @@ export default function Proyecto() {
                 <button
                     className="label flex m-0 cursor-pointer w-full"
                     onClick={() => setFiltrosColapsados((prev) => !prev)}
+                    type="button"
                 >
                     <ChevronRight
                         className={!filtrosColapsados ? "block" : "hidden"}
@@ -959,6 +960,7 @@ export default function Proyecto() {
                             <button
                                 className="label flex cursor-pointer"
                                 onClick={() => setIsCollapsed((prev) => !prev)}
+                                type="button"
                             >
                                 <ChevronRight
                                     className={isCollapsed ? "block" : "hidden"}
@@ -1209,6 +1211,7 @@ export default function Proyecto() {
                             <button
                                 className="label flex cursor-pointer"
                                 onClick={() => setIsCollapsed((prev) => !prev)}
+                                type="button"
                             >
                                 <ChevronRight
                                     className={isCollapsed ? "block" : "hidden"}
