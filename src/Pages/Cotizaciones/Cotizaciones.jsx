@@ -23,6 +23,7 @@ import { CotizacionesContext } from "@/context/CotizacionesContext";
 import ModalAdjuntarCopia from "@/Pages/Cotizaciones/CotizacionesComponents/ModalAdjuntarCopia";
 import {tabs} from "@/utils/utils.js"
 import { useCachedAjax } from "@/hooks/useCachedAjax";
+import { extractErrorMessages } from "@/helpers/extractErrorMessages";
 
 import ReactDOMServer from "react-dom/server";
 import { getColumnasCotizaciones } from "./configCotizaciones";
@@ -464,10 +465,17 @@ export default function Cotizaciones() {
                     requestHeader
                 );
             } catch (error) {
-                console.log(error.response.data.error)
-                setErrors(error.response?.data?.errors || error.response?.data?.error || {});
-                setLoading(false);
-                return; 
+                const messages = extractErrorMessages(error);
+                console.error("Error al validar la facturación:", messages);
+                setErrors(error.response?.data?.errors || {});
+
+                Swal.fire({
+                    title: "Error al emitir la(s) factura(s)",
+                    text: messages.join("\n"),
+                    icon: "error",
+                    ...swalConfig(),
+                });
+                return;
             }
             setLoading(false);
 
