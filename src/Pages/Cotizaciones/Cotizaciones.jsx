@@ -40,8 +40,6 @@ export default function Cotizaciones() {
     const [selectedRows, setSelectedRows] = useState([]);
     const [listaComplementos, setListaComplementos] = useState([]);
 
-
-
     const [modal, setModal] = useState(false);
     const [modal2, setModal2] = useState(false);
     const [modal3, setModal3] = useState(false);
@@ -320,6 +318,7 @@ export default function Cotizaciones() {
 
         if (!validarMismoCentro()) return;  
 
+        fetchInbox(); //Asegurarnos de refrescar la bandeja de entrada
         setModal2(true)
         setErrors({})
         setFormData({...formData, joined:1});

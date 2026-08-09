@@ -31,7 +31,6 @@ export default function CotizacionesProvider({ children }) {
 
     const [inbox, setInbox] = useState([]);
 
-
     const fetchCotizacion = async (id) => {
         try {
             setLoading(true);
