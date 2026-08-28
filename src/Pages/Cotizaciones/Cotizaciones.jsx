@@ -310,10 +310,6 @@ export default function Cotizaciones() {
         }
     }
 
-    async function handleSeleccionarCorreo(emailSeleccionado) {
-        setModalInbox(true);
-    }
-
     async function handleClickFacturar() {
 
         if (!validarMismoCentro()) return;  
@@ -890,6 +886,11 @@ export default function Cotizaciones() {
                         >
                             Ver pdf 📄
                         </button>
+                    </div>
+
+                    <div className="text">
+                        <span className="label-modal">Estatus</span>{" "}
+                        <p>{tabsMap[cotizacion.status] || cotizacion.status }</p>
                     </div>
 
                     {cotizacion?.billing?.pdf_path && (

@@ -76,7 +76,6 @@ export default function Personalizadas() {
         // console.log(cotizacion);
         if(cotizacion){
             handleSelectCotizacion(null, cotizacion);
-
         }
     },[cotizacion]);
 
@@ -270,26 +269,28 @@ export default function Personalizadas() {
                 precios personalizados.
             </p>
 
-            {mostrarBotones && <div className="flex gap-2 mb-4">
-                <button
-                    className="btn"
-                    onClick={() => {
-                        setMostrarBotones(false);
-                        setAccion("create");
-                    }}
-                >
-                    Crear nueva
-                </button>
-                <button
-                    className="btn btn-secondary"
-                    onClick={() => {
-                        setMostrarBotones(false);
-                        setAccion("edit");
-                    }}
-                >
-                    Ver pendientes
-                </button>
-            </div>}
+            {mostrarBotones && (
+                <div className="flex gap-2 mb-4">
+                    <button
+                        className="btn"
+                        onClick={() => {
+                            setMostrarBotones(false);
+                            setAccion("create");
+                        }}
+                    >
+                        Crear nueva
+                    </button>
+                    <button
+                        className="btn btn-secondary"
+                        onClick={() => {
+                            setMostrarBotones(false);
+                            setAccion("edit");
+                        }}
+                    >
+                        Ver pendientes
+                    </button>
+                </div>
+            )}
 
             {accion && (
                 <form action="" onSubmit={handleSubmit(onSubmit)}>
@@ -320,12 +321,9 @@ export default function Personalizadas() {
                                 ))}
                             </select>
                             <ErrorLabel>{errors.centre_id}</ErrorLabel>
-
-                            
                         </div>
 
                         <div className={accion === "create" ? "hidden" : ""}>
-                            
                             <label className="label" htmlFor="invoice_id">
                                 Cotización
                             </label>
@@ -333,23 +331,39 @@ export default function Personalizadas() {
                                 id="invoice_id"
                                 className="input"
                                 onChange={handleSelectCotizacion}
-                                value={cotizacion?.centre?.id || formData.invoice_id || ""}
-                                disabled ={cotizacion ? true : false}
+                                value={
+                                    cotizacion?.centre?.id ||
+                                    formData.invoice_id ||
+                                    ""
+                                }
+                                disabled={cotizacion ? true : false}
                             >
                                 <option value="" disabled>
                                     Selecciona una cotización
                                 </option>
                                 {pendientes.map((cot) => (
                                     <option key={cot.id} value={cot.id}>
-                                        {cot.centre.name} ({format(new Date(cot.date), "DD/MM/YYYY")})
+                                        {cot.centre.name} (
+                                        {format(
+                                            new Date(cot.date),
+                                            "DD/MM/YYYY",
+                                        )}
+                                        )
                                     </option>
                                 ))}
-                                {
-                                    cotizacion && 
-                                    <option key={cotizacion.centre.id} value={cotizacion.centre.id}>
-                                        {cotizacion.centre.name} ({format(new Date(cotizacion.date), "DD/MM/YYYY")})
+                                {cotizacion && (
+                                    <option
+                                        key={cotizacion.centre.id}
+                                        value={cotizacion.centre.id}
+                                    >
+                                        {cotizacion.centre.name} (
+                                        {format(
+                                            new Date(cotizacion.date),
+                                            "DD/MM/YYYY",
+                                        )}
+                                        )
                                     </option>
-                                }
+                                )}
                             </select>
                             <ErrorLabel>{errors?.invoice_id}</ErrorLabel>
                         </div>
@@ -367,20 +381,27 @@ export default function Personalizadas() {
                                 })
                             }
                             value={formData.responsible_id || ""}
-                            disabled ={!formData.centre_id}
+                            disabled={!formData.centre_id}
                         >
                             <option value="" disabled>
                                 Seleccione un destinatario
                             </option>
                             {responsables
                                 .filter((responsable) =>
-                                    centros.find(c=>c.id == formData.centre_id)?.responsibles?.some(r => r.id === responsable.id)
+                                    centros
+                                        .find((c) => c.id == formData.centre_id)
+                                        ?.responsibles?.some(
+                                            (r) => r.id === responsable.id,
+                                        ),
                                 )
                                 .map((responsable) => (
-                                <option key={responsable.id} value={responsable.id}>
-                                    {responsable.name}
-                                </option>
-                            ))}
+                                    <option
+                                        key={responsable.id}
+                                        value={responsable.id}
+                                    >
+                                        {responsable.name}
+                                    </option>
+                                ))}
                         </select>
                         <ErrorLabel>{errors.responsible_id}</ErrorLabel>
 
@@ -401,24 +422,29 @@ export default function Personalizadas() {
                             }
                         />
                         <ErrorLabel>{errors?.date}</ErrorLabel>
-                        
+
                         {fields.map((field, index) => (
-                            <div key={field.id} className="my-3 relative border p-2 rounded-lg border-neutral-400">
-                                
+                            <div
+                                key={field.id}
+                                className="my-3 relative border p-2 rounded-lg border-neutral-400"
+                            >
                                 <div className="flex justify-between mb-1 center-items">
-                                    <p className="text ">Fila {index+1}</p>
-                                    <button className="btn btn-danger !w-auto !p-1 m-0" type="button" onClick={() => remove(index)}>
-                                        <Trash2
-                                            className="h-4 w-4"
-                                        />
+                                    <p className="text ">Fila {index + 1}</p>
+                                    <button
+                                        className="btn btn-danger !w-auto !p-1 m-0"
+                                        type="button"
+                                        onClick={() => remove(index)}
+                                    >
+                                        <Trash2 className="h-4 w-4" />
                                     </button>
                                 </div>
-                                
+
                                 <div className="grid md:grid-cols-[1fr_4fr_2fr_1fr_2fr] gap-1 items-start">
-                                    
                                     <div>
                                         <input
-                                            {...register(`items.${index}.quantity`)}
+                                            {...register(
+                                                `items.${index}.quantity`,
+                                            )}
                                             placeholder="Cantidad"
                                             className="input"
                                             type="number"
@@ -427,82 +453,130 @@ export default function Personalizadas() {
                                     </div>
 
                                     <div>
-                                        {items[index]?.isListActive ?
+                                        {items[index]?.isListActive ? (
                                             <SearchInput
                                                 lista={servicios}
                                                 error={errors.service_id}
-                                                onSelectItem={handleServiceSelect(index)}  
+                                                onSelectItem={handleServiceSelect(
+                                                    index,
+                                                )}
                                                 placeholder="Elige un servicio (opcional)"
                                                 className="min-h-9 field-sizing-content"
-                                                {...register(`items.${index}.concept`)}
+                                                {...register(
+                                                    `items.${index}.concept`,
+                                                )}
                                             />
-                                            :
-                                            <input
-                                                {...register(`items.${index}.concept`)}
+                                        ) : (
+                                            <textarea
+                                                {...register(
+                                                    `items.${index}.concept`,
+                                                )}
                                                 placeholder="Concepto"
-                                                className="input"
+                                                className="input scrollbar-none"
                                                 type="text"
+                                                rows={3}
                                             />
-                                        }
-                                        <ErrorLabel>{get(errors, `rows.${index}.concept`)}</ErrorLabel>
-
+                                        )}
+                                        <ErrorLabel>
+                                            {get(
+                                                errors,
+                                                `rows.${index}.concept`,
+                                            )}
+                                        </ErrorLabel>
                                     </div>
 
                                     <div>
                                         <input
-                                            {...register(`items.${index}.price`)}
+                                            {...register(
+                                                `items.${index}.price`,
+                                            )}
                                             placeholder="Precio"
                                             className="input"
                                             type="number"
                                             step="any"
                                         />
-                                        <ErrorLabel>{get(errors, `rows.${index}.price`)}</ErrorLabel>
+                                        <ErrorLabel>
+                                            {get(errors, `rows.${index}.price`)}
+                                        </ErrorLabel>
                                     </div>
 
                                     <div>
-                                        <select 
+                                        <select
                                             id="sat_unit_key"
                                             defaultValue=""
-                                            {...register(`items.${index}.sat_unit_key`)}
+                                            {...register(
+                                                `items.${index}.sat_unit_key`,
+                                            )}
                                         >
                                             {/* <option value="" disabled>Unidad de medida</option> */}
-                                                {units.map((unit) => (
-                                                    <option
-                                                        key={unit.key}
-                                                        value={unit.key}
-                                                    >
-                                                        {unit.name} ({unit.key})
-                                                    </option>
-                                                ))}
+                                            {units.map((unit) => (
+                                                <option
+                                                    key={unit.key}
+                                                    value={unit.key}
+                                                >
+                                                    {unit.name} ({unit.key})
+                                                </option>
+                                            ))}
                                         </select>
-                                        <ErrorLabel>{get(errors, `rows.${index}.sat_unit_key`)}</ErrorLabel>
+                                        <ErrorLabel>
+                                            {get(
+                                                errors,
+                                                `rows.${index}.sat_unit_key`,
+                                            )}
+                                        </ErrorLabel>
                                     </div>
-                                    
+
                                     <div>
                                         <input
-                                            {...register(`items.${index}.sat_key_prod_serv`)}
+                                            {...register(
+                                                `items.${index}.sat_key_prod_serv`,
+                                            )}
                                             placeholder="Clave de producto o servicio"
                                             className="input"
                                             type="number"
                                         />
-                                        <ErrorLabel>{get(errors, `rows.${index}.sat_key_prod_serv`)}</ErrorLabel>
+                                        <ErrorLabel>
+                                            {get(
+                                                errors,
+                                                `rows.${index}.sat_key_prod_serv`,
+                                            )}
+                                        </ErrorLabel>
                                     </div>
-
                                 </div>
-                                
+
                                 <div className="contenedor-botones">
-                                    <button className="link block" type="button" onClick={() => {
-                                        setValue(`items.${index}.isListActive`, !items[index]?.isListActive);
-                                    }}>
-                                        {items[index]?.isListActive ? 'Ocultar' : 'Ver'} lista de servicios
+                                    <button
+                                        className="link block"
+                                        type="button"
+                                        onClick={() => {
+                                            setValue(
+                                                `items.${index}.isListActive`,
+                                                !items[index]?.isListActive,
+                                            );
+                                        }}
+                                    >
+                                        {items[index]?.isListActive
+                                            ? "Ocultar"
+                                            : "Ver"}{" "}
+                                        lista de servicios
                                     </button>
                                 </div>
                             </div>
                         ))}
 
                         <div className="flex justify-end mt-2">
-                            <button className="w-auto btn" type="button" onClick={() => append({ concept: '', quantity: '', price: '' })}>
-                                <ListPlus/>
+                            <button
+                                className="w-auto btn"
+                                type="button"
+                                onClick={() =>
+                                    append({
+                                        concept: "",
+                                        quantity: "",
+                                        price: "",
+                                    })
+                                }
+                            >
+                                <ListPlus />
                                 Agregar fila
                             </button>
                         </div>
@@ -538,45 +612,45 @@ export default function Personalizadas() {
                         ></textarea>
                     </div>
 
-                    { 
+                    {
                         // Solo en caso de que se esté editando
-                        cotizacion &&
-                        <div className="border-1 border-neutral-400 p-2 rounded my-4">
-                            <OtrosDatos
-                                formData={formData}
-                                setFormData={setFormData}
-                                errors={errors}
-                                cotizacion={cotizacion}
-                            />
-                        </div>
+                        cotizacion && (
+                            <div className="border-1 border-neutral-400 p-2 rounded my-4">
+                                <OtrosDatos
+                                    formData={formData}
+                                    setFormData={setFormData}
+                                    errors={errors}
+                                    cotizacion={cotizacion}
+                                />
+                            </div>
+                        )
                     }
 
-
                     <div className="contenedor-botones">
-                            <button 
-                                className="btn" 
-                                type="submit"
-                                onClick={()=> setCompleted(true)}
-                            >
-                                <Printer />
-                                Generar
-                            </button>
+                        <button
+                            className="btn"
+                            type="submit"
+                            onClick={() => setCompleted(true)}
+                        >
+                            <Printer />
+                            Generar
+                        </button>
 
-                            {
-                                    
-                                // Si hay cotización, es porque se está editando
-                                !cotizacion && <>
+                        {
+                            // Si hay cotización, es porque se está editando
+                            // !cotizacion && (
+                                <>
                                     <button
                                         className="btn bg-green-700"
                                         type="submit"
-                                        onClick={()=> setCompleted(false)}
+                                        onClick={() => setCompleted(false)}
                                     >
                                         <CalendarClock />
                                         Borrador
                                     </button>
 
-                                    <button 
-                                        className="btn btn-secondary" 
+                                    <button
+                                        className="btn btn-secondary"
                                         type="submit"
                                         onClick={() => {
                                             setIsBudget(true);
@@ -587,38 +661,45 @@ export default function Personalizadas() {
                                         Presupuesto
                                     </button>
 
-                                    {formData.invoice_id && <button 
-                                        className="btn btn-danger" 
-                                        type="button"
-                                        onClick={handleClickEliminar}
-                                    >
-                                        <Trash2 />
-                                        Eliminar
-                                    </button>}
+                                    {formData.invoice_id && (
+                                        <button
+                                            className="btn btn-danger"
+                                            type="button"
+                                            onClick={handleClickEliminar}
+                                        >
+                                            <Trash2 />
+                                            Eliminar
+                                        </button>
+                                    )}
                                 </>
-                            }
-                        </div>
+                            // )
+                        }
+                    </div>
                 </form>
             )}
 
-            <Modal
-                isOpen={modalOpen}
-                onClose={() => setModalOpen(false)}
-            >
+            <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
                 <h2 className="title-3">Selecciona un precio</h2>
 
                 <table className="text border dark:border-neutral-600">
                     <tbody>
                         {precios.map((precio, index) => (
-                            <tr key={index} className="" >
-                                <td className="border dark:border-neutral-600 p-2">$ {formatearDinero(precio.price)}</td>
-                                <td className="border dark:border-neutral-600 p-2">{precio.vehicle_type.type}</td>
+                            <tr key={index} className="">
+                                <td className="border dark:border-neutral-600 p-2">
+                                    $ {formatearDinero(precio.price)}
+                                </td>
+                                <td className="border dark:border-neutral-600 p-2">
+                                    {precio.vehicle_type.type}
+                                </td>
                                 <td className="border dark:border-neutral-600 p-2">
                                     <button
                                         key={index}
                                         className="btn"
                                         onClick={() => {
-                                            setValue(`items.${items.findIndex(item => item.isListActive)}.price`, precio.price);
+                                            setValue(
+                                                `items.${items.findIndex((item) => item.isListActive)}.price`,
+                                                precio.price,
+                                            );
                                             setModalOpen(false);
                                         }}
                                     >
@@ -629,7 +710,6 @@ export default function Personalizadas() {
                         ))}
                     </tbody>
                 </table>
-
             </Modal>
         </div>
     );
