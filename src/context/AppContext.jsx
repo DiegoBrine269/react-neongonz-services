@@ -25,6 +25,9 @@ export default function AppProvider({ children }) {
 
     const [servicios, setServicios] = useState([]);
 
+    const [productos, setProductos] = useState([]);
+
+
     const [mostrarCerrados, setMostrarCerrados] = useState(false);
 
     //
@@ -178,6 +181,20 @@ export default function AppProvider({ children }) {
         }
     }
 
+    async function fetchProductos() {
+        try {
+            const res = await clienteAxios.get(
+                "/api/products",
+                requestHeader,
+            );
+
+            setProductos(res.data);
+        } catch (error) {
+            setProductos([]);
+            toast.error("Error al cargar los productos");
+        }
+    }
+
     async function fetchPendientes() {
         try {
             const res = await clienteAxios.get("/api/invoices/pending", requestHeader);
@@ -282,6 +299,10 @@ export default function AppProvider({ children }) {
                 setProyectos,
                 fetchServicios,
                 servicios,
+
+                fetchProductos,
+                productos,
+
                 tableRef,
                 mostrarCerrados,
                 setMostrarCerrados,

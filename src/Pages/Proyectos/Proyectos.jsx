@@ -188,15 +188,18 @@ export default function Proyectos() {
     return (
         <>
             <h2 className="title-2">Listado de proyectos</h2>
-            <button
-                className="btn mb-4"
-                onClick={() => {
-                    setModalOpen(true);
-                }}
-            >
-                <CirclePlus />
-                Nuevo
-            </button>
+
+            <div className="contenedor-botones">
+                <button
+                    className="btn mb-4"
+                    onClick={() => {
+                        setModalOpen(true);
+                    }}
+                >
+                    <CirclePlus />
+                    Nuevo
+                </button>
+            </div>
 
             {user?.role === "admin" && (
                 <label

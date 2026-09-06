@@ -87,7 +87,7 @@ export default function SearchInput({htmlId, initialValue, lista, placeholder, o
                         <div 
                             key={item.id} 
                             value={item.id} 
-                            className="text px-2 py-1 border-b-1 cursor-pointer hover:dark:bg-neutral-800 hover:bg-gray-200"
+                            className="text px-2 py-1 border-b cursor-pointer hover:dark:bg-neutral-800 hover:bg-gray-200"
                             onClick={handleItemClick}
                         >
                             {item.name}

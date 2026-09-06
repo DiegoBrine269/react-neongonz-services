@@ -15,6 +15,8 @@ import Centro from "@/Pages/Centros/Centro";
 
 import EditarCentros from "@/Pages/Centros/Editar";
 
+import Productos from "@/Pages/Productos/Productos";
+
 import Servicios from "@/Pages/Servicios/Servicios";
 import Servicio from "@/Pages/Servicios/Servicio";
 import Usuarios from "@/Pages/Usuarios/Usuarios";
@@ -43,6 +45,9 @@ import ResetPassword from "@/Pages/Auth/ResetPassword";
 
 import Galeria from "@/Pages/Galeria/Galeria";
 
+import Gastos from "@/Pages/Gastos/Gastos";
+import { Nuevo as NuevoGasto } from "@/Pages/Gastos/Nuevo";
+import { Categorias as CategoriasGasto } from "@/Pages/Gastos/Categorias";
 
 export default function App() {
     const { user } = useContext(AppContext);
@@ -78,8 +83,14 @@ export default function App() {
 
                                         <Route path="/responsables" element={<Responsables />} />
                                         <Route path="/clientes" element={<Clientes />} />
+                                        <Route path="/productos" element={<Productos />} />
                                         <Route path="/servicios" element={<Servicios />} />
                                         <Route path="/cotizaciones" element={<Cotizaciones />} />
+                                        <Route path="/gastos" element={<Gastos />} />
+                                        <Route path="/gastos/nuevo" element={<NuevoGasto />} />
+                                        <Route path="/gastos/categorias" element={<CategoriasGasto />} />
+
+
                                         <Route path="/cotizaciones/nueva" element={<Nueva />} />
                                         <Route path="/cotizaciones/personalizadas" element={<Personalizadas />} />
                                         <Route path="/cotizaciones/personalizadas/:id" element={<Personalizadas />} />

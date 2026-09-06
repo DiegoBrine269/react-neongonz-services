@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { CalendarClock, Printer, Trash2, ListPlus } from "lucide-react";
+import { CalendarClock, Printer, Trash2, ListPlus, TextAlignJustify } from "lucide-react";
 import { downloadBlobResponse } from "@/utils/downloadFile"; 
 import { useContext } from "react";
 import { AppContext } from "@/context/AppContext";
@@ -27,7 +27,7 @@ export default function Personalizadas() {
     const { id } = useParams();
 
     const { cotizacion, fetchCotizacion, setCotizacion } = useContext(CotizacionesContext);
-    const { token, setLoading, centros, fetchCentros, pendientes, fetchPendientes, responsables, fetchResponsables, fetchUnits, units, servicios, fetchServicios } = useContext(AppContext);
+    const { token, setLoading, centros, fetchCentros, pendientes, fetchPendientes, responsables, fetchResponsables, fetchUnits, units, servicios, fetchServicios, productos, fetchProductos } = useContext(AppContext);
 
     const navigate = useNavigate();
 
@@ -53,7 +53,11 @@ export default function Personalizadas() {
     const [accion, setAccion] = useState(null); // create or update
     const [mostrarBotones, setMostrarBotones] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
+    const [modalCatalogoOpen, setModalCatalogoOpen] = useState(false);
+
+    const [selectedItemIndex, setSelectedItemIndex] = useState(null);
     const [precios, setPrecios] = useState([]);
+    const [catalogo, setCatalogo] = useState([]);
 
     const items = watch('items');
 
@@ -64,6 +68,7 @@ export default function Personalizadas() {
         fetchUnits();
         setCotizacion(null);
         fetchServicios();
+        fetchProductos();
 
         if(id){
             setAccion("edit");
@@ -170,7 +175,7 @@ export default function Personalizadas() {
                     concept: row.concept,
                     quantity: row.quantity,
                     price: row.price,
-                    sat_unit_key: row.sat_unit_key,
+                    sat_unit_key: row.sat_unit_key ?? null,
                     sat_key_prod_serv: row.sat_key_prod_serv.trim(),
                 });
             });
@@ -178,21 +183,42 @@ export default function Personalizadas() {
     }
 
     const handleServiceSelect = (index) => (id, name) => {
-        const servicio = servicios.find(s => s.id.toString() === id.toString());
 
-        if (servicio) {
-            setValue(`items.${index}.concept`, servicio?.name);
-            setValue(`items.${index}.sat_unit_key`, servicio?.sat_unit_key);
-            setValue(`items.${index}.sat_key_prod_serv`, servicio?.sat_key_prod_serv?.trim());
+        
+
+        let item;
+
+        if(catalogo === 'servicios'){
+            item = servicios.find((servicio) => servicio.id.toString() === id.toString());
+            if (item) {
+                setValue(`items.${index}.concept`, item?.name);
+                setValue(`items.${index}.sat_unit_key`, item?.sat_unit_key);
+                setValue(`items.${index}.sat_key_prod_serv`, item?.sat_key_prod_serv?.trim());
+            }
+    
+            if(item?.prices?.length > 0){
+                setPrecios(item.prices);
+                setModalOpen(true);
+            }
+
         }
-
-        if(servicio?.prices?.length > 0){
-            setPrecios(servicio.prices);
-            console.log(servicio.prices);
-            setModalOpen(true);
+        
+        else if(catalogo === 'productos'){
+            item = productos.find((producto) => producto.id.toString() === id.toString());
+            if (item) {
+                setValue(`items.${index}.concept`, item?.name);
+                setValue(`items.${index}.sat_unit_key`, item?.sat_unit_key);
+                setValue(
+                    `items.${index}.sat_key_prod_serv`,
+                    item?.sat_key_prod_serv?.trim(),
+                );
+                setValue(`items.${index}.price`, item?.price);
+            }
         }
+        
+        console.log("Selected item details:", item);
+        setModalCatalogoOpen(false);
 
-        // setValue(`items.${index}.price`, servicio?.price);
     };
 
     const onSubmit = async (data) => {
@@ -449,34 +475,25 @@ export default function Personalizadas() {
                                             className="input"
                                             type="number"
                                         />
-                                        {/* <ErrorLabel>{errors?.['rows.0.quantity']}</ErrorLabel> */}
+                                        <ErrorLabel>
+                                            {get(
+                                                errors,
+                                                `rows.${index}.quantity`,
+                                            )}
+                                        </ErrorLabel>
                                     </div>
 
                                     <div>
-                                        {items[index]?.isListActive ? (
-                                            <SearchInput
-                                                lista={servicios}
-                                                error={errors.service_id}
-                                                onSelectItem={handleServiceSelect(
-                                                    index,
-                                                )}
-                                                placeholder="Elige un servicio (opcional)"
-                                                className="min-h-9 field-sizing-content"
-                                                {...register(
-                                                    `items.${index}.concept`,
-                                                )}
-                                            />
-                                        ) : (
-                                            <textarea
-                                                {...register(
-                                                    `items.${index}.concept`,
-                                                )}
-                                                placeholder="Concepto"
-                                                className="input scrollbar-none"
-                                                type="text"
-                                                rows={3}
-                                            />
-                                        )}
+                                        <textarea
+                                            {...register(
+                                                `items.${index}.concept`,
+                                            )}
+                                            placeholder="Concepto"
+                                            className="input scrollbar-none"
+                                            type="text"
+                                            rows={3}
+                                        />
+                                        
                                         <ErrorLabel>
                                             {get(
                                                 errors,
@@ -545,7 +562,7 @@ export default function Personalizadas() {
                                 </div>
 
                                 <div className="contenedor-botones">
-                                    <button
+                                    {/* <button
                                         className="link block"
                                         type="button"
                                         onClick={() => {
@@ -559,6 +576,32 @@ export default function Personalizadas() {
                                             ? "Ocultar"
                                             : "Ver"}{" "}
                                         lista de servicios
+                                    </button> */}
+
+                                    <button
+                                        className="btn btn-secondary"
+                                        type="button"
+                                        onClick={() => {
+                                            setSelectedItemIndex(index);
+                                            setModalCatalogoOpen(true)
+                                            setCatalogo('servicios');
+                                        }}
+                                    >
+                                        <TextAlignJustify />
+                                        Servicios
+                                    </button>
+
+                                    <button
+                                        className="btn btn-secondary"
+                                        type="button"
+                                        onClick={() => {
+                                            setSelectedItemIndex(index);
+                                            setModalCatalogoOpen(true);
+                                            setCatalogo('productos');
+                                        }}
+                                    >
+                                        <TextAlignJustify />
+                                        Productos
                                     </button>
                                 </div>
                             </div>
@@ -615,7 +658,7 @@ export default function Personalizadas() {
                     {
                         // Solo en caso de que se esté editando
                         cotizacion && (
-                            <div className="border-1 border-neutral-400 p-2 rounded my-4">
+                            <div className="border border-neutral-400 p-2 rounded my-4">
                                 <OtrosDatos
                                     formData={formData}
                                     setFormData={setFormData}
@@ -639,39 +682,39 @@ export default function Personalizadas() {
                         {
                             // Si hay cotización, es porque se está editando
                             // !cotizacion && (
-                                <>
-                                    <button
-                                        className="btn bg-green-700"
-                                        type="submit"
-                                        onClick={() => setCompleted(false)}
-                                    >
-                                        <CalendarClock />
-                                        Borrador
-                                    </button>
+                            <>
+                                <button
+                                    className="btn bg-green-700"
+                                    type="submit"
+                                    onClick={() => setCompleted(false)}
+                                >
+                                    <CalendarClock />
+                                    Borrador
+                                </button>
 
-                                    <button
-                                        className="btn btn-secondary"
-                                        type="submit"
-                                        onClick={() => {
-                                            setIsBudget(true);
-                                            setCompleted(true);
-                                        }}
-                                    >
-                                        <Printer />
-                                        Presupuesto
-                                    </button>
+                                <button
+                                    className="btn btn-secondary"
+                                    type="submit"
+                                    onClick={() => {
+                                        setIsBudget(true);
+                                        setCompleted(true);
+                                    }}
+                                >
+                                    <Printer />
+                                    Presupuesto
+                                </button>
 
-                                    {formData.invoice_id && (
-                                        <button
-                                            className="btn btn-danger"
-                                            type="button"
-                                            onClick={handleClickEliminar}
-                                        >
-                                            <Trash2 />
-                                            Eliminar
-                                        </button>
-                                    )}
-                                </>
+                                {formData.invoice_id && (
+                                    <button
+                                        className="btn btn-danger"
+                                        type="button"
+                                        onClick={handleClickEliminar}
+                                    >
+                                        <Trash2 />
+                                        Eliminar
+                                    </button>
+                                )}
+                            </>
                             // )
                         }
                     </div>
@@ -686,7 +729,7 @@ export default function Personalizadas() {
                         {precios.map((precio, index) => (
                             <tr key={index} className="">
                                 <td className="border dark:border-neutral-600 p-2">
-                                    $ {formatearDinero(precio.price)}
+                                    {formatearDinero(precio.price)}
                                 </td>
                                 <td className="border dark:border-neutral-600 p-2">
                                     {precio.vehicle_type.type}
@@ -697,7 +740,7 @@ export default function Personalizadas() {
                                         className="btn"
                                         onClick={() => {
                                             setValue(
-                                                `items.${items.findIndex((item) => item.isListActive)}.price`,
+                                                `items.${selectedItemIndex}.price`,
                                                 precio.price,
                                             );
                                             setModalOpen(false);
@@ -710,6 +753,21 @@ export default function Personalizadas() {
                         ))}
                     </tbody>
                 </table>
+            </Modal>
+
+            <Modal
+                isOpen={modalCatalogoOpen}
+                onClose={() => setModalCatalogoOpen(false)}
+            >
+                <h2 className="title-3">Catálogo de Productos</h2>     
+                                   
+                <SearchInput
+                    placeholder="Buscar producto"
+                    onSelectItem={handleServiceSelect(selectedItemIndex)}
+                    id="search-producto"
+                    lista={catalogo === 'servicios' ? servicios : productos}
+
+                />
             </Modal>
         </div>
     );

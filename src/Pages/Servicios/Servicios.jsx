@@ -70,7 +70,7 @@ export default function Servicios() {
 
     return (
         <>
-            <h2 className="title-2">Catálogo de servicios</h2>
+            <h2 className="title-2">Catálogo de servicios de flotillas</h2>
             
             <div className="contenedor-botones">
                 <button
