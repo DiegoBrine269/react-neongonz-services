@@ -25,9 +25,7 @@ import CopyField from "./CopyField";
 import useSWR, {mutate} from "swr";
 import SearchInput from "@/components/UI/SearchInput";
 
-import Lightbox from "yet-another-react-lightbox";
-import "yet-another-react-lightbox/styles.css";
-import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import PhotoViewer from "@/components/UI/PhotoViewer";
 
 import 'react-html5-camera-photo/build/css/index.css';
 import ButtonSubmit from "@/components/UI/Buttons/ButtonSubmit.jsx";
@@ -204,14 +202,6 @@ export default function Proyecto() {
             setLoading(false)
             tableRef.current.clearFilter();
             setFiltros([])
-            // setFormData({
-            //     centre_id: "",
-            //     service_id: "",
-            //     date: "",
-            //     images: [],  // <-- reset
-            // });
-            // setPreviews([])
-            formFiltrosRef.reset();
         }
     };
 
@@ -1390,17 +1380,14 @@ export default function Proyecto() {
                 </div>
             </Modal>
 
-            <Lightbox
-                open={lightboxOpen}
-                close={() => setLightboxOpen(false)}
-                index={lightboxIndex}
-                slides={vehiculo?.photos
-                    ?.map((photo) => ({
-                        src: imageUrls[photo.id],
-                    }))
-                    .filter((s) => s.src)}
-                plugins={[Zoom]}
-                controller={{ closeOnBackdropClick: true }}
+            <PhotoViewer
+                lightboxOpen={lightboxOpen}
+                setLightboxOpen={setLightboxOpen}
+                lightboxIndex={lightboxIndex}
+                slides={vehiculo?.photos?.map((photo) => ({
+                    src: imageUrls[photo.id],
+                    alt: `Foto ${photo.id}`,
+                }))}    
             />
 
             {user?.role === "admin" && vehiculos.length > 0 && (

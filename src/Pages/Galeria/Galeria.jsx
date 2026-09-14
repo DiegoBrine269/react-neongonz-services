@@ -2,8 +2,8 @@ import React, { useEffect } from 'react'
 import { useContext, useState, useRef } from 'react';
 import { AppContext } from '@/context/AppContext';
 import { Link } from 'react-router-dom';
-import Lightbox from 'yet-another-react-lightbox';
-import Zoom from 'yet-another-react-lightbox/plugins/zoom';
+import PhotoViewer from "@/components/UI/PhotoViewer";
+
 
 export default function Galeria() {
 
@@ -74,15 +74,13 @@ export default function Galeria() {
                 {hasMoreImages && <span>Cargando...</span>}
             </div>
 
-            <Lightbox
-                open={lightboxOpen}
-                close={() => setLightboxOpen(false)}
-                index={lightboxIndex}
+            <PhotoViewer
+                lightboxOpen={lightboxOpen}
+                setLightboxOpen={setLightboxOpen}
+                lightboxIndex={lightboxIndex}
                 slides={images.map(img => ({ src: img.url, alt: img.name }))}
-                plugins={[Zoom]}
-                on={{ view: handleLightboxView }}
-                controller={{ closeOnBackdropClick: true }}
             />
+            
         </>
     );
 }

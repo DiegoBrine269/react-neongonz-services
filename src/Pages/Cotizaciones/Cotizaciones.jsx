@@ -121,7 +121,6 @@ export default function Cotizaciones() {
             params.append(`filter[${i}][value]`, oc);
         });
 
-            //
         params.append(`filter[${Array.from(ocs).length}][field]`, 'status');
         params.append(`filter[${Array.from(ocs).length}][type]`, '=');
         params.append(`filter[${Array.from(ocs).length}][value]`, 'complemento');
@@ -427,6 +426,58 @@ export default function Cotizaciones() {
 
         try {
             setLoading(true);
+
+            //Confirmar que no haya otra cotización con el mismo número de OC
+            const res = await clienteAxios.get("/api/invoices", {
+                ...requestHeader,
+                params: {
+                    filter: [
+                        {
+                            field: "oc",
+                            type: "=",
+                            value: formData.oc,
+                        },
+                    ],
+                },
+            });
+            
+            let resultConfirmacion1 = true;
+
+            if (res.data.data.length > 0 && res.data.data[0].id !== cotizacion.id) {
+                resultConfirmacion1 = await Swal.fire({
+                    title: "OC duplicada",
+                    text: "Ya existe otra cotización con el mismo número de Orden de Compra. ¿Deseas continuar?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sí, continuar",
+                    cancelButtonText: "Cancelar",
+                    ...swalConfig(true),
+                });
+
+                if (!resultConfirmacion1.isConfirmed) {
+                    setLoading(false);
+                    return;
+                }
+            }
+
+            if (!resultConfirmacion1.isConfirmed) {
+
+                const result = await Swal.fire({
+                    title: "¿Estás segur@ de querer asignar la OC?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sí, asignar",
+                    cancelButtonText: "Cancelar",
+                    ...swalConfig(true),
+                });
+
+                if (!result.isConfirmed) {
+                    setLoading(false);
+                    return;
+                }
+            }
+
+
             await clienteAxios.put(`/api/invoices/${cotizacion.id}/update-status`, formData, requestHeader);
             setFormData({});
             setModal(false);

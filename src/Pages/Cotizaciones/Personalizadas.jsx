@@ -525,7 +525,7 @@ export default function Personalizadas() {
                                                 `items.${index}.sat_unit_key`,
                                             )}
                                         >
-                                            {/* <option value="" disabled>Unidad de medida</option> */}
+                                            <option value="" disabled>USelecciona una unidad de medida</option>
                                             {units.map((unit) => (
                                                 <option
                                                     key={unit.key}
