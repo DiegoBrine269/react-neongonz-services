@@ -60,7 +60,6 @@ export default function Cotizaciones() {
         }
     });
 
-    const [activeTab, setActiveTab] = useState('todas');
 
     
     const tabsMap = Object.fromEntries(tabs.map(t => [t.id, t.label]));
@@ -89,7 +88,7 @@ export default function Cotizaciones() {
         )
     });
 
-    const { fetchInbox } = useContext(CotizacionesContext);
+    const { fetchInbox, activeTab, setActiveTab } = useContext(CotizacionesContext);
     const { tableRef, token, setLoading, pendientes, fetchPendientes,  fetchPendientesEnvio, requestHeader, fetchCustomers, customers, responsables, fetchResponsables } = useContext(AppContext);
     const ajaxRequestFunc = useCachedAjax("invoices", token, tableRef);
 
@@ -161,6 +160,7 @@ export default function Cotizaciones() {
     const handleRowClick = useCallback((e, row) => {
         const data = row?.getData?.();
         setCotizacion(data);
+
         setFormData(prev => ({
             ...prev,
             validation_date: format(new Date(), "YYYY-MM-DD")
@@ -340,15 +340,15 @@ export default function Cotizaciones() {
                 
                 toast.success(res.data.message || "Cotizaciones enviadas correctamente");
                 recargarTabla();
-
             } catch (error) {
-                toast.error("Error al enviar las cotizaciones");
+                const mensaje = error.response?.data?.error || error.response?.data?.message || "Error al enviar las cotizaciones";
+                console.error(error);
+                toast.error(mensaje);
             } finally {
                 setLoading(false);
                 setSelectedRows([]);
             }
         }
-    
     }
 
     async function handleReenviarFacturas() {
@@ -767,7 +767,7 @@ export default function Cotizaciones() {
             </div>
 
             <Modal isOpen={modal} onClose={() => setModal(false)}>
-                <h2 className="title-3">{cotizacion?.invoice_number}</h2>
+                <h2 className="title-3">{cotizacion?.invoice_number} {cotizacion?.is_budget ? "(Presupuesto)" : ""}</h2>
                 <div className="flex flex-col gap-3 pl-2">
                     {activeTab === "oc" && (
                         <div className="text">
@@ -863,6 +863,11 @@ export default function Cotizaciones() {
                     </div>
 
                     <div className="text">
+                        <span className="label-modal">Responsable</span>{" "}
+                        <p>{cotizacion?.responsible?.name}</p>
+                    </div>
+
+                    <div className="text">
                         <span className="label-modal">Fecha de cotización</span>{" "}
                         <p>{format(cotizacion?.date, "DD/MM/YYYY")}</p>
                     </div>
@@ -941,7 +946,7 @@ export default function Cotizaciones() {
 
                     <div className="text">
                         <span className="label-modal">Estatus</span>{" "}
-                        <p>{tabsMap[cotizacion.status] || cotizacion.status }</p>
+                        <p>{tabsMap[cotizacion.status] || cotizacion.status}</p>
                     </div>
 
                     {cotizacion?.billing?.pdf_path && (

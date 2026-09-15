@@ -31,6 +31,9 @@ export default function CotizacionesProvider({ children }) {
 
     const [inbox, setInbox] = useState([]);
 
+    const [activeTab, setActiveTab] = useState("todas");
+
+
     const fetchCotizacion = async (id) => {
         try {
             setLoading(true);
@@ -67,6 +70,7 @@ export default function CotizacionesProvider({ children }) {
 
             cotizacion, fetchCotizacion, setCotizacion,
             inbox, 
+            activeTab, setActiveTab,
             fetchInbox
         }}>
             {children}

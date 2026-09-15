@@ -394,7 +394,7 @@ export default function Personalizadas() {
                             <ErrorLabel>{errors?.invoice_id}</ErrorLabel>
                         </div>
 
-                        <label className="label" htmlFor="centre_id">
+                        <label className="label" htmlFor="responsible_id">
                             Destinatario
                         </label>
                         <select
@@ -416,9 +416,8 @@ export default function Personalizadas() {
                                 .filter((responsable) =>
                                     centros
                                         .find((c) => c.id == formData.centre_id)
-                                        ?.responsibles?.some(
-                                            (r) => r.id === responsable.id,
-                                        ),
+                                        ?.responsibles?.some((r) => r.id === responsable.id) ||
+                                    responsable.id === formData.responsible_id,
                                 )
                                 .map((responsable) => (
                                     <option
@@ -493,7 +492,7 @@ export default function Personalizadas() {
                                             type="text"
                                             rows={3}
                                         />
-                                        
+
                                         <ErrorLabel>
                                             {get(
                                                 errors,
@@ -525,7 +524,9 @@ export default function Personalizadas() {
                                                 `items.${index}.sat_unit_key`,
                                             )}
                                         >
-                                            <option value="" disabled>USelecciona una unidad de medida</option>
+                                            <option value="" disabled>
+                                                Selecciona una unidad de medida
+                                            </option>
                                             {units.map((unit) => (
                                                 <option
                                                     key={unit.key}
@@ -583,8 +584,8 @@ export default function Personalizadas() {
                                         type="button"
                                         onClick={() => {
                                             setSelectedItemIndex(index);
-                                            setModalCatalogoOpen(true)
-                                            setCatalogo('servicios');
+                                            setModalCatalogoOpen(true);
+                                            setCatalogo("servicios");
                                         }}
                                     >
                                         <TextAlignJustify />
@@ -597,7 +598,7 @@ export default function Personalizadas() {
                                         onClick={() => {
                                             setSelectedItemIndex(index);
                                             setModalCatalogoOpen(true);
-                                            setCatalogo('productos');
+                                            setCatalogo("productos");
                                         }}
                                     >
                                         <TextAlignJustify />
@@ -759,14 +760,13 @@ export default function Personalizadas() {
                 isOpen={modalCatalogoOpen}
                 onClose={() => setModalCatalogoOpen(false)}
             >
-                <h2 className="title-3">Catálogo de Productos</h2>     
-                                   
+                <h2 className="title-3">Catálogo de Productos</h2>
+
                 <SearchInput
                     placeholder="Buscar producto"
                     onSelectItem={handleServiceSelect(selectedItemIndex)}
                     id="search-producto"
-                    lista={catalogo === 'servicios' ? servicios : productos}
-
+                    lista={catalogo === "servicios" ? servicios : productos}
                 />
             </Modal>
         </div>
