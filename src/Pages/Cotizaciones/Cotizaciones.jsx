@@ -427,46 +427,50 @@ export default function Cotizaciones() {
         try {
             setLoading(true);
 
-            //Confirmar que no haya otra cotización con el mismo número de OC
-            const res = await clienteAxios.get("/api/invoices", {
-                ...requestHeader,
-                params: {
-                    filter: [
-                        {
-                            field: "oc",
-                            type: "=",
-                            value: formData.oc,
-                        },
-                    ],
-                },
-            });
-            
             let resultConfirmacion1 = true;
 
-            if (res.data.data.length > 0 && res.data.data[0].id !== cotizacion.id) {
-                resultConfirmacion1 = await Swal.fire({
-                    title: "OC duplicada",
-                    text: "Ya existe otra cotización con el mismo número de Orden de Compra. ¿Deseas continuar?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonText: "Sí, continuar",
-                    cancelButtonText: "Cancelar",
-                    ...swalConfig(true),
-                });
 
-                if (!resultConfirmacion1.isConfirmed) {
-                    setLoading(false);
-                    return;
+            //Confirmar que no haya otra cotización con el mismo número de OC
+            if(activeTab === 'oc' && formData.oc){
+                const res = await clienteAxios.get("/api/invoices", {
+                    ...requestHeader,
+                    params: {
+                        filter: [
+                            {
+                                field: "oc",
+                                type: "=",
+                                value: formData.oc,
+                            },
+                        ],
+                    },
+                });
+                
+
+                if (res.data.data.length > 0 && res.data.data[0].id !== cotizacion.id) {
+                    resultConfirmacion1 = await Swal.fire({
+                        title: "OC duplicada",
+                        text: "Ya existe otra cotización con el mismo número de Orden de Compra. ¿Deseas continuar?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Sí, continuar",
+                        cancelButtonText: "Cancelar",
+                        ...swalConfig(true),
+                    });
+
+                    if (!resultConfirmacion1.isConfirmed) {
+                        setLoading(false);
+                        return;
+                    }
                 }
             }
 
             if (!resultConfirmacion1.isConfirmed) {
 
                 const result = await Swal.fire({
-                    title: "¿Estás segur@ de querer asignar la OC?",
+                    title: "¿Estás segur@ de querer actualizar la cotización?",
                     icon: "warning",
                     showCancelButton: true,
-                    confirmButtonText: "Sí, asignar",
+                    confirmButtonText: "Sí, actualizar",
                     cancelButtonText: "Cancelar",
                     ...swalConfig(true),
                 });

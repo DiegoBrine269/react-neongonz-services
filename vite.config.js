@@ -14,10 +14,10 @@ export default defineConfig({
     },
     server: {
         host: true,
-        // https: {
-        //     key: fs.readFileSync('./cert/key.pem'),
-        //     cert: fs.readFileSync('./cert/cert.pem')
-        // },
+        https: {
+            key: fs.readFileSync('./cert/key.pem'),
+            cert: fs.readFileSync('./cert/cert.pem')
+        },
         proxy: {
             "/api": {
                 target: "https://vpf0g2vq-8000.usw3.devtunnels.ms/",
@@ -29,17 +29,4 @@ export default defineConfig({
             },
         },
     },
-    // theme: {
-    //     extend: {
-    //         colors: {
-    //             dark: {
-    //                 background: "#1A1A1A",
-    //                 text: "#F0F0F0",
-    //                 accent1: "#004D61",
-    //                 accent2: "#822659",
-    //                 button: "#3E5641",
-    //             },
-    //         },
-    //     },
-    // },
 });

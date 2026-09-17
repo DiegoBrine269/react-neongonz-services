@@ -7,7 +7,8 @@ export default function PhotoViewer({ lightboxOpen, setLightboxOpen, lightboxInd
 
     async function shareAsImage({ slide }) {
         try {
-            const proxyUrl = `/api/photos/proxy?url=${encodeURIComponent(slide.src)}`;
+            
+            const proxyUrl = `${import.meta.env.VITE_API_URL}/api/photos/proxy?url=${encodeURIComponent(slide.src)}`;
             const response = await fetch(proxyUrl);
             const blob = await response.blob();
             const fileName = slide.src.split("/").pop() || "imagen.jpg";
