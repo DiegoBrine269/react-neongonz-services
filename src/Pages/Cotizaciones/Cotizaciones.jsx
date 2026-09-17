@@ -750,7 +750,7 @@ export default function Cotizaciones() {
                     ref={tableRef}
                     layout="fitColumns"
                     options={{
-                        selectable: true,
+                        // selectable: true,
                         selectablePersistence: true,
                         pagination: true, //enable pagination
                         paginationMode: "remote", //enable remote pagination
