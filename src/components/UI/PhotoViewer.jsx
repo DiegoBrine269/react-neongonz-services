@@ -7,7 +7,8 @@ export default function PhotoViewer({ lightboxOpen, setLightboxOpen, lightboxInd
 
     async function shareAsImage({ slide }) {
         try {
-            const response = await fetch(slide.src);
+            const proxyUrl = `/api/photos/proxy?url=${encodeURIComponent(slide.src)}`;
+            const response = await fetch(proxyUrl);
             const blob = await response.blob();
             const fileName = slide.src.split("/").pop() || "imagen.jpg";
             const file = new File([blob], fileName, {
@@ -15,16 +16,9 @@ export default function PhotoViewer({ lightboxOpen, setLightboxOpen, lightboxInd
             });
 
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: slide.title,
-                });
+                await navigator.share({ files: [file], title: slide.title });
             } else {
-                // Fallback: si el navegador no soporta compartir archivos
-                await navigator.share({
-                    url: slide.src,
-                    title: slide.title,
-                });
+                await navigator.share({ url: slide.src, title: slide.title });
             }
         } catch (err) {
             console.error("Error al compartir:", err);

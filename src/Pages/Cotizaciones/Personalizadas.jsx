@@ -228,7 +228,7 @@ export default function Personalizadas() {
             ...formData,
             rows: data.items,
             completed: completed,
-            is_budget: isBudget,
+            is_budget: formData.is_budget === "true" ? true : false,
         };
 
 
@@ -413,11 +413,18 @@ export default function Personalizadas() {
                                 Seleccione un destinatario
                             </option>
                             {responsables
-                                .filter((responsable) =>
-                                    centros
-                                        .find((c) => c.id == formData.centre_id)
-                                        ?.responsibles?.some((r) => r.id === responsable.id) ||
-                                    responsable.id === formData.responsible_id,
+                                .filter(
+                                    (responsable) =>
+                                        centros
+                                            .find(
+                                                (c) =>
+                                                    c.id == formData.centre_id,
+                                            )
+                                            ?.responsibles?.some(
+                                                (r) => r.id === responsable.id,
+                                            ) ||
+                                        responsable.id ===
+                                            formData.responsible_id,
                                 )
                                 .map((responsable) => (
                                     <option
@@ -456,7 +463,7 @@ export default function Personalizadas() {
                                 <div className="flex justify-between mb-1 center-items">
                                     <p className="text ">Fila {index + 1}</p>
                                     <button
-                                        className="btn btn-danger !w-auto !p-1 m-0"
+                                        className="btn btn-danger w-auto! p-1! m-0"
                                         type="button"
                                         onClick={() => remove(index)}
                                     >
@@ -473,6 +480,7 @@ export default function Personalizadas() {
                                             placeholder="Cantidad"
                                             className="input"
                                             type="number"
+                                            min="1"
                                         />
                                         <ErrorLabel>
                                             {get(
@@ -625,6 +633,14 @@ export default function Personalizadas() {
                             </button>
                         </div>
 
+                        <label htmlFor="is_budget" className="label">
+                            Crear como presupuesto
+                        </label>
+                        <select id="is_budget" value={formData.is_budget ?? "false"} className="input" onChange={(e) => setFormData({ ...formData, is_budget: e.target.value })}>
+                            <option value="false">No</option>
+                            <option value="true">Sí</option>
+                        </select>
+
                         <label htmlFor="internal_commentary" className="label">
                             Comentarios internos
                         </label>
@@ -693,7 +709,7 @@ export default function Personalizadas() {
                                     Borrador
                                 </button>
 
-                                <button
+                                {/* <button
                                     className="btn btn-secondary"
                                     type="submit"
                                     onClick={() => {
@@ -703,7 +719,7 @@ export default function Personalizadas() {
                                 >
                                     <Printer />
                                     Presupuesto
-                                </button>
+                                </button> */}
 
                                 {formData.invoice_id && (
                                     <button

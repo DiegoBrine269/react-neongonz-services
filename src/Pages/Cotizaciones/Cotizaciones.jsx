@@ -750,7 +750,7 @@ export default function Cotizaciones() {
                     ref={tableRef}
                     layout="fitColumns"
                     options={{
-                        // selectable: true,
+                        selectable: true,
                         selectablePersistence: true,
                         pagination: true, //enable pagination
                         paginationMode: "remote", //enable remote pagination
@@ -863,7 +863,7 @@ export default function Cotizaciones() {
                     </div>
 
                     <div className="text">
-                        <span className="label-modal">Responsable</span>{" "}
+                        <span className="label-modal">Destinatario</span>{" "}
                         <p>{cotizacion?.responsible?.name}</p>
                     </div>
 

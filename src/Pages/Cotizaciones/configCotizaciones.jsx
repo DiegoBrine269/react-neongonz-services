@@ -6,6 +6,7 @@ import { formasPago, metodosPago } from '@/helpers/sat.js';
 export function getColumnasCotizaciones({ renderAcciones }) {
 
     return [
+        
         {
             title: "Centro",
             field: "centre",
