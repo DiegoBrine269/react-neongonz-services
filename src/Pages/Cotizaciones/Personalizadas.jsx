@@ -164,6 +164,7 @@ export default function Personalizadas() {
                 oc: selectedCot.oc,
                 f_receipt: selectedCot.f_receipt,
                 validation_date: selectedCot.validation_date,
+                is_budget: selectedCot.is_budget,
             });
 
             removeAll();
