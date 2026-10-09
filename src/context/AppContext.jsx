@@ -132,6 +132,17 @@ export default function AppProvider({ children }) {
         }
     }
 
+    // async function fetchFacturas() {
+    //     try {
+    //         const res = await clienteAxios.get("/api/billings", requestHeader);
+
+    //         setFacturas(res.data);
+    //     } catch (error) {
+    //         setFacturas([]);
+    //         toast.error("Error al cargar las facturas");
+    //     }
+    // }
+
     async function fetchCentros() {
         try {
             const res = await clienteAxios.get("/api/centres", requestHeader);

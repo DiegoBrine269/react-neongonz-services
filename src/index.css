@@ -35,6 +35,10 @@ body {
         overflow-x: hidden;
         overflow-y: auto;
     }
+
+    form fieldset, .form-fieldset {
+        @apply border rounded-2xl p-4 border-slate-300 dark:border-neutral-700 mt-4 pt-4;
+    }
     
     label {
         @apply block text-sm leading-6 text-slate-900 first-letter:capitalize mt-2;

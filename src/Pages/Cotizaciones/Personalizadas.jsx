@@ -14,13 +14,17 @@ import 'animate.css';
 import { useForm, useFieldArray } from 'react-hook-form';
 import Swal from "sweetalert2";
 import { swalConfig } from "@/config/variables";
-import get from 'lodash.get';
 import { useParams } from "react-router-dom";
 import { CotizacionesContext } from "@/context/CotizacionesContext";
 import OtrosDatos from "./EditarComponents/OtrosDatos.jsx";
 import SearchInput from "@/components/UI/SearchInput";
 import Modal from "@/components/Modal";
 import { formatearDinero } from "@/utils/utils";
+
+import PartidasCotizacion from "@/components/PartidasCotizacion.jsx";
+
+import ModalPrecios from "@/components/ModalPrecios";
+import ModalCatalogo from "@/components/ModalCatalogo";
 
 export default function Personalizadas() {
 
@@ -48,7 +52,6 @@ export default function Personalizadas() {
 
     const [formData, setFormData] = useState({});
     const [completed, setCompleted] = useState(false);
-    const [isBudget, setIsBudget] = useState(false);
     const [errors, setErrors] = useState({});
     const [accion, setAccion] = useState(null); // create or update
     const [mostrarBotones, setMostrarBotones] = useState(true);
@@ -91,7 +94,6 @@ export default function Personalizadas() {
             comments: "",
             internal_commentary: "",
             date: format(new Date(), "YYYY-MM-DD"),
-
         });
         setErrors({});
     }, [accion]);    
@@ -183,10 +185,13 @@ export default function Personalizadas() {
         }
     }
 
+    const abrirCatalogo = (index, tipo) => {
+        setSelectedItemIndex(index);
+        setCatalogo(tipo);
+        setModalCatalogoOpen(true);
+    };
+
     const handleServiceSelect = (index) => (id, name) => {
-
-        
-
         let item;
 
         if(catalogo === 'servicios'){
@@ -219,7 +224,6 @@ export default function Personalizadas() {
         
         console.log("Selected item details:", item);
         setModalCatalogoOpen(false);
-
     };
 
     const onSubmit = async (data) => {
@@ -321,7 +325,7 @@ export default function Personalizadas() {
 
             {accion && (
                 <form action="" onSubmit={handleSubmit(onSubmit)}>
-                    <div className="border-1 border-neutral-400 p-2 rounded my-4">
+                    <div className="border border-neutral-400 p-2 rounded my-4">
                         <h3 className="title-3">Datos del documento</h3>
                         <div className={accion === "edit" ? "hidden" : ""}>
                             <label className="label" htmlFor="centre_id">
@@ -456,168 +460,16 @@ export default function Personalizadas() {
                         />
                         <ErrorLabel>{errors?.date}</ErrorLabel>
 
-                        {fields.map((field, index) => (
-                            <div
-                                key={field.id}
-                                className="my-3 relative border p-2 rounded-lg border-neutral-400"
-                            >
-                                <div className="flex justify-between mb-1 center-items">
-                                    <p className="text ">Fila {index + 1}</p>
-                                    <button
-                                        className="btn btn-danger w-auto! p-1! m-0"
-                                        type="button"
-                                        onClick={() => remove(index)}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
-                                </div>
+                        <PartidasCotizacion
+                            fields={fields ?? []}
+                            errors={errors}
+                            remove={remove}
+                            register={register}
+                            setValue={setValue}
+                            onOpenCatalogo={abrirCatalogo}
+                        />
 
-                                <div className="grid md:grid-cols-[1fr_4fr_2fr_1fr_2fr] gap-1 items-start">
-                                    <div>
-                                        <input
-                                            {...register(
-                                                `items.${index}.quantity`,
-                                            )}
-                                            placeholder="Cantidad"
-                                            className="input"
-                                            type="number"
-                                            min="1"
-                                        />
-                                        <ErrorLabel>
-                                            {get(
-                                                errors,
-                                                `rows.${index}.quantity`,
-                                            )}
-                                        </ErrorLabel>
-                                    </div>
-
-                                    <div>
-                                        <textarea
-                                            {...register(
-                                                `items.${index}.concept`,
-                                            )}
-                                            placeholder="Concepto"
-                                            className="input scrollbar-none"
-                                            type="text"
-                                            rows={3}
-                                        />
-
-                                        <ErrorLabel>
-                                            {get(
-                                                errors,
-                                                `rows.${index}.concept`,
-                                            )}
-                                        </ErrorLabel>
-                                    </div>
-
-                                    <div>
-                                        <input
-                                            {...register(
-                                                `items.${index}.price`,
-                                            )}
-                                            placeholder="Precio"
-                                            className="input"
-                                            type="number"
-                                            step="any"
-                                        />
-                                        <ErrorLabel>
-                                            {get(errors, `rows.${index}.price`)}
-                                        </ErrorLabel>
-                                    </div>
-
-                                    <div>
-                                        <select
-                                            id="sat_unit_key"
-                                            defaultValue=""
-                                            {...register(
-                                                `items.${index}.sat_unit_key`,
-                                            )}
-                                        >
-                                            <option value="" disabled>
-                                                Selecciona una unidad de medida
-                                            </option>
-                                            {units.map((unit) => (
-                                                <option
-                                                    key={unit.key}
-                                                    value={unit.key}
-                                                >
-                                                    {unit.name} ({unit.key})
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <ErrorLabel>
-                                            {get(
-                                                errors,
-                                                `rows.${index}.sat_unit_key`,
-                                            )}
-                                        </ErrorLabel>
-                                    </div>
-
-                                    <div>
-                                        <input
-                                            {...register(
-                                                `items.${index}.sat_key_prod_serv`,
-                                            )}
-                                            placeholder="Clave de producto o servicio"
-                                            className="input"
-                                            type="number"
-                                        />
-                                        <ErrorLabel>
-                                            {get(
-                                                errors,
-                                                `rows.${index}.sat_key_prod_serv`,
-                                            )}
-                                        </ErrorLabel>
-                                    </div>
-                                </div>
-
-                                <div className="contenedor-botones">
-                                    {/* <button
-                                        className="link block"
-                                        type="button"
-                                        onClick={() => {
-                                            setValue(
-                                                `items.${index}.isListActive`,
-                                                !items[index]?.isListActive,
-                                            );
-                                        }}
-                                    >
-                                        {items[index]?.isListActive
-                                            ? "Ocultar"
-                                            : "Ver"}{" "}
-                                        lista de servicios
-                                    </button> */}
-
-                                    <button
-                                        className="btn btn-secondary"
-                                        type="button"
-                                        onClick={() => {
-                                            setSelectedItemIndex(index);
-                                            setModalCatalogoOpen(true);
-                                            setCatalogo("servicios");
-                                        }}
-                                    >
-                                        <TextAlignJustify />
-                                        Servicios
-                                    </button>
-
-                                    <button
-                                        className="btn btn-secondary"
-                                        type="button"
-                                        onClick={() => {
-                                            setSelectedItemIndex(index);
-                                            setModalCatalogoOpen(true);
-                                            setCatalogo("productos");
-                                        }}
-                                    >
-                                        <TextAlignJustify />
-                                        Productos
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-
-                        <div className="flex justify-end mt-2">
+                        <div className="contenedor-botones">
                             <button
                                 className="w-auto btn"
                                 type="button"
@@ -637,7 +489,17 @@ export default function Personalizadas() {
                         <label htmlFor="is_budget" className="label">
                             Crear como presupuesto
                         </label>
-                        <select id="is_budget" value={formData.is_budget ?? "false"} className="input" onChange={(e) => setFormData({ ...formData, is_budget: e.target.value })}>
+                        <select
+                            id="is_budget"
+                            value={formData.is_budget ?? "false"}
+                            className="input"
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    is_budget: e.target.value,
+                                })
+                            }
+                        >
                             <option value="false">No</option>
                             <option value="true">Sí</option>
                         </select>
@@ -710,18 +572,6 @@ export default function Personalizadas() {
                                     Borrador
                                 </button>
 
-                                {/* <button
-                                    className="btn btn-secondary"
-                                    type="submit"
-                                    onClick={() => {
-                                        setIsBudget(true);
-                                        setCompleted(true);
-                                    }}
-                                >
-                                    <Printer />
-                                    Presupuesto
-                                </button> */}
-
                                 {formData.invoice_id && (
                                     <button
                                         className="btn btn-danger"
@@ -733,59 +583,28 @@ export default function Personalizadas() {
                                     </button>
                                 )}
                             </>
-                            // )
                         }
                     </div>
                 </form>
             )}
 
-            <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
-                <h2 className="title-3">Selecciona un precio</h2>
+            <ModalPrecios
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                precios={precios}
+                onSelect={(precio) => {
+                    setValue(`items.${selectedItemIndex}.price`, precio.price);
+                    setModalOpen(false);
+                }}
+            />
 
-                <table className="text border dark:border-neutral-600">
-                    <tbody>
-                        {precios.map((precio, index) => (
-                            <tr key={index} className="">
-                                <td className="border dark:border-neutral-600 p-2">
-                                    {formatearDinero(precio.price)}
-                                </td>
-                                <td className="border dark:border-neutral-600 p-2">
-                                    {precio.vehicle_type.type}
-                                </td>
-                                <td className="border dark:border-neutral-600 p-2">
-                                    <button
-                                        key={index}
-                                        className="btn"
-                                        onClick={() => {
-                                            setValue(
-                                                `items.${selectedItemIndex}.price`,
-                                                precio.price,
-                                            );
-                                            setModalOpen(false);
-                                        }}
-                                    >
-                                        Seleccionar
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </Modal>
-
-            <Modal
+            <ModalCatalogo
                 isOpen={modalCatalogoOpen}
                 onClose={() => setModalCatalogoOpen(false)}
-            >
-                <h2 className="title-3">Catálogo de Productos</h2>
-
-                <SearchInput
-                    placeholder="Buscar producto"
-                    onSelectItem={handleServiceSelect(selectedItemIndex)}
-                    id="search-producto"
-                    lista={catalogo === "servicios" ? servicios : productos}
-                />
-            </Modal>
+                tipo={catalogo}
+                items={catalogo === "servicios" ? servicios : productos}
+                onSelect={handleServiceSelect(selectedItemIndex)}
+            />
         </div>
     );
 }

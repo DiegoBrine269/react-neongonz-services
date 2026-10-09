@@ -39,6 +39,10 @@ import Estadisticas from "@/Pages/Cotizaciones/Estadisticas";
 import Enviar from "@/Pages/Cotizaciones/Enviar";
 import Editar from "@/Pages/Cotizaciones/Editar";
 
+import Facturas from "@/Pages/Facturas/Facturas";
+import {Nueva as NuevaFactura} from "@/Pages/Facturas/Nueva";
+
+
 import Desempeno from "@/Pages/Reportes/Desempeno"
 import ResetPassword from "@/Pages/Auth/ResetPassword";
 // import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
@@ -48,6 +52,7 @@ import Galeria from "@/Pages/Galeria/Galeria";
 import Gastos from "@/Pages/Gastos/Gastos";
 import { Nuevo as NuevoGasto } from "@/Pages/Gastos/Nuevo";
 import { Categorias as CategoriasGasto } from "@/Pages/Gastos/Categorias";
+
 
 export default function App() {
     const { user } = useContext(AppContext);
@@ -86,6 +91,10 @@ export default function App() {
                                         <Route path="/productos" element={<Productos />} />
                                         <Route path="/servicios" element={<Servicios />} />
                                         <Route path="/cotizaciones" element={<Cotizaciones />} />
+                                        <Route path="/facturas" element={<Facturas />} />
+                                        <Route path="/facturas/nueva" element={<NuevaFactura />} />
+
+
                                         <Route path="/gastos" element={<Gastos />} />
                                         <Route path="/gastos/nuevo" element={<NuevoGasto />} />
                                         <Route path="/gastos/categorias" element={<CategoriasGasto />} />

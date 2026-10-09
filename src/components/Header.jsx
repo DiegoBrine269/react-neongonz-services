@@ -19,7 +19,8 @@ import {
     Users,
     Images,
     BanknoteArrowDown,
-    Package
+    Package,
+    Landmark
 } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import { useContext } from "react";
@@ -60,6 +61,7 @@ export default function Header() {
                 {user && user.role === "admin" && <Item to="/productos" text="Productos" children={<Package size={15} />} />}
                 {user && <Item to="/proyectos" text="Proyectos" children={<BriefcaseBusiness size={15} />} />}
                 {user && user.role === "admin" && <Item to="/cotizaciones" text="Cotizaciones" children={<Receipt size={15} />} />}
+                {user && user.role === "admin" && <Item to="/facturas" text="Facturación" children={<Landmark size={15} />} />}
                 {/* {user && <Item to="/gastos" text="Gastos" children={<BanknoteArrowDown size={15} />} />} */}
                 {user && <Item to="/galeria" text="Galería" children={<Images size={15} />} />}
                 {user && <Item to="/mi-cuenta" text="Mi cuenta" children={<User size={15} />} />}

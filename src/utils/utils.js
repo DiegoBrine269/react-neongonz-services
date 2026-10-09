@@ -15,8 +15,19 @@ const tabs = [
     { id: 'finalizada', label: 'Finalizadas' },
 ];
 
+// utils/parseBlobError.js
+async function getResponseErrors(error) {
+    const data = error.response?.data;
 
-export{
-    formatearDinero,
-    tabs
+    if (data instanceof Blob) {
+        try {
+            return JSON.parse(await data.text());
+        } catch {
+            return null;
+        }
+    }
+    return data ?? null;
 }
+
+
+export { formatearDinero, tabs, getResponseErrors };
