@@ -85,7 +85,7 @@ export default function PartidasCotizacion({
                         <div>
                             <select
                                 id="sat_unit_key"
-                                defaultValue=""
+                                // value=""
                                 {...register(`items.${index}.sat_unit_key`)}
                             >
                                 <option value="" disabled>

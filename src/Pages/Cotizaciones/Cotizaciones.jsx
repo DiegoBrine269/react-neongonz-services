@@ -1068,7 +1068,6 @@ export default function Cotizaciones() {
                     </label>
                     <select
                         id="payment_form"
-                        defaultValue=""
                         value={formData.payment_form || ""}
                         onChange={(e) =>
                             setFormData({
@@ -1095,7 +1094,6 @@ export default function Cotizaciones() {
                     </label>
                     <select
                         id="payment_method"
-                        defaultValue=""
                         value={formData.payment_method || ""}
                         onChange={(e) =>
                             setFormData({
@@ -1191,7 +1189,6 @@ export default function Cotizaciones() {
                     </label>
                     <select
                         id="payment_form"
-                        defaultValue=""
                         value={formData.payment_form}
                         onChange={(e) =>
                             setFormData({
@@ -1230,7 +1227,6 @@ export default function Cotizaciones() {
                     </label>
                     <select
                         id="customer"
-                        defaultValue=""
                         // value={formData.payment_form || ''}
                         onChange={(e) =>
                             setFormData({

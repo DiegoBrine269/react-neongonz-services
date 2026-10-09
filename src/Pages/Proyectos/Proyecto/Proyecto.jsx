@@ -935,7 +935,6 @@ export default function Proyecto() {
                         id="fecha"
                         placeholder="fecha"
                         value={formDataEdit?.date}
-                        // defaultValue={formData.date || new Date().toISOString().split("T")[0]}
                         onChange={(e) =>
                             setFormDataEdit({
                                 ...formDataEdit,
